@@ -6,9 +6,7 @@ from enum import Enum
 
 
 class Anchor(Enum):
-    """
-    Anchor of the image to adjust the (x, y) coordinates.
-    """
+    """Anchor of the image to adjust the (x, y) coordinates"""
 
     MIN = 0.0
     CENTER = 0.5
@@ -52,7 +50,9 @@ def render_single(
     """
     x, y, w, h, x_a, y_a = calc_coords(i, j)
     x, y = adjust_xy(x, y, w, h, x_a, y_a)
-    piece = piece.resize((w, h), Image.LANCZOS) if img.size != (w, h) else piece
+    piece = (
+        piece.resize((w, h), Image.Resampling.LANCZOS) if img.size != (w, h) else piece
+    )
     img.paste(piece, (x, y), piece if piece.mode == "RGBA" else None)
     return img
 

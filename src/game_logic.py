@@ -1,18 +1,6 @@
-import random
-
 import numpy as np
 import numpy.typing as npt
-import threading
-
-
-_thread_local = threading.local()
-
-
-def get_random() -> random.Random:
-    global _thread_local
-    if not hasattr(_thread_local, "rng"):
-        _thread_local.rng = random.Random()
-    return _thread_local.rng
+from utils.game_utils import in_bounds
 
 
 def create_board(size: int = 15):
@@ -28,46 +16,13 @@ def is_board_full(board: npt.NDArray[np.int8]) -> bool:
 
 
 def make_move(board: npt.NDArray[np.int8], y: int, x: int, player: int):
-    if not (0 <= y < board.shape[0]):
-        raise ValueError("y value out of board range")
-    if not (0 <= x < board.shape[1]):
-        raise ValueError("x value out of board range")
+    if not in_bounds(board, x, y):
+        raise ValueError("x/y value out of board range")
     if player not in [1, 2]:
         raise ValueError("player must be either 1 or 2")
-    if not (position_is_empty(board, y, x)):
+    if not position_is_empty(board, y, x):
         raise RuntimeError("position already occupied")
     board[y, x] = player
-
-
-def _get_random_empty_position(
-    board: npt.NDArray[np.int8], rng: random.Random
-) -> tuple[int, int]:
-    """
-    Return a random (y, x) that is currently empty.
-    """
-
-    empties = np.argwhere(board == 0)  # shape: (k, 2) rows of empty [y, x] points
-    if len(empties) == 0:
-        raise RuntimeError("board is full")
-
-    y, x = rng.choice(empties)
-    return y, x
-
-
-def generate_next_move_random(
-    board: npt.NDArray[np.int8], player: int
-) -> tuple[int, int]:
-    """
-    Perform a random, but valid move for the given player.
-    Returns the (y, x) position where the move was performed.
-    """
-
-    if player not in [1, 2]:
-        raise RuntimeError("player must be either 1 or 2")
-
-    y, x = _get_random_empty_position(board, get_random())
-    make_move(board, y, x, player)
-    return y, x
 
 
 def _has_player_won_helper(board: npt.NDArray[np.int8], n: int, player: int):
