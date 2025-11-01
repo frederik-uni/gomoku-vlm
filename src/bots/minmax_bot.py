@@ -27,7 +27,7 @@ def find_best_move(
     board: np.ndarray,
     us: int,
     max_depth: int,
-    radius: int,
+    radius: int = 2,
     alpha: int = -(10**12),
     beta: int = 10**12,
 ) -> tuple[tuple[int, int] | None, int]:
