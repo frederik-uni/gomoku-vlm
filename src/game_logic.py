@@ -15,6 +15,10 @@ def is_board_full(board: npt.NDArray[np.int8]) -> bool:
     return not np.any(board == 0)
 
 
+def is_board_empty(board: npt.NDArray[np.int8]) -> bool:
+    return not np.any(board != 0)
+
+
 def make_move(board: npt.NDArray[np.int8], y: int, x: int, player: int):
     if not in_bounds(board, x, y):
         raise ValueError("x/y value out of board range")
