@@ -1,8 +1,13 @@
+import shutil
+
 import numpy as np
 from game_logic import create_board, generate_next_move_random, get_winner
 from PIL import Image, ImageDraw
-from renderer import render, calc_coords_gomoku
+from gen_dataset.renderer import render, calc_coords_gomoku
+from pathlib import Path
 
+IMG_TMP_PATH = Path(__file__).resolve().parent / "tmp" / "sim_game"
+IMG_TMP_PATH.mkdir(parents=True, exist_ok=True)
 
 def play_random_game(size: int = 15, n: int = 5) -> np.ndarray:
     """
@@ -109,7 +114,7 @@ def render_game_steps(game_states: np.ndarray):
         return calc_coords_gomoku(i, j, 40, (20, 20))
 
     for i, state in enumerate(game_states):
-        move_num = i + 1
+        move_num = i
         print(f"Rendering move {move_num}...")
 
         board_img = render(
@@ -120,11 +125,21 @@ def render_game_steps(game_states: np.ndarray):
             calc_coords=calc_coords_gomoku_wrapper,
         )
 
-        board_img.save(f"move_{move_num:03d}.png")
+        filename = f"move_{move_num:03d}.png"
+        board_img.save(IMG_TMP_PATH / filename)
 
         prev_state = state
 
 
-if __name__ == "__main__":
-    game_states = play_random_game()
+def _delete_img_out_dir():
+    if IMG_TMP_PATH.exists():
+        shutil.rmtree(IMG_TMP_PATH)
+    IMG_TMP_PATH.mkdir(parents=True, exist_ok=True)
+
+
+def sim_game_with_images(size: int = 15, n: int = 5) -> np.ndarray:
+    _delete_img_out_dir()
+    game_states = play_random_game(size, n)
     render_game_steps(game_states)
+
+    return game_states
