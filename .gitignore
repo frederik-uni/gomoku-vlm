@@ -211,3 +211,9 @@ __marimo__/
 game_data/
 move_*.png
 *.npy
+
+# dataset dir
+dataset/
+
+# gen_dataset/tmp dir
+gen_dataset/tmp/
