@@ -1,3 +1,5 @@
+import math
+from collections import defaultdict
 from dataclasses import asdict
 from typing import List
 
@@ -28,6 +30,7 @@ def _determine_num_of_required_episodes() -> int:
             max_required = max(max_required, n)
 
     return max_required
+
 
 def generate_question_dataset() -> List[DatasetRow]:
     """
@@ -65,6 +68,67 @@ def assemble_parquet_file(rows: List[DatasetRow]) -> None:
     print(f"Wrote {len(df)} rows to {out_path}")
 
 
+def _check_train_eval_split_config(train_r: float, eval_r: float, test_r: float) -> None:
+    # basic sanity: non-negative
+    if train_r < 0 or eval_r < 0 or test_r < 0:
+        raise ValueError(
+            f"Invalid split_ratios (must be >= 0): "
+            f"train={train_r}, eval={eval_r}, test={test_r}"
+        )
+
+    total_r = train_r + eval_r + test_r
+
+    # require sum ≈ 1.0, with float tolerance
+    if not math.isclose(total_r, 1.0, rel_tol=1e-9, abs_tol=1e-9):
+        raise ValueError(
+            f"Invalid split_ratios: train+eval+test={total_r} (expected 1.0). "
+            "Please fix sphinx_config.json."
+        )
+
+
+def assign_splits(rows: List[DatasetRow]) -> None:
+    """
+    In-place assignment of row.split based on split_ratios in sphinx_config.json.
+    """
+    ratios = SPHINX_CONFIG["general"].get("split_ratios", {})
+    train_r = float(ratios.get("train", 0.9))
+    eval_r  = float(ratios.get("eval", 0.05))
+    test_r  = float(ratios.get("test", 0.05))
+
+    _check_train_eval_split_config(train_r, eval_r, test_r)
+
+    # Group indices by q_id
+    by_qid: dict[str, list[int]] = defaultdict(list)
+    for idx, row in enumerate(rows):
+        by_qid[row.q_id].append(idx) # map q_id -> idx, where the element is found in the list
+
+    for q_id, idxs in by_qid.items():
+        num_samples_for_this_question = len(idxs)
+
+        # Compute counts for this question
+        n_train = int(round(num_samples_for_this_question * train_r))
+        n_eval = int(round(num_samples_for_this_question * eval_r))
+        n_test = num_samples_for_this_question - n_train - n_eval # rest goes to test
+        # Fail if any of the resulting splits is < 0 (probably sample size too small for that question)
+        if n_train < 0 or n_eval < 0 or n_test < 0:
+            raise ValueError(
+                f"Bad split for q_id={q_id}: "
+                f"num_samples_for_this_question={num_samples_for_this_question}, n_train={n_train}, n_eval={n_eval}, n_test={n_test}. "
+                "Check your \"num_samples\" for that questions and \"split_ratios\" in sphinx_config.json."
+            )
+
+        # Assign splits for this question
+        for local_idx, row_idx in enumerate(idxs):
+            row = rows[row_idx]
+            if local_idx < n_train:
+                row.split = "train"
+            elif local_idx < n_train + n_eval:
+                row.split = "eval"
+            else:
+                row.split = "test"
+
+
 if __name__ == "__main__":
     rows = generate_question_dataset()
+    assign_splits(rows)
     assemble_parquet_file(rows)

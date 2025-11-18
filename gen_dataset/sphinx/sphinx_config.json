@@ -3,7 +3,12 @@
     "output_dir": "dataset/sphinx/out/",
     "default_num_samples": 10,
     "default_min_turns": 1,
-    "default_max_turns": 50
+    "default_max_turns": 50,
+    "split_ratios": {
+      "train": 0.8,
+      "eval": 0.1,
+      "test": 0.1
+    }
   },
   "questions": {
     "perception": {
