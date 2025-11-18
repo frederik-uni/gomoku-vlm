@@ -9,12 +9,12 @@ class DatasetRow:
     """
     One row in our (eventually parquet) dataset.
     """
+    img_path: str   # for easier debugging
+    img_bytes: bytes # for training
+
     family: str  # "perception" | "strategy"
     q_id: str  # "Q1", "Q2", ...
     focus: str  # "count_black_stones", ...
-
-    img_path: str   # for easier debugging
-    img_bytes: bytes # for training
 
     answer: str  # canonical answer used for training
     valid_answers: Optional[List[str]] = None  # all acceptable answers (incl. canonical)

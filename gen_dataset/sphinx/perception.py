@@ -40,12 +40,16 @@ def _focus_count_black_stones(q_id: str, sim_id: int, simulated_game: np.ndarray
 
     # build DatasetRow (question and split is filled later)
     row = DatasetRow(
+        img_path=str(img_path.relative_to(PROJECT_ROOT)),
+        img_bytes=img_bytes,
+
         family=family.value,
         q_id=q_id,
         focus=focus,
+
         answer=answer_text,
-        img_path=str(img_path.relative_to(PROJECT_ROOT)),
-        img_bytes=img_bytes,
+        valid_answers=[answer_text],
+
         question=None,
         split=None
     )
