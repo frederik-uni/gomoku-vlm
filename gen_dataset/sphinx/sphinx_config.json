@@ -1,17 +1,18 @@
 {
   "general": {
     "output_dir": "dataset/sphinx/out/",
-    "default_question_amount_per_type": 100,
+    "default_num_samples": 10,
     "default_min_turns": 1,
     "default_max_turns": 50
   },
   "questions": {
     "perception": {
       "Q1": {
-        "focus": "count_black_pieces"
+        "focus": "count_black_stones",
+        "num_samples": 20
       },
       "Q2": {
-        "focus": "count_white_pieces"
+        "focus": "count_white_stones"
       }
     },
     "strategy": {

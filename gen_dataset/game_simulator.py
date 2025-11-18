@@ -125,7 +125,7 @@ def render_game_steps(game_states: np.ndarray):
             calc_coords=calc_coords_gomoku_wrapper,
         )
 
-        filename = f"move_{move_num:03d}.png"
+        filename = f"turn_{move_num:03d}.png"
         board_img.save(IMG_TMP_PATH / filename)
 
         prev_state = state

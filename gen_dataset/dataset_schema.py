@@ -11,15 +11,17 @@ class DatasetRow:
     - family:       "perception" or "strategy"
     - q_id:         "Q1", "Q2", "Q3", ...
     - focus:        e.g. "horizontal_line_detection", "best_move"
-    - question:     the natural language question
     - answer:       the expected model output
-    - image_path:   where the associated board image is stored
-    - split:        "train" | "eval" | "test" (filled later when creatin parquet file)
+    - img_path:     where the associated board image is stored
+    - img_bytes:    the byte representation of the image
+    - question:     the natural language question (filled later after helper function executed)
+    - split:        "train" | "eval" | "test" (filled later when creating parquet file)
     """
     family: str
     q_id: str
     focus: str
-    question: str
     answer: str
-    image_path: str
+    img_path: str
+    img_bytes: bytes
+    question: Optional[str] = None
     split: Optional[str] = None
