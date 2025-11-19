@@ -81,6 +81,19 @@ def random_turn_index(q_family: QuestionFamily, q_id: str, game_states: np.ndarr
     return random.randint(min_turns, max_turns) - 1
 
 
+def _get_sim_image_dir(sim_id: int) -> Path:
+    """
+    Return the directory where images for a single simulation are stored,
+    e.g.  dataset_NNN/images/sim_0000
+    """
+    if SPHINX_IMG_OUT_PATH is None:
+        raise RuntimeError("init_output_dirs() must be called first")
+
+    sim_dir = SPHINX_IMG_OUT_PATH / f"sim_{sim_id:04d}"
+    sim_dir.mkdir(parents=True, exist_ok=True)
+    return sim_dir
+
+
 def store_turn_image(turn_index: int, sim_id: int) -> tuple[Path, bytes]:
     """
     Copy the image for a given turn from /tmp to /out
@@ -98,8 +111,8 @@ def store_turn_image(turn_index: int, sim_id: int) -> tuple[Path, bytes]:
     tmp_filename = f"turn_{turn_index:03d}.png"
     tmp_path = game_simulator.IMG_TMP_PATH / tmp_filename
 
-    filename = f"sim_{sim_id:04d}_turn_{turn_index:03d}.png"
-    img_path = SPHINX_IMG_OUT_PATH / filename
+    filename = f"turn_{turn_index:03d}.png"
+    img_path = _get_sim_image_dir(sim_id) / filename
 
     shutil.copy2(tmp_path, img_path)
 
