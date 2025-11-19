@@ -1,8 +1,12 @@
 import numpy as np
 
 from gen_dataset.dataset_schema import DatasetRow
-from gen_dataset.sphinx.core import QuestionFamily, SPHINX_CONFIG, build_basic_dataset_row, select_turn_and_store_image, \
-    get_question_meta
+from gen_dataset.sphinx.core import (
+    QuestionFamily,
+    build_basic_dataset_row,
+    select_turn_and_store_image,
+    get_question_meta,
+)
 
 
 def _focus_count_black_stones(q_id: str, sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
@@ -24,7 +28,14 @@ def _focus_count_black_stones(q_id: str, sim_id: int, simulated_game: np.ndarray
     num_black = int(np.count_nonzero(board == 1))
     answer_text = str(num_black)
 
-    return build_basic_dataset_row(img_path, img_bytes, family, q_id, focus, answer_text)
+    return build_basic_dataset_row(
+        img_path=img_path,
+        img_bytes=img_bytes,
+        family=family,
+        q_id=q_id,
+        focus=focus,
+        answer=answer_text,
+    )
 
 
 def gen_question_q1_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
