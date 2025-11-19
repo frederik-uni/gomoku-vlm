@@ -62,21 +62,11 @@ def random_turn_index(q_family: QuestionFamily, q_id: str, game_states: np.ndarr
     num_turns = game_states.shape[0]
     max_turns = min(max_turns, num_turns)
 
-    # Possibly miss configured sphinx_config file, or edge case where the game ended much earlier than expected
+    # Possibly a miss configured sphinx_config file,
+    # edge case where the game ended earlier than expected,
+    # or a forced last_turn
     if min_turns > max_turns:
-        warnings.warn(
-            f"Possibly inconsistent config for {q_family.value} {q_id}: "
-            f"min_turns={min_turns}, max_turns={max_turns}, num_turns={num_turns}. "
-            "Falling back to sensible defaults.",
-            RuntimeWarning,
-        )
-        min_turns, max_turns = default_min_turns, min(default_max_turns, num_turns)
-        # sphinx_config file must have miss configured defaults
-        if min_turns > max_turns:
-            raise ValueError(
-                f"Inconsistent turn range for {q_family.value} {q_id}: "
-                f"min_turns={min_turns}, max_turns={max_turns}, num_turns={num_turns}"
-            )
+        min_turns, max_turns = num_turns, num_turns
 
     # Return zero based index
     return random.randint(min_turns, max_turns) - 1

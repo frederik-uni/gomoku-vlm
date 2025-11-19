@@ -3,15 +3,11 @@
     "output_dir": "out/sphinx/dataset",
     "default_num_samples": 20,
     "default_min_turns": 1,
-    "default_max_turns": 100,
+    "default_max_turns": 999,
     "split_ratios": {
       "train": 0.8,
       "eval": 0.1,
       "test": 0.1
-    },
-    "target_resolution": {
-      "width": 800,
-      "height": 800
     }
   },
   "questions": {
@@ -31,10 +27,26 @@
       "Q11": { "focus": "count_empty_intersections" },
       "Q12": { "focus": "count_empty_intersections" },
 
-      "Q13": { "focus": "color_at_position" },
-      "Q14": { "focus": "color_at_position" },
-      "Q15": { "focus": "color_at_position" },
-      "Q16": { "focus": "color_at_position" }
+      "Q13": {
+        "focus": "color_at_position",
+        "min_turns": 25,
+        "max_turns": 999
+      },
+      "Q14": {
+        "focus": "color_at_position",
+        "min_turns": 999,
+        "max_turns": 999
+      },
+      "Q15": {
+        "focus": "color_at_position",
+        "min_turns": 25,
+        "max_turns": 999
+      },
+      "Q16": {
+        "focus": "color_at_position",
+        "min_turns": 999,
+        "max_turns": 999
+      }
     },
     "strategy": {
       "Q1000": { "focus": "best_move" }

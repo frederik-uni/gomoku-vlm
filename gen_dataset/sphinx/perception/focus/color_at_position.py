@@ -97,11 +97,11 @@ def gen_question_q14_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetR
     dataset_row, row_idx, col_idx = _focus_color_at_position(q_id, sim_id, simulated_game)
 
     question_text = (
-        "This image shows a snapshot of a Gomoku board. "
-        "Player 1 uses black stones, player 2 uses white stones. "
-        f"Focus on the intersection at row {row_idx}, column {col_idx} (0-based coordinates). "
-        "Is that intersection occupied by a black stone, a white stone, or is it empty? "
-        "Respond with a single token: 'black', 'white', or 'empty'."
+        "You are looking at a Gomoku game position. "
+        "Black stones belong to player 1 and white stones belong to player 2. "
+        f"Consider the board intersection at row {row_idx}, column {col_idx} (0-based indexing). "
+        "Which piece is placed on that intersection? "
+        "Answer with exactly one word: 'black', 'white', or 'empty'."
     )
 
     dataset_row.question = question_text
@@ -117,11 +117,11 @@ def gen_question_q15_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetR
     dataset_row, row_idx, col_idx = _focus_color_at_position(q_id, sim_id, simulated_game)
 
     question_text = (
-        "Analyze the current Gomoku position. "
-        "Black stones represent player 1 and white stones represent player 2. "
-        f"Look specifically at the cell at row {row_idx}, column {col_idx} (0-based). "
-        "What is on that cell: a black stone, a white stone, or nothing? "
-        "Answer with exactly one word: 'black', 'white', or 'empty'."
+        "You are inspecting a partially played Gomoku game. "
+        "Some intersections are occupied by black or white stones, others are empty. "
+        f"Consider the intersection located at row {row_idx}, column {col_idx} (0-based indexing). "
+        "Which piece occupies this intersection: 'black', 'white', or 'empty'? "
+        "Reply with exactly one of these three words."
     )
 
     dataset_row.question = question_text
