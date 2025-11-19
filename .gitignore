@@ -208,3 +208,8 @@ __marimo__/
 
 # MacOs
 .DS_Store
+# Gomoku Game Data
+# game states and images
+game_data/
+move_*.png
+*.npy
