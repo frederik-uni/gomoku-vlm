@@ -1,6 +1,4 @@
 # gen_dataset/debug_sample.py
-import os
-import sys
 import io
 from pathlib import Path
 
