@@ -91,9 +91,9 @@ def assign_splits(rows: List[DatasetRow]) -> None:
     In-place assignment of row.split based on split_ratios in sphinx_config.json.
     """
     ratios = SPHINX_CONFIG["general"].get("split_ratios", {})
-    train_r = float(ratios.get("train", 0.9))
-    eval_r  = float(ratios.get("eval", 0.05))
-    test_r  = float(ratios.get("test", 0.05))
+    train_r = float(ratios.get("train", 0.8))
+    eval_r  = float(ratios.get("eval", 0.1))
+    test_r  = float(ratios.get("test", 0.1))
 
     _check_train_eval_split_config(train_r, eval_r, test_r)
 
@@ -130,5 +130,6 @@ def assign_splits(rows: List[DatasetRow]) -> None:
 
 if __name__ == "__main__":
     rows = generate_question_dataset()
+    # If you run Hydra, then here, before assigning the splits
     assign_splits(rows)
     assemble_parquet_file(rows)

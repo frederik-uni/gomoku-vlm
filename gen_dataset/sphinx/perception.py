@@ -3,7 +3,8 @@ from typing import List
 
 import numpy as np
 
-from .core import SPHINX_CONFIG, QuestionFamily, random_turn_index, SPHINX_IMG_OUT_PATH, PROJECT_ROOT
+from .core import SPHINX_CONFIG, QuestionFamily, random_turn_index, SPHINX_IMG_OUT_PATH, PROJECT_ROOT, store_turn_image, \
+    build_basic_dataset_row, select_turn_and_store_image
 from gen_dataset import game_simulator
 from gen_dataset.dataset_schema import DatasetRow
 
@@ -17,44 +18,20 @@ def _focus_count_black_stones(q_id: str, sim_id: int, simulated_game: np.ndarray
     q_id = q_id
     focus = SPHINX_CONFIG["questions"][family.value][q_id]["focus"]
 
-    # pick a random turn index (0-based) according to sphinx_config bounds
-    turn_index = random_turn_index(family, q_id, simulated_game)
-    board = simulated_game[turn_index]
-
-    # permanently copy the image from /tmp to /out
-    tmp_filename = f"turn_{turn_index:03d}.png"
-    tmp_path = game_simulator.IMG_TMP_PATH / tmp_filename
-
-    filename = f"sim_{sim_id:04d}_turn_{turn_index:03d}.png"
-    img_path = SPHINX_IMG_OUT_PATH / filename
-
-    shutil.copy2(tmp_path, img_path)
-
-    # read image bytes (PNG-encoded)
-    with open(img_path, "rb") as f:
-        img_bytes = f.read()
+    # choose turn, get board, store image
+    turn_index, board, img_path, img_bytes = select_turn_and_store_image(
+        family=family,
+        q_id=q_id,
+        sim_id=sim_id,
+        simulated_game=simulated_game,
+    )
 
     # count black stones (=1) as ground truth
     num_black = int(np.count_nonzero(board == 1))
     answer_text = str(num_black)
 
-    # build DatasetRow (question and split is filled later)
-    row = DatasetRow(
-        img_path=str(img_path.relative_to(PROJECT_ROOT)),
-        img_bytes=img_bytes,
+    return build_basic_dataset_row(img_path, img_bytes, family, q_id, focus, answer_text)
 
-        family=family.value,
-        q_id=q_id,
-        focus=focus,
-
-        answer=answer_text,
-        valid_answers=[answer_text],
-
-        question=None,
-        split=None
-    )
-
-    return row
 
 def gen_question_q1_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """

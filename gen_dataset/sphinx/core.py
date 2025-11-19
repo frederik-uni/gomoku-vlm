@@ -1,9 +1,13 @@
 import random
+import shutil
 import warnings
 from enum import Enum
 import numpy as np
 from pathlib import Path
 import json
+
+from gen_dataset import game_simulator
+from gen_dataset.dataset_schema import DatasetRow
 
 SPHINX_CONFIG_PATH = Path(__file__).with_name("sphinx_config.json")
 # core.py -> /sphinx -> /generate_dataset -> /PROJECT_ROOT
@@ -71,3 +75,90 @@ def random_turn_index(q_family: QuestionFamily, q_id: str, game_states: np.ndarr
 
     # Return zero based index
     return random.randint(min_turns, max_turns) - 1
+
+
+def store_turn_image(turn_index: int, sim_id: int) -> tuple[Path, bytes]:
+    """
+    Copy the image for a given turn from /tmp to /out
+    and return its new location and bytes.
+
+    Args:
+        turn_index (int): Zero-based turn index used to locate the image in the /tmp folder.
+        sim_id (int): Zero-based index of the simulated game (episode).
+
+    Returns:
+        tuple[Path, bytes]: A tuple containing:
+            - Path: The path of the copied image in the output directory.
+            - bytes: The PNG-encoded image bytes.
+    """
+    tmp_filename = f"turn_{turn_index:03d}.png"
+    tmp_path = game_simulator.IMG_TMP_PATH / tmp_filename
+
+    filename = f"sim_{sim_id:04d}_turn_{turn_index:03d}.png"
+    img_path = SPHINX_IMG_OUT_PATH / filename
+
+    shutil.copy2(tmp_path, img_path)
+
+    # read image bytes (PNG-encoded)
+    with open(img_path, "rb") as f:
+        img_bytes = f.read()
+
+    return img_path, img_bytes
+
+
+def build_basic_dataset_row(img_path: Path, img_bytes: bytes, family: QuestionFamily, q_id: str, focus: str, answer: str, valid_answers = None):
+    """
+    Helper function to build a basic DatasetRow,
+    where question and split is filled in later.
+    """
+    if valid_answers is None:
+        valid_answers = [answer]
+
+    row = DatasetRow(
+        img_path=str(img_path.relative_to(PROJECT_ROOT)),
+        img_bytes=img_bytes,
+
+        family=family.value,
+        q_id=q_id,
+        focus=focus,
+
+        answer=answer,
+        valid_answers=valid_answers,
+
+        question=None,
+        split=None
+    )
+    return row
+
+def select_turn_and_store_image(
+    family: QuestionFamily,
+    q_id: str,
+    sim_id: int,
+    simulated_game: np.ndarray,
+) -> tuple[int, np.ndarray, Path, bytes]:
+    """
+    Helper function to select a random turn for a given question, fetch the board for that turn,
+    and store the corresponding image permanently.
+
+    Args:
+        family (QuestionFamily): Question family (e.g. PERCEPTION or STRATEGY).
+        q_id (str): Question ID (e.g. "Q1", "Q10").
+        sim_id (int): Zero-based index of the simulated game (episode).
+        simulated_game (np.ndarray): 3D array of shape (num_turns, size, size)
+            containing the board state after each turn.
+
+    Returns:
+        tuple[int, np.ndarray, Path, bytes]: A tuple containing:
+            - int: The chosen turn index (0-based).
+            - np.ndarray: The board state at that turn.
+            - Path: The path of the copied image in the output directory.
+            - bytes: The PNG-encoded image bytes.
+    """
+    # pick a random turn index (0-based) according to sphinx_config bounds
+    turn_index = random_turn_index(family, q_id, simulated_game)
+    board = simulated_game[turn_index]
+
+    # permanently store the image for that turn from /tmp
+    img_path, img_bytes = store_turn_image(turn_index, sim_id)
+
+    return turn_index, board, img_path, img_bytes
