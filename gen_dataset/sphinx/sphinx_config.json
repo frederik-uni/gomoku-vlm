@@ -24,10 +24,15 @@
       "Q5": { "focus": "count_white_stones" },
       "Q6": { "focus": "count_white_stones" },
       "Q7": { "focus": "count_white_stones" },
-      "Q8": { "focus": "count_white_stones" }
+      "Q8": { "focus": "count_white_stones" },
+
+      "Q9":  { "focus": "count_empty_intersections" },
+      "Q10": { "focus": "count_empty_intersections" },
+      "Q11": { "focus": "count_empty_intersections" },
+      "Q12": { "focus": "count_empty_intersections" }
     },
     "strategy": {
-      "Q10": { "focus": "best_move" }
+      "Q1000": { "focus": "best_move" }
     }
   }
 }
