@@ -22,6 +22,7 @@ SPHINX_BASE_OUT = PROJECT_ROOT / SPHINX_CONFIG["general"].get("output_dir")
 
 # These will be filled later by the runner, calling core.init_output_dirs
 SPHINX_IMG_OUT_PATH: Path | None = None
+SPHINX_GAME_STATES_OUT_PATH: Path | None = None
 SPHINX_PARQUET_OUT_PATH: Path | None = None
 
 
@@ -94,6 +95,19 @@ def _get_sim_image_dir(sim_id: int) -> Path:
     return sim_dir
 
 
+def _get_sim_game_state_dir(sim_id: int) -> Path:
+    """
+    Return the directory where game states for a single simulation are stored,
+    e.g. dataset_NNN/game_states/sim_0000
+    """
+    if SPHINX_GAME_STATES_OUT_PATH is None:
+        raise RuntimeError("init_output_dirs() must be called first")
+
+    sim_dir = SPHINX_GAME_STATES_OUT_PATH / f"sim_{sim_id:04d}"
+    sim_dir.mkdir(parents=True, exist_ok=True)
+    return sim_dir
+
+
 def store_turn_image(turn_index: int, sim_id: int) -> tuple[Path, bytes]:
     """
     Copy the image for a given turn from /tmp to /out
@@ -121,6 +135,24 @@ def store_turn_image(turn_index: int, sim_id: int) -> tuple[Path, bytes]:
         img_bytes = f.read()
 
     return img_path, img_bytes
+
+
+def store_turn_game_state(turn_index: int, sim_id: int, board: np.ndarray) -> Path:
+    """
+    Store the numpy board for a given turn into the debug folder and
+    return the path to the .npy file.
+
+    File layout:
+      dataset_NNN/game_states/sim_0000/turn_007.npy
+    """
+    sim_dir = _get_sim_game_state_dir(sim_id)
+    filename = f"turn_{turn_index:03d}.npy"
+    out_path = sim_dir / filename
+
+    # Save as .npy for easy debugging with np.load
+    np.savetxt(out_path, board, fmt="%d", delimiter=" ")
+
+    return out_path
 
 
 def build_basic_dataset_row(img_path: Path, img_bytes: bytes, family: QuestionFamily, q_id: str, focus: str, answer: str, valid_answers = None):
@@ -178,6 +210,9 @@ def select_turn_and_store_image(
     # permanently store the image for that turn from /tmp
     img_path, img_bytes = store_turn_image(turn_index, sim_id)
 
+    # store the board state for debugging
+    store_turn_game_state(turn_index, sim_id, board)
+
     return turn_index, board, img_path, img_bytes
 
 
@@ -186,7 +221,7 @@ def init_output_dirs() -> None:
     Create dataset_<NNN>/images and dataset_<NNN>/parquet under SPHINX_BASE_OUT
     and write the paths into SPHINX_IMG_OUT_PATH, SPHINX_PARQUET_OUT_PATH.
     """
-    global SPHINX_IMG_OUT_PATH, SPHINX_PARQUET_OUT_PATH
+    global SPHINX_IMG_OUT_PATH, SPHINX_PARQUET_OUT_PATH, SPHINX_GAME_STATES_OUT_PATH
 
     SPHINX_BASE_OUT.mkdir(parents=True, exist_ok=True)
 
@@ -200,12 +235,15 @@ def init_output_dirs() -> None:
 
     dataset_root = SPHINX_BASE_OUT / f"dataset_{next_idx:03d}"
     img_dir = dataset_root / "images"
+    game_states_dir = dataset_root / "game_states"
     parquet_dir = dataset_root / "parquet"
 
     img_dir.mkdir(parents=True, exist_ok=True)
+    game_states_dir.mkdir(parents=True, exist_ok=True)
     parquet_dir.mkdir(parents=True, exist_ok=True)
 
     SPHINX_IMG_OUT_PATH = img_dir
+    SPHINX_GAME_STATES_OUT_PATH = game_states_dir
     SPHINX_PARQUET_OUT_PATH = parquet_dir
 
     print(f"Created dataset dir: {dataset_root}")

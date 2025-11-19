@@ -3,7 +3,7 @@
     "output_dir": "out/sphinx/dataset",
     "default_num_samples": 20,
     "default_min_turns": 1,
-    "default_max_turns": 50,
+    "default_max_turns": 100,
     "split_ratios": {
       "train": 0.8,
       "eval": 0.1,
@@ -29,7 +29,12 @@
       "Q9":  { "focus": "count_empty_intersections" },
       "Q10": { "focus": "count_empty_intersections" },
       "Q11": { "focus": "count_empty_intersections" },
-      "Q12": { "focus": "count_empty_intersections" }
+      "Q12": { "focus": "count_empty_intersections" },
+
+      "Q13": { "focus": "color_at_position" },
+      "Q14": { "focus": "color_at_position" },
+      "Q15": { "focus": "color_at_position" },
+      "Q16": { "focus": "color_at_position" }
     },
     "strategy": {
       "Q1000": { "focus": "best_move" }

@@ -133,9 +133,6 @@ def assign_splits(rows: List[DatasetRow]) -> None:
 
 if __name__ == "__main__":
     sphinx.core.init_output_dirs() # sets SPHINX_IMG_OUT_PATH / SPHINX_PARQUET_OUT_PATH
-
     rows = generate_question_dataset()
-    # If you run Hydra, then here, before assigning the splits
-
     assign_splits(rows)
     assemble_parquet_file(rows)

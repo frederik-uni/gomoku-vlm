@@ -6,7 +6,8 @@ from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.perception.focus import (
     count_black_stones,
     count_white_stones,
-    count_empty_intersections
+    count_empty_intersections,
+    color_at_position
 )
 
 
@@ -33,5 +34,11 @@ def generate_perception_questions_for_episode(sim_id: int, simulated_game: np.nd
     rows.append(count_empty_intersections.gen_question_q10_sample(sim_id, simulated_game))
     rows.append(count_empty_intersections.gen_question_q11_sample(sim_id, simulated_game))
     rows.append(count_empty_intersections.gen_question_q12_sample(sim_id, simulated_game))
+
+    # focus: color_at_position
+    rows.append(color_at_position.gen_question_q13_sample(sim_id, simulated_game))
+    rows.append(color_at_position.gen_question_q14_sample(sim_id, simulated_game))
+    rows.append(color_at_position.gen_question_q15_sample(sim_id, simulated_game))
+    rows.append(color_at_position.gen_question_q16_sample(sim_id, simulated_game))
 
     return rows
