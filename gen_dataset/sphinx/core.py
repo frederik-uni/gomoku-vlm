@@ -29,6 +29,17 @@ class QuestionFamily(str, Enum):
     PERCEPTION = "perception"
     STRATEGY = "strategy"
 
+
+def get_question_meta(family: QuestionFamily, q_id: str) -> tuple:
+    """
+    Return the question metadata
+    """
+    family = family # a bit redundant, may change later
+    focus = SPHINX_CONFIG["questions"][family.value][q_id]["focus"]
+
+    return family, focus
+
+
 def random_turn_index(q_family: QuestionFamily, q_id: str, game_states: np.ndarray) -> int:
     """
     returns a random turn number to sample from the simulated game.

@@ -1,7 +1,8 @@
 import numpy as np
 
 from gen_dataset.dataset_schema import DatasetRow
-from gen_dataset.sphinx.core import QuestionFamily, SPHINX_CONFIG, build_basic_dataset_row, select_turn_and_store_image
+from gen_dataset.sphinx.core import QuestionFamily, SPHINX_CONFIG, build_basic_dataset_row, select_turn_and_store_image, \
+    get_question_meta
 
 
 def _focus_count_black_stones(q_id: str, sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
@@ -9,8 +10,7 @@ def _focus_count_black_stones(q_id: str, sim_id: int, simulated_game: np.ndarray
     Helper function for any question that has the
     focus: "count_black_stones"
     """
-    family = QuestionFamily.PERCEPTION
-    focus = SPHINX_CONFIG["questions"][family.value][q_id]["focus"]
+    family, focus = get_question_meta(QuestionFamily.PERCEPTION, q_id)
 
     # choose turn, get board, store image
     turn_index, board, img_path, img_bytes = select_turn_and_store_image(
@@ -35,8 +35,8 @@ def gen_question_q1_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRo
     q_id = "Q1"
     question_text = "How many black stones (player 1) are on the board?"
 
-    row = _focus_count_black_stones(q_id, sim_id, simulated_game)
-    row.question = question_text
+    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    dataset_row.question = question_text
 
-    return row
+    return dataset_row
 
