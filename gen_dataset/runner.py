@@ -10,6 +10,7 @@ from gen_dataset.sphinx.core import SPHINX_CONFIG
 from gen_dataset import sphinx, game_simulator
 from gen_dataset.sphinx import core as sphinx_core
 from gen_dataset.sphinx.perception.per_simulation import generate_perception_questions_for_episode
+from gen_dataset.sphinx.strategy.per_simulation import generate_strategy_questions_for_episode
 
 
 def _determine_num_of_required_episodes() -> int:
@@ -42,12 +43,13 @@ def generate_question_dataset() -> List[DatasetRow]:
     num_required_episodes = _determine_num_of_required_episodes()
     rows: List[DatasetRow] = []
     for sim_id in range(num_required_episodes):
+        print(f"Simulating {sim_id} / {num_required_episodes}")
         simulated_game = game_simulator.sim_game_with_images()
 
         perception_rows: List[DatasetRow] = generate_perception_questions_for_episode(sim_id, simulated_game)
         rows.extend(perception_rows)
 
-        strategy_rows: List[DatasetRow] = sphinx.strategy.generate_strategy_questions_for_episode(sim_id, simulated_game)
+        strategy_rows: List[DatasetRow] = generate_strategy_questions_for_episode(sim_id, simulated_game)
         rows.extend(strategy_rows)
 
     return rows
@@ -130,7 +132,10 @@ def assign_splits(rows: List[DatasetRow]) -> None:
 
 
 if __name__ == "__main__":
+    sphinx.core.init_output_dirs() # sets SPHINX_IMG_OUT_PATH / SPHINX_PARQUET_OUT_PATH
+
     rows = generate_question_dataset()
     # If you run Hydra, then here, before assigning the splits
+
     assign_splits(rows)
     assemble_parquet_file(rows)

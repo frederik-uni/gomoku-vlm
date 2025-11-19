@@ -17,20 +17,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 with open(SPHINX_CONFIG_PATH, "r", encoding="utf-8") as config_file:
     SPHINX_CONFIG = json.load(config_file)
 
-# root dir for permanent files generated via sphinx
-SPHINX_OUT_PATH = PROJECT_ROOT / SPHINX_CONFIG["general"].get("output_dir")
-SPHINX_OUT_PATH.mkdir(parents=True, exist_ok=True)
+# base dir from config, e.g. "dataset/sphinx/out/"
+SPHINX_BASE_OUT = PROJECT_ROOT / SPHINX_CONFIG["general"].get("output_dir")
 
-# dir for permanent images that are needed for training
-SPHINX_IMG_OUT_PATH = SPHINX_OUT_PATH / "images"
-SPHINX_IMG_OUT_PATH.mkdir(parents=True, exist_ok=True)
+# These will be filled later by the runner, calling core.init_output_dirs
+SPHINX_IMG_OUT_PATH: Path | None = None
+SPHINX_PARQUET_OUT_PATH: Path | None = None
 
-# dir for parquet files
-SPHINX_PARQUET_OUT_PATH = SPHINX_OUT_PATH / "parquet"
-SPHINX_PARQUET_OUT_PATH.mkdir(parents=True, exist_ok=True)
-
-def get_output_path_for(q_id: str) -> Path:
-    return SPHINX_OUT_PATH / f"{q_id}.parquet"
 
 class QuestionFamily(str, Enum):
     PERCEPTION = "perception"
@@ -162,3 +155,33 @@ def select_turn_and_store_image(
     img_path, img_bytes = store_turn_image(turn_index, sim_id)
 
     return turn_index, board, img_path, img_bytes
+
+
+def init_output_dirs() -> None:
+    """
+    Create dataset_<NNN>/images and dataset_<NNN>/parquet under SPHINX_BASE_OUT
+    and write the paths into SPHINX_IMG_OUT_PATH, SPHINX_PARQUET_OUT_PATH.
+    """
+    global SPHINX_IMG_OUT_PATH, SPHINX_PARQUET_OUT_PATH
+
+    SPHINX_BASE_OUT.mkdir(parents=True, exist_ok=True)
+
+    # find first free index of existing dataset_XXX dirs
+    next_idx = 0
+    while True:
+        dataset_root = SPHINX_BASE_OUT / f"dataset_{next_idx:03d}"
+        if not dataset_root.exists():
+            break
+        next_idx += 1
+
+    dataset_root = SPHINX_BASE_OUT / f"dataset_{next_idx:03d}"
+    img_dir = dataset_root / "images"
+    parquet_dir = dataset_root / "parquet"
+
+    img_dir.mkdir(parents=True, exist_ok=True)
+    parquet_dir.mkdir(parents=True, exist_ok=True)
+
+    SPHINX_IMG_OUT_PATH = img_dir
+    SPHINX_PARQUET_OUT_PATH = parquet_dir
+
+    print(f"Created dataset dir: {dataset_root}")

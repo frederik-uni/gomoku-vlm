@@ -1,6 +1,6 @@
 {
   "general": {
-    "output_dir": "dataset/sphinx/out/",
+    "output_dir": "out/sphinx/dataset",
     "default_num_samples": 10,
     "default_min_turns": 1,
     "default_max_turns": 50,

@@ -20,7 +20,7 @@ def play_random_game(size: int = 15, n: int = 5) -> np.ndarray:
 
     while True:
         y, x = generate_next_move_random(board, current_player)
-        print(f"Player {current_player} placed at (y={y}, x={x})")
+        # print(f"Player {current_player} placed at (y={y}, x={x})")
 
         game_states.append(board.copy())
 
@@ -115,7 +115,7 @@ def render_game_steps(game_states: np.ndarray):
 
     for i, state in enumerate(game_states):
         move_num = i
-        print(f"Rendering move {move_num}...")
+        # print(f"Rendering move {move_num}...")
 
         board_img = render(
             board_img,

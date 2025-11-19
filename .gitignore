@@ -212,8 +212,8 @@ game_data/
 move_*.png
 *.npy
 
-# dataset dir
-dataset/
-
-# gen_dataset/tmp dir
+# tmp dir during the dataset generation proccess
 gen_dataset/tmp/
+
+# generated datasets
+out/sphinx/dataset/
