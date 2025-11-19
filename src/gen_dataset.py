@@ -1,8 +1,9 @@
 import numpy as np
-from .game_logic import create_board, get_winner
 from PIL import Image, ImageDraw
-from .renderer import render, calc_coords_gomoku
+
 from .bots.random_bot import generate_next_move_random
+from .game_logic import create_board, get_winner, make_move
+from .renderer import calc_coords_gomoku, render
 
 
 def play_random_game(size: int = 15, n: int = 5) -> np.ndarray:
@@ -15,7 +16,8 @@ def play_random_game(size: int = 15, n: int = 5) -> np.ndarray:
     current_player = 1
 
     while True:
-        y, x = generate_next_move_random(board, current_player)
+        y, x = generate_next_move_random(board)
+        make_move(board, y, x, current_player)
         print(f"Player {current_player} placed at (y={y}, x={x})")
 
         game_states.append(board.copy())
@@ -34,11 +36,16 @@ def play_random_game(size: int = 15, n: int = 5) -> np.ndarray:
 
 
 def create_gomoku_board(
-    size: int = 15, cell_size: int = 40, margin: int = 20, line_width: int = 2
+    size: int = 15,
+    cell_size: int = 40,
+    margin: int = 20,
+    line_width: int = 2,
+    color=(238, 178, 73),
+    line_color=(0, 0, 0),
 ):
     size = size - 1
     board_px = size * cell_size + 2 * margin
-    img = Image.new("RGB", (board_px, board_px), color=(238, 178, 73))
+    img = Image.new("RGB", (board_px, board_px), color=color)
     draw = ImageDraw.Draw(img)
 
     for i in range(size + 1):
@@ -46,12 +53,12 @@ def create_gomoku_board(
         draw.line(
             (margin, offset, board_px - margin, offset),
             width=line_width,
-            fill=(0, 0, 0),
+            fill=line_color,
         )
         draw.line(
             (offset, margin, offset, board_px - margin),
             width=line_width,
-            fill=(0, 0, 0),
+            fill=line_color,
         )
 
     if size == 15:
@@ -67,26 +74,31 @@ def create_gomoku_board(
                     cx + star_radius,
                     cy + star_radius,
                 ),
-                fill=(0, 0, 0),
+                fill=line_color,
             )
 
     return img
 
 
-def create_gomoku_stone(color: str = "black", size: int = 40) -> Image.Image:
+def create_gomoku_stone(
+    color: str = "black",
+    size: int = 40,
+    outline="black",
+    shadow_color=(255, 255, 255, 100),
+) -> Image.Image:
     scale = 4
     large_size = size * scale
 
     img = Image.new("RGBA", (large_size, large_size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
-    draw.ellipse((0, 0, large_size - 1, large_size - 1), fill=color, outline="black")
+    draw.ellipse((0, 0, large_size - 1, large_size - 1), fill=color, outline=outline)
 
     highlight = Image.new("RGBA", (large_size, large_size), (0, 0, 0, 0))
     hdraw = ImageDraw.Draw(highlight)
     hdraw.ellipse(
         (large_size * 0.1, large_size * 0.1, large_size * 0.6, large_size * 0.6),
-        fill=(255, 255, 255, 100),
+        fill=shadow_color,
     )
     img = Image.alpha_composite(img, highlight)
 

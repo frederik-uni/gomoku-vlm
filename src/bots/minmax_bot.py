@@ -1,7 +1,3 @@
-import numpy as np
-from ..utils.bot_utils import PATTERN_WEIGHTS, board_key
-from ..game_logic import has_player_won
-from ..utils.bot_utils import generate_moves
 import sys
 
 
@@ -58,7 +54,6 @@ def minimax_alpha_beta(
         child_score, _ = minimax_alpha_beta(
             board,
             depth - 1,
-            radius,
             alpha,
             beta,
             not maximizing,
@@ -89,6 +84,9 @@ def find_best_move(
     alpha: int = -(10**12),
     beta: int = 10**12,
 ) -> tuple[tuple[int, int] | None, int]:
+    if sys.maxsize <= 2**32:
+        raise RuntimeError("This implementation is not supported on 32-bit systems")
+
     them = (us % 2) + 1
     best_overall_move = None
     best_overall_score = 0
@@ -106,3 +104,9 @@ def find_best_move(
         if abs(score) >= PATTERN_WEIGHTS[5]:
             break
     return best_overall_move, best_overall_score
+
+
+def generate_next_move_minimax(board: npt.NDArray[np.int8]) -> tuple[int, int]:
+    player = 1 if (board != 0).sum() % 2 == 0 else 2
+
+    return find_best_move(board, player, 3)[0] or (0, 0)

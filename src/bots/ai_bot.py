@@ -31,7 +31,10 @@ def generate_next_move_greedy(board: npt.NDArray[np.int8]) -> tuple[int, int]:
     global bot1
     if bot1 is None:
         bot1 = GreedyPolicyPlayer(policy)
-    x, y = bot1.get_move(convert_board(board))
+    res = bot1.get_move(convert_board(board))
+    if res is None:
+        raise RuntimeError("board is full")
+    x, y = res
     return (y, x)
 
 
@@ -39,7 +42,10 @@ def generate_next_move_probabilistic(board: npt.NDArray[np.int8]) -> tuple[int, 
     global bot2
     if bot2 is None:
         bot2 = ProbabilisticPolicyPlayer(policy, temperature=0.1)
-    x, y = bot2.get_move(convert_board(board))
+    res = bot2.get_move(convert_board(board))
+    if res is None:
+        raise RuntimeError("board is full")
+    x, y = res
     return (y, x)
 
 
