@@ -1,7 +1,8 @@
 import numpy as np
-from game_logic import create_board, generate_next_move_random, get_winner
+from .game_logic import create_board, get_winner
 from PIL import Image, ImageDraw
-from renderer import render, calc_coords_gomoku
+from .renderer import render, calc_coords_gomoku
+from .bots.random_bot import generate_next_move_random
 
 
 def play_random_game(size: int = 15, n: int = 5) -> np.ndarray:
@@ -89,7 +90,7 @@ def create_gomoku_stone(color: str = "black", size: int = 40) -> Image.Image:
     )
     img = Image.alpha_composite(img, highlight)
 
-    img = img.resize((size, size), Image.LANCZOS)
+    img = img.resize((size, size), Image.Resampling.LANCZOS)
     return img
 
 
