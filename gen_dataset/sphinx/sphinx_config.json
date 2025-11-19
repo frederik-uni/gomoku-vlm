@@ -1,0 +1,55 @@
+{
+  "general": {
+    "output_dir": "out/sphinx/dataset",
+    "default_num_samples": 20,
+    "default_min_turns": 1,
+    "default_max_turns": 999,
+    "split_ratios": {
+      "train": 0.8,
+      "eval": 0.1,
+      "test": 0.1
+    }
+  },
+  "questions": {
+    "perception": {
+      "Q1": { "focus": "count_black_stones" },
+      "Q2": { "focus": "count_black_stones" },
+      "Q3": { "focus": "count_black_stones" },
+      "Q4": { "focus": "count_black_stones" },
+
+      "Q5": { "focus": "count_white_stones" },
+      "Q6": { "focus": "count_white_stones" },
+      "Q7": { "focus": "count_white_stones" },
+      "Q8": { "focus": "count_white_stones" },
+
+      "Q9":  { "focus": "count_empty_intersections" },
+      "Q10": { "focus": "count_empty_intersections" },
+      "Q11": { "focus": "count_empty_intersections" },
+      "Q12": { "focus": "count_empty_intersections" },
+
+      "Q13": {
+        "focus": "color_at_position",
+        "min_turns": 25,
+        "max_turns": 999
+      },
+      "Q14": {
+        "focus": "color_at_position",
+        "min_turns": 999,
+        "max_turns": 999
+      },
+      "Q15": {
+        "focus": "color_at_position",
+        "min_turns": 25,
+        "max_turns": 999
+      },
+      "Q16": {
+        "focus": "color_at_position",
+        "min_turns": 999,
+        "max_turns": 999
+      }
+    },
+    "strategy": {
+      "Q1000": { "focus": "best_move" }
+    }
+  }
+}

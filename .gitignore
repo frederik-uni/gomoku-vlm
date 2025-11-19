@@ -213,3 +213,12 @@ __marimo__/
 game_data/
 move_*.png
 *.npy
+
+# tmp dir during the dataset generation proccess
+gen_dataset/tmp/
+
+# generated datasets
+out/sphinx/dataset/
+
+# macOS .DS_Store file
+.DS_Store
