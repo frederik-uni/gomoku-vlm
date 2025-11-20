@@ -219,6 +219,3 @@ src/tmp/
 
 # generated datasets
 out/sphinx/dataset/
-
-# macOS .DS_Store file
-.DS_Store

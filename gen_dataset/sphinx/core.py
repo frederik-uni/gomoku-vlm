@@ -1,5 +1,6 @@
 import random
 import shutil
+import warnings
 from enum import Enum
 import numpy as np
 from pathlib import Path
@@ -168,7 +169,7 @@ def build_basic_dataset_row(img_path: Path, img_bytes: bytes, family: QuestionFa
     )
     return row
 
-def select_turn_and_store_image(
+def select_random_turn_and_store_image(
     family: QuestionFamily,
     q_id: str,
     sim_id: int,
@@ -203,6 +204,50 @@ def select_turn_and_store_image(
     store_turn_game_state(turn_index, sim_id, board)
 
     return turn_index, board, img_path, img_bytes
+
+
+def select_fixed_turn_and_store_image(
+    sim_id: int,
+    simulated_game: np.ndarray,
+    turn_index: int
+) -> tuple[np.ndarray, Path, bytes]:
+    """
+    Helper function to select a fixed turn for a given question, fetch the board for that turn,
+    and store the corresponding image permanently.
+
+    Args:
+        sim_id (int): Zero-based index of the simulated game (episode).
+        simulated_game (np.ndarray): 3D array of shape (num_turns, size, size)
+            containing the board state after each turn.
+        turn_index (int): Desired 0-based turn index.
+
+    Returns:
+        tuple[np.ndarray, Path, bytes]: A tuple containing:
+            - np.ndarray: The board state at that turn.
+            - Path: The path of the copied image in the output directory.
+            - bytes: The PNG-encoded image bytes.
+    """
+    if simulated_game.shape[0] == 0:
+        raise ValueError(f"Simulated game has not turns.")
+    last_index = simulated_game.shape[0] - 1
+    if turn_index > last_index or turn_index < 0:
+        warnings.warn(
+            f"Selected turn_index in select_fixed_turn_and_store_image is out of range. "
+            f"Provided: {turn_index}, valid range: 0..{last_index}. "
+            f"Using last turn {last_index} instead.",
+            RuntimeWarning
+        )
+        turn_index = last_index
+
+    board = simulated_game[turn_index]
+
+    # permanently store the image for that turn from /tmp
+    img_path, img_bytes = store_turn_image(turn_index, sim_id)
+
+    # store the board state for debugging
+    store_turn_game_state(turn_index, sim_id, board)
+
+    return board, img_path, img_bytes
 
 
 def init_output_dirs() -> None:

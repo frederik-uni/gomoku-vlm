@@ -7,7 +7,8 @@ from gen_dataset.sphinx.perception.focus import (
     count_black_stones,
     count_white_stones,
     count_empty_intersections,
-    color_at_position
+    color_at_position,
+    print_board_matrix
 )
 
 
@@ -40,5 +41,11 @@ def generate_perception_questions_for_episode(sim_id: int, simulated_game: np.nd
     rows.append(color_at_position.gen_question_q14_sample(sim_id, simulated_game))
     rows.append(color_at_position.gen_question_q15_sample(sim_id, simulated_game))
     rows.append(color_at_position.gen_question_q16_sample(sim_id, simulated_game))
+
+    # focus: print_board_matrix
+    rows.append(print_board_matrix.gen_question_q17_sample(sim_id, simulated_game))
+    rows.append(print_board_matrix.gen_question_q18_sample(sim_id, simulated_game))
+    rows.append(print_board_matrix.gen_question_q19_sample(sim_id, simulated_game))
+    rows.append(print_board_matrix.gen_question_q20_sample(sim_id, simulated_game))
 
     return rows
