@@ -12,6 +12,10 @@ def position_is_empty(board: npt.NDArray[np.int8], y: int, x: int) -> bool:
     return board[y, x] == 0
 
 
+def valid_moves(board: npt.NDArray[np.int8]):
+    return np.argwhere(board == 0)
+
+
 def is_board_full(board: npt.NDArray[np.int8]) -> bool:
     return not np.any(board == 0)
 
