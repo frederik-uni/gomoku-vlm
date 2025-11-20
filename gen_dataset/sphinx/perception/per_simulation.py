@@ -9,10 +9,11 @@ from gen_dataset.sphinx.perception.focus import (
     count_empty_intersections,
     color_at_position,
     print_board_matrix,
+    determine_who_won,
     can_you_win,
     can_you_lose,
     where_are_the_black_stones,
-    where_are_the_white_stones,
+    where_are_the_white_stones
 )
 
 
@@ -55,29 +56,35 @@ def generate_perception_questions_for_episode(
     rows.append(print_board_matrix.gen_question_q19_sample(sim_id, simulated_game))
     rows.append(print_board_matrix.gen_question_q20_sample(sim_id, simulated_game))
 
-    # === Frederik ===
-    # focus: can_you_win
-    rows.append(can_you_win.gen_question_q100_sample(sim_id, simulated_game))
-    rows.append(can_you_win.gen_question_q101_sample(sim_id, simulated_game))
-    rows.append(can_you_win.gen_question_q102_sample(sim_id, simulated_game))
-    rows.append(can_you_win.gen_question_q103_sample(sim_id, simulated_game))
+    # focus: determine_who_won
+    rows.append(determine_who_won.gen_question_q21_sample(sim_id, simulated_game))
+    rows.append(determine_who_won.gen_question_q22_sample(sim_id, simulated_game))
+    rows.append(determine_who_won.gen_question_q23_sample(sim_id, simulated_game))
+    rows.append(determine_who_won.gen_question_q24_sample(sim_id, simulated_game))
 
-    # focus: can_you_loose
-    rows.append(can_you_loose.gen_question_q104_sample(sim_id, simulated_game))
-    rows.append(can_you_loose.gen_question_q105_sample(sim_id, simulated_game))
-    rows.append(can_you_loose.gen_question_q106_sample(sim_id, simulated_game))
-    rows.append(can_you_loose.gen_question_q107_sample(sim_id, simulated_game))
-
-    # focus: where_are_the_white_stones
-    rows.append(where_are_the_white_stones.gen_question_q108_sample(sim_id, simulated_game))
-    rows.append(where_are_the_white_stones.gen_question_q109_sample(sim_id, simulated_game))
-    rows.append(where_are_the_white_stones.gen_question_q110_sample(sim_id, simulated_game))
-    rows.append(where_are_the_white_stones.gen_question_q111_sample(sim_id, simulated_game))
-
-    # focus: where_are_the_black_stones
-    rows.append(where_are_the_black_stones.gen_question_q112_sample(sim_id, simulated_game))
-    rows.append(where_are_the_black_stones.gen_question_q113_sample(sim_id, simulated_game))
-    rows.append(where_are_the_black_stones.gen_question_q114_sample(sim_id, simulated_game))
-    rows.append(where_are_the_black_stones.gen_question_q115_sample(sim_id, simulated_game))
+    # # === Frederik ===
+    # # focus: can_you_win
+    # rows.append(can_you_win.gen_question_q100_sample(sim_id, simulated_game))
+    # rows.append(can_you_win.gen_question_q101_sample(sim_id, simulated_game))
+    # rows.append(can_you_win.gen_question_q102_sample(sim_id, simulated_game))
+    # rows.append(can_you_win.gen_question_q103_sample(sim_id, simulated_game))
+    #
+    # # focus: can_you_loose
+    # rows.append(can_you_loose.gen_question_q104_sample(sim_id, simulated_game))
+    # rows.append(can_you_loose.gen_question_q105_sample(sim_id, simulated_game))
+    # rows.append(can_you_loose.gen_question_q106_sample(sim_id, simulated_game))
+    # rows.append(can_you_loose.gen_question_q107_sample(sim_id, simulated_game))
+    #
+    # # focus: where_are_the_white_stones
+    # rows.append(where_are_the_white_stones.gen_question_q108_sample(sim_id, simulated_game))
+    # rows.append(where_are_the_white_stones.gen_question_q109_sample(sim_id, simulated_game))
+    # rows.append(where_are_the_white_stones.gen_question_q110_sample(sim_id, simulated_game))
+    # rows.append(where_are_the_white_stones.gen_question_q111_sample(sim_id, simulated_game))
+    #
+    # # focus: where_are_the_black_stones
+    # rows.append(where_are_the_black_stones.gen_question_q112_sample(sim_id, simulated_game))
+    # rows.append(where_are_the_black_stones.gen_question_q113_sample(sim_id, simulated_game))
+    # rows.append(where_are_the_black_stones.gen_question_q114_sample(sim_id, simulated_game))
+    # rows.append(where_are_the_black_stones.gen_question_q115_sample(sim_id, simulated_game))
 
     return rows

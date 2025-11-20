@@ -66,11 +66,38 @@
         "focus": "print_board_matrix",
         "min_turns": 999,
         "max_turns": 999,
-        "num_samples": 200
-      }
+        "num_samples": 20
+      },
+      "Q21": { "focus": "determine_who_won" },
+      "Q22": { "focus": "determine_who_won" },
+      "Q23": { "focus": "determine_who_won" },
+      "Q24": { "focus": "determine_who_won" }
     },
     "strategy": {
-      "Q1000": { "focus": "best_move" }
+      "Q500": {
+        "focus": "win_next_turn",
+        "min_turns": 999,
+        "max_turns": 999,
+        "num_samples": 20
+      },
+      "Q501": {
+        "focus": "win_next_turn",
+        "min_turns": 999,
+        "max_turns": 999,
+        "num_samples": 20
+      },
+      "Q502": {
+        "focus": "win_next_turn",
+        "min_turns": 999,
+        "max_turns": 999,
+        "num_samples": 20
+      },
+      "Q503": {
+        "focus": "win_next_turn",
+        "min_turns": 999,
+        "max_turns": 999,
+        "num_samples": 20
+      }
     }
   }
 }
