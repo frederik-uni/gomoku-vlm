@@ -10,12 +10,12 @@ from gen_dataset.sphinx.core import (
 )
 
 
-def _focus_count_black_stones(
+def _focus_can_you_lose(
     q_id: str, sim_id: int, simulated_game: np.ndarray
 ) -> tuple[int, DatasetRow]:
     """
     Helper function for any question that has the
-    focus: "count_black_stones"
+    focus: "can_you_lose"
     """
     family, focus = get_question_meta(QuestionFamily.PERCEPTION, q_id)
 
@@ -43,13 +43,13 @@ def _focus_count_black_stones(
     )
 
 
-def gen_question_q21_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q104_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
     Generate a single Q1 sample:
     focus: "count_black_stones"
     """
     q_id = "Q1"
-    player, dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    player, dataset_row = _focus_can_you_lose(q_id, sim_id, simulated_game)
     player = "Player 1" if player == 2 else "Player 2"
     question_text = (
         "“Analyze the position in this Gomoku game."
@@ -65,14 +65,14 @@ def gen_question_q21_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetR
     return dataset_row
 
 
-def gen_question_q22_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q105_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
     Generate a single Q2 sample:
     focus: "count_black_stones"
     """
     q_id = "Q2"
 
-    player, dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    player, dataset_row = _focus_can_you_lose(q_id, sim_id, simulated_game)
     player = "Player 1" if player == 2 else "Player 2"
     question_text = (
         "“You are analyzing the current Gomoku game state."
@@ -85,14 +85,14 @@ def gen_question_q22_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetR
     return dataset_row
 
 
-def gen_question_q23_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q106_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
     Generate a single Q3 sample:
     focus: "count_black_stones"
     """
     q_id = "Q3"
 
-    player, dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    player, dataset_row = _focus_can_you_lose(q_id, sim_id, simulated_game)
     player = "Player 1" if player == 2 else "Player 2"
     question_text = (
         "“Consider the following Gomoku position."
@@ -106,14 +106,14 @@ def gen_question_q23_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetR
     return dataset_row
 
 
-def gen_question_q24_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q107_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
     Generate a single Q4 sample:
     focus: "count_black_stones"
     """
     q_id = "Q4"
 
-    player, dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    player, dataset_row = _focus_can_you_lose(q_id, sim_id, simulated_game)
     player = "Player 1" if player == 2 else "Player 2"
     question_text = (
         "“You are reviewing a Gomoku board position."

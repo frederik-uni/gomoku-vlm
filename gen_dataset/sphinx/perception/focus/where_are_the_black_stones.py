@@ -5,21 +5,21 @@ from gen_dataset.sphinx.core import (
     QuestionFamily,
     build_basic_dataset_row,
     get_question_meta,
-    select_turn_and_store_image,
+    select_random_turn_and_store_image,
 )
 
 
-def _focus_count_black_stones(
+def _focus_where_are_the_black_stones(
     q_id: str, sim_id: int, simulated_game: np.ndarray
 ) -> DatasetRow:
     """
     Helper function for any question that has the
-    focus: "count_black_stones"
+    focus: "where_are_the_black_stones"
     """
     family, focus = get_question_meta(QuestionFamily.PERCEPTION, q_id)
 
     # choose turn, get board, store image
-    turn_index, board, img_path, img_bytes = select_turn_and_store_image(
+    turn_index, board, img_path, img_bytes = select_random_turn_and_store_image(
         family=family,
         q_id=q_id,
         sim_id=sim_id,
@@ -40,7 +40,7 @@ def _focus_count_black_stones(
     )
 
 
-def gen_question_q29_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q112_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
     Generate a single Q1 sample:
     focus: "count_black_stones"
@@ -53,7 +53,7 @@ def gen_question_q29_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetR
         "List the coordinates of all black stones as index pairs. Return only the list of index pairs.”"
     )
 
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    dataset_row = _focus_where_are_the_black_stones(q_id, sim_id, simulated_game)
     dataset_row.question = question_text
 
     # Optionally, add additional valid answers here
@@ -61,7 +61,7 @@ def gen_question_q29_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetR
     return dataset_row
 
 
-def gen_question_q30_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q113_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
     Generate a single Q2 sample:
     focus: "count_black_stones"
@@ -74,13 +74,13 @@ def gen_question_q30_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetR
         "Provide the indices of each black stone as (row, column) pairs, and output nothing else.”"
     )
 
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    dataset_row = _focus_where_are_the_black_stones(q_id, sim_id, simulated_game)
     dataset_row.question = question_text
 
     return dataset_row
 
 
-def gen_question_q31_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q114_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
     Generate a single Q3 sample:
     focus: "count_black_stones"
@@ -93,13 +93,13 @@ def gen_question_q31_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetR
         "Return the complete set of indices for black stones in row-major order.”"
     )
 
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    dataset_row = _focus_where_are_the_black_stones(q_id, sim_id, simulated_game)
     dataset_row.question = question_text
 
     return dataset_row
 
 
-def gen_question_q32_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q115_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
     Generate a single Q4 sample:
     focus: "count_black_stones"
@@ -112,7 +112,7 @@ def gen_question_q32_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetR
         "Output the indices of all black stones as an ordered list of (row, column) tuples only.”"
     )
 
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    dataset_row = _focus_where_are_the_black_stones(q_id, sim_id, simulated_game)
     dataset_row.question = question_text
 
     return dataset_row
