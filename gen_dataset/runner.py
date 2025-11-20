@@ -7,10 +7,11 @@ import pandas as pd
 
 from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.core import SPHINX_CONFIG
-from gen_dataset import sphinx, game_simulator
+from gen_dataset import sphinx
 from gen_dataset.sphinx import core as sphinx_core
 from gen_dataset.sphinx.perception.per_simulation import generate_perception_questions_for_episode
 from gen_dataset.sphinx.strategy.per_simulation import generate_strategy_questions_for_episode
+from src import sim_game
 
 
 def _determine_num_of_required_episodes() -> int:
@@ -44,7 +45,7 @@ def generate_question_dataset() -> List[DatasetRow]:
     rows: List[DatasetRow] = []
     for sim_id in range(num_required_episodes):
         print(f"Simulating {sim_id} / {num_required_episodes}")
-        simulated_game = game_simulator.sim_game_with_images()
+        simulated_game = sim_game.sim_game_with_images()
 
         perception_rows: List[DatasetRow] = generate_perception_questions_for_episode(sim_id, simulated_game)
         rows.extend(perception_rows)

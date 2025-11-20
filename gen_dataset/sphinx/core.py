@@ -1,12 +1,11 @@
 import random
 import shutil
-import warnings
 from enum import Enum
 import numpy as np
 from pathlib import Path
 import json
 
-from gen_dataset import game_simulator
+from src import sim_game
 from gen_dataset.dataset_schema import DatasetRow
 
 SPHINX_CONFIG_PATH = Path(__file__).with_name("sphinx_config.json")
@@ -113,7 +112,7 @@ def store_turn_image(turn_index: int, sim_id: int) -> tuple[Path, bytes]:
             - bytes: The PNG-encoded image bytes.
     """
     tmp_filename = f"turn_{turn_index:03d}.png"
-    tmp_path = game_simulator.IMG_TMP_PATH / tmp_filename
+    tmp_path = sim_game.IMG_TMP_PATH / tmp_filename
 
     filename = f"turn_{turn_index:03d}.png"
     img_path = _get_sim_image_dir(sim_id) / filename

@@ -215,7 +215,7 @@ move_*.png
 *.npy
 
 # tmp dir during the dataset generation proccess
-gen_dataset/tmp/
+src/tmp/
 
 # generated datasets
 out/sphinx/dataset/
