@@ -100,11 +100,12 @@ def gen_question_q500_sample(sim_id: int, simulated_game: np.ndarray) -> Dataset
             raise ValueError(f"Unexpected winner, game may still be in progress.")
 
     question_text = (
-        "You are looking at the Gomoku board position just before the final move of the game. "
+        f"You are looking at the Gomoku board position just before the final move of the game. "
+        f"Player 1 is black; Player 2 is white."
         f"The game ended in a {outcome_phrase}. "
         f"You are currently playing as {player_color}. "
         f"What is your next, best move to {goal_phrase}? "
-         "Answer with two 0-based integers in the format 'row col', and nothing else."
+        f"Answer with two 0-based integers in the format 'row col', and nothing else."
     )
     dataset_row.question = question_text
 
@@ -142,6 +143,7 @@ def gen_question_q501_sample(sim_id: int, simulated_game: np.ndarray) -> Dataset
 
     question_text = (
         "You are viewing the Gomoku position just before the decisive last move. "
+        "Player 1 uses black stones, and player 2 uses white stones. "
         f"In the final result, the game was a {outcome_phrase}. "
         f"Now imagine you are playing as {player_color} and it is your turn. "
         f"What move should you play to {goal_phrase}? "

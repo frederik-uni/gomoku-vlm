@@ -97,6 +97,30 @@
         "min_turns": 999,
         "max_turns": 999,
         "num_samples": 20
+      },
+      "Q600": {
+        "focus": "best_next_move",
+        "min_turns": 2,
+        "max_turns": 999,
+        "num_samples": 20
+      },
+      "Q601": {
+        "focus": "best_next_move",
+        "min_turns": 2,
+        "max_turns": 999,
+        "num_samples": 20
+      },
+      "Q602": {
+        "focus": "best_next_move",
+        "min_turns": 2,
+        "max_turns": 999,
+        "num_samples": 20
+      },
+      "Q603": {
+        "focus": "best_next_move",
+        "min_turns": 2,
+        "max_turns": 999,
+        "num_samples": 20
       }
     }
   }
