@@ -75,8 +75,8 @@ def main(dataset_idx: int, q_id: str, q_row_idx: int = 0) -> None:
 
 
 if __name__ == "__main__":
-    dataset_idx = 7
-    q_id = "Q16"
-    q_row_idx = 1
+    dataset_idx = 15
+    q_id = "Q17"
+    q_row_idx = 0
 
     main(dataset_idx, q_id, q_row_idx)

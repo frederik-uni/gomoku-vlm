@@ -6,7 +6,7 @@ from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.core import (
     QuestionFamily,
     build_basic_dataset_row,
-    select_turn_and_store_image,
+    select_random_turn_and_store_image,
     get_question_meta,
 )
 import random
@@ -25,7 +25,7 @@ def _focus_color_at_position(q_id: str, sim_id: int, simulated_game: np.ndarray)
     family, focus = get_question_meta(QuestionFamily.PERCEPTION, q_id)
 
     # choose turn, get board, store image
-    turn_index, board, img_path, img_bytes = select_turn_and_store_image(
+    turn_index, board, img_path, img_bytes = select_random_turn_and_store_image(
         family=family,
         q_id=q_id,
         sim_id=sim_id,

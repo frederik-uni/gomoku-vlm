@@ -46,6 +46,27 @@
         "focus": "color_at_position",
         "min_turns": 999,
         "max_turns": 999
+      },
+      "Q17": {
+        "focus": "print_board_matrix",
+        "min_turns": 1,
+        "max_turns": 999
+      },
+      "Q18": {
+        "focus": "print_board_matrix",
+        "min_turns": 25,
+        "max_turns": 999
+      },
+      "Q19": {
+        "focus": "print_board_matrix",
+        "min_turns": 50,
+        "max_turns": 999
+      },
+      "Q20": {
+        "focus": "print_board_matrix",
+        "min_turns": 999,
+        "max_turns": 999,
+        "num_samples": 200
       }
     },
     "strategy": {
