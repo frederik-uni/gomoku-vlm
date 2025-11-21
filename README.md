@@ -4,20 +4,22 @@
 ```bash
 pip install -e .
 ```
+or 
 ```bash
 pip install "git+https://github.com/frederik-uni/gomoku-vlm.git"
 ```
 
 ## Usage
+### Game
 ```bash
-# Standard (15x15, bot vs. human)
-python -m game
+usage: python -m game [-h] [--size SIZE] [--bot {random,ai,none}]
 
-# custom board size
-python -m game --size 9
+configurable settings
 
-# 2-Player mode
-python -m game --bot none
+options:
+  -h, --help            show this help message and exit
+  --size SIZE           Board size (default: 15)
+  --bot {random,ai,none}
 ```
 
 ## PyGame Controls
