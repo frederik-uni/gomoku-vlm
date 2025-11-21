@@ -12,7 +12,9 @@ dependencies = [
     "numpy",
     "Pillow",
     "torch",
-    "pygame"
+    "pygame",
+    "pandas",
+    "pyarrow"
 ]
 
 [tool.setuptools]

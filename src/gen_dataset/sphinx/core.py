@@ -116,7 +116,7 @@ def store_turn_image(board: np.ndarray, turn_index: int, sim_id: int) -> tuple[P
     filename = f"turn_{turn_index:03d}.png"
     img_path = _get_sim_image_dir(sim_id) / filename
     img = sim_game.render_game_step(board)
-    img.save(img_path / filename)
+    img.save(img_path)
 
     # read image bytes (PNG-encoded)
     with open(img_path, "rb") as f:
