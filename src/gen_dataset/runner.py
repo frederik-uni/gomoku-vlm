@@ -5,6 +5,7 @@ from typing import List
 
 import pandas as pd
 
+from bots.ai_bot import generate_next_move_greedy, generate_next_move_probabilistic
 from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.core import SPHINX_CONFIG
 from gen_dataset import sphinx
@@ -47,7 +48,9 @@ def generate_question_dataset() -> List[DatasetRow]:
     rows: List[DatasetRow] = []
     for sim_id in range(num_required_episodes):
         print(f"Simulating {sim_id} / {num_required_episodes}")
-        simulated_game = sim_game.sim_game_with_images()
+        simulated_game = sim_game.simulate_game(
+        (generate_next_move_greedy, generate_next_move_probabilistic), 15, 5
+        )
 
         perception_rows: List[DatasetRow] = generate_perception_questions_for_episode(sim_id, simulated_game)
         rows.extend(perception_rows)

@@ -98,12 +98,13 @@ def _get_sim_game_state_dir(sim_id: int) -> Path:
     return sim_dir
 
 
-def store_turn_image(turn_index: int, sim_id: int) -> tuple[Path, bytes]:
+def store_turn_image(board: np.ndarray, turn_index: int, sim_id: int) -> tuple[Path, bytes]:
     """
     Copy the image for a given turn from /tmp to /out
     and return its new location and bytes.
 
     Args:
+        board: (np.ndarray): The 2D-board of the turn.
         turn_index (int): Zero-based turn index used to locate the image in the /tmp folder.
         sim_id (int): Zero-based index of the simulated game (episode).
 
@@ -112,13 +113,10 @@ def store_turn_image(turn_index: int, sim_id: int) -> tuple[Path, bytes]:
             - Path: The path of the copied image in the output directory.
             - bytes: The PNG-encoded image bytes.
     """
-    tmp_filename = f"turn_{turn_index:03d}.png"
-    tmp_path = sim_game.IMG_TMP_PATH / tmp_filename
-
     filename = f"turn_{turn_index:03d}.png"
     img_path = _get_sim_image_dir(sim_id) / filename
-
-    shutil.copy2(tmp_path, img_path)
+    img = sim_game.render_game_step(board)
+    img.save(img_path / filename)
 
     # read image bytes (PNG-encoded)
     with open(img_path, "rb") as f:
@@ -198,7 +196,7 @@ def select_random_turn_and_store_image(
     board = simulated_game[turn_index]
 
     # permanently store the image for that turn from /tmp
-    img_path, img_bytes = store_turn_image(turn_index, sim_id)
+    img_path, img_bytes = store_turn_image(board, turn_index, sim_id)
 
     # store the board state for debugging
     store_turn_game_state(turn_index, sim_id, board)
@@ -242,7 +240,7 @@ def select_fixed_turn_and_store_image(
     board = simulated_game[turn_index]
 
     # permanently store the image for that turn from /tmp
-    img_path, img_bytes = store_turn_image(turn_index, sim_id)
+    img_path, img_bytes = store_turn_image(board, turn_index, sim_id)
 
     # store the board state for debugging
     store_turn_game_state(turn_index, sim_id, board)
