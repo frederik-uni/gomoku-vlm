@@ -1,4 +1,6 @@
+import argparse
 import math
+import sys
 from collections import defaultdict
 from dataclasses import asdict
 from typing import List
@@ -6,24 +8,25 @@ from typing import List
 import pandas as pd
 
 from gen_dataset.dataset_schema import DatasetRow
-from gen_dataset.sphinx.core import SPHINX_CONFIG
-from gen_dataset import sphinx
 from gen_dataset.sphinx import core as sphinx_core
-from gen_dataset.sphinx.perception.per_simulation import generate_perception_questions_for_episode
-from gen_dataset.sphinx.strategy.per_simulation import generate_strategy_questions_for_episode
+from gen_dataset.sphinx.core import SPHINX_CONFIG
+from gen_dataset.sphinx.perception.per_simulation import (
+    generate_perception_questions_for_episode,
+)
+from gen_dataset.sphinx.strategy.per_simulation import (
+    generate_strategy_questions_for_episode,
+)
 from src import sim_game
-
-import sys
 
 
 def _determine_num_of_required_episodes() -> int:
     """
-        Return how many full game simulations we need.
+    Return how many full game simulations we need.
 
-        Logic:
-          num_episodes = max(required_samples over all questions)
-          where required_samples = per-question "num_samples" or global default.
-        """
+    Logic:
+      num_episodes = max(required_samples over all questions)
+      where required_samples = per-question "num_samples" or global default.
+    """
     general = SPHINX_CONFIG.get("general", {})
     max_required = general.get("default_num_samples", 0)
 
@@ -49,10 +52,14 @@ def generate_question_dataset() -> List[DatasetRow]:
         print(f"Simulating {sim_id} / {num_required_episodes}")
         simulated_game = sim_game.sim_game_with_images()
 
-        perception_rows: List[DatasetRow] = generate_perception_questions_for_episode(sim_id, simulated_game)
+        perception_rows: List[DatasetRow] = generate_perception_questions_for_episode(
+            sim_id, simulated_game
+        )
         rows.extend(perception_rows)
 
-        strategy_rows: List[DatasetRow] = generate_strategy_questions_for_episode(sim_id, simulated_game)
+        strategy_rows: List[DatasetRow] = generate_strategy_questions_for_episode(
+            sim_id, simulated_game
+        )
         rows.extend(strategy_rows)
 
     return rows
@@ -66,7 +73,9 @@ def assemble_parquet_file(rows: List[DatasetRow]) -> None:
     df = pd.DataFrame(data)
 
     # get output path for Q1
-    out_path = sphinx_core.SPHINX_PARQUET_OUT_PATH / "dataset.parquet"  # e.g. PROJECT_ROOT/dataset/sphinx/out/dataset.parquet
+    out_path = (
+        sphinx_core.SPHINX_PARQUET_OUT_PATH / "dataset.parquet"
+    )  # e.g. PROJECT_ROOT/dataset/sphinx/out/dataset.parquet
 
     # write parquet
     df.to_parquet(out_path, index=False)
@@ -74,7 +83,9 @@ def assemble_parquet_file(rows: List[DatasetRow]) -> None:
     print(f"Wrote {len(df)} rows to {out_path}")
 
 
-def _check_train_eval_split_config(train_r: float, eval_r: float, test_r: float) -> None:
+def _check_train_eval_split_config(
+    train_r: float, eval_r: float, test_r: float
+) -> None:
     # basic sanity: non-negative
     if train_r < 0 or eval_r < 0 or test_r < 0:
         raise ValueError(
@@ -98,15 +109,17 @@ def assign_splits(rows: List[DatasetRow]) -> None:
     """
     ratios = SPHINX_CONFIG["general"].get("split_ratios", {})
     train_r = float(ratios.get("train", 0.8))
-    eval_r  = float(ratios.get("eval", 0.1))
-    test_r  = float(ratios.get("test", 0.1))
+    eval_r = float(ratios.get("eval", 0.1))
+    test_r = float(ratios.get("test", 0.1))
 
     _check_train_eval_split_config(train_r, eval_r, test_r)
 
     # Group indices by q_id
     by_qid: dict[str, list[int]] = defaultdict(list)
     for idx, row in enumerate(rows):
-        by_qid[row.q_id].append(idx) # map q_id -> idx, where the element is found in the list
+        by_qid[row.q_id].append(
+            idx
+        )  # map q_id -> idx, where the element is found in the list
 
     for q_id, idxs in by_qid.items():
         num_samples_for_this_question = len(idxs)
@@ -114,13 +127,13 @@ def assign_splits(rows: List[DatasetRow]) -> None:
         # Compute counts for this question
         n_train = int(round(num_samples_for_this_question * train_r))
         n_eval = int(round(num_samples_for_this_question * eval_r))
-        n_test = num_samples_for_this_question - n_train - n_eval # rest goes to test
+        n_test = num_samples_for_this_question - n_train - n_eval  # rest goes to test
         # Fail if any of the resulting splits is < 0 (probably sample size too small for that question)
         if n_train < 0 or n_eval < 0 or n_test < 0:
             raise ValueError(
                 f"Bad split for q_id={q_id}: "
                 f"num_samples_for_this_question={num_samples_for_this_question}, n_train={n_train}, n_eval={n_eval}, n_test={n_test}. "
-                "Check your \"num_samples\" for that questions and \"split_ratios\" in sphinx_config.json."
+                'Check your "num_samples" for that questions and "split_ratios" in sphinx_config.json.'
             )
 
         # Assign splits for this question
@@ -134,33 +147,28 @@ def assign_splits(rows: List[DatasetRow]) -> None:
                 row.split = "test"
 
 
-if __name__ == "__main__":
-    # -------------------------------------------------
-    # CLI help
-    # -------------------------------------------------
-    if len(sys.argv) > 1 and sys.argv[1] in ("-h", "--help"):
-        print("Usage:")
-        print("  python -m gen_dataset.runner")
-        print()
-        print("Description:")
-        print("  Simulate multiple Gomoku games, generate all configured")
-        print("  perception and strategy questions, assign train/eval/test")
-        print("  splits, and write a single dataset.parquet file plus images.")
-        print()
-        print("Output:")
-        print("  Creates a new dataset_NNN directory under:")
-        print(f"    {sphinx_core.SPHINX_BASE_OUT}")
-        print("  with subfolders:")
-        print("    images/  -> Persisted PNGs for each simulation + turn")
-        print("    parquet/ -> dataset.parquet with all DatasetRow entries")
-        print()
-        print("Requirements (Python packages):")
-        print("  numpy, pandas, pyarrow, pillow")
-        sys.exit(0)
+def parse_args():
+    """cli"""
+    parser = argparse.ArgumentParser(
+        description="Simulate multiple Gomoku games, generate all configured perception and strategy questions, assign train/eval/test splits, and write a single dataset.parquet file plus images."
+    )
+    parser.add_argument(
+        "--output",
+        default="./out",
+        type=str,
+        help="Path where parquet file will be stored",
+    )
+    parser.add_argument(
+        "--config",
+        default="sphinx.toml",
+        type=str,
+        help="Path where the config file is stored",
+    )
+    return parser.parse_args()
 
-    # -------------------------------------------------
-    # Normal run (PyCharm or terminal with no args)
-    # -------------------------------------------------
+
+if __name__ == "__main__":
+    args = parse_args()
     sphinx_core.init_output_dirs()  # sets SPHINX_IMG_OUT_PATH / SPHINX_PARQUET_OUT_PATH
     rows = generate_question_dataset()
     assign_splits(rows)
