@@ -77,7 +77,7 @@ def count(board: npt.NDArray[np.int8], n: int, player: int, almost: bool) -> int
 
         diag2 = np.diag(np.fliplr(board), k=offset)
         counter += func(diag2, n, player)
-    return counter
+    return int(counter)
 
 
 def has_player_won(board: npt.NDArray[np.int8], n: int, player: int) -> bool:
