@@ -11,7 +11,7 @@ from gen_dataset.dataset_schema import DatasetRow
 
 SPHINX_CONFIG_PATH = Path(__file__).with_name("sphinx_config.json")
 # core.py -> /sphinx -> /generate_dataset -> /PROJECT_ROOT
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 # Load sphinx_config.json
 with open(SPHINX_CONFIG_PATH, "r", encoding="utf-8") as config_file:
