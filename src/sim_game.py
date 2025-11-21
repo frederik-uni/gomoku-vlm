@@ -55,7 +55,7 @@ def render_game_step(state: np.ndarray) -> Image.Image:
     board_img = create_gomoku_board(
         size=15,  # fields
         cell_size=size,  # pixel for cell
-        margin=20,  # margin on all sides in px
+        margin=size//2,  # margin on all sides in px
         line_width=2,  # line width
         color=(238, 178, 73),  # board color
         line_color=(0, 0, 0),  # line color
