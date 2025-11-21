@@ -6,7 +6,7 @@ from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.strategy.focus import (
     win_next_turn,
     best_next_move,
-    perform_valid_move
+    list_valid_moves
 )
 
 
