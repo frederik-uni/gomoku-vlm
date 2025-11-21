@@ -5,8 +5,11 @@ from collections import defaultdict
 from dataclasses import asdict
 from typing import List
 
+import numpy as np
 import pandas as pd
 
+from bots.ai_bot import generate_next_move_greedy, generate_next_move_probabilistic
+from game_logic import get_winner
 from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx import core as sphinx_core
 from gen_dataset.sphinx.core import SPHINX_CONFIG
@@ -16,6 +19,7 @@ from gen_dataset.sphinx.perception.per_simulation import (
 from gen_dataset.sphinx.strategy.per_simulation import (
     generate_strategy_questions_for_episode,
 )
+from sim_game import simulate_game
 from src import sim_game
 
 
@@ -40,6 +44,40 @@ def _determine_num_of_required_episodes() -> int:
     return max_required
 
 
+def simulate_game_preferring_winner(
+    bots,
+    size: int,
+    to_win: int,
+    max_attempts: int = 5,
+):
+    """
+    Simulate games, preferring ones that end with a clear winner.
+    - Try up to max_attempts times.
+    - If any game ends with winner 1 or 2, return that one immediately.
+    - If all attempts end in draw (or weird winner codes), return the last game anyway.
+    """
+    if max_attempts <= 0:
+        raise ValueError(f"max_attempts must be >= 1, got {max_attempts}")
+
+    last_game: np.ndarray | None = None
+
+    for attempt in range(max_attempts):
+        print(f"Simulating attempt {attempt + 1} / {max_attempts}...")
+        game = simulate_game(bots, size, to_win)
+
+        final_board = game[-1]
+        winner = get_winner(final_board, to_win)
+        last_game = game
+
+        if winner in (1, 2):
+            print(f"Player {winner} wins! After {attempt + 1} / {max_attempts} attempts.")
+            return game
+
+    # Return last game anyway, after max_attempts.
+    print(f"Game ended in a draw. After {max_attempts} / {max_attempts} attempts.")
+    return last_game
+
+
 def generate_question_dataset() -> List[DatasetRow]:
     """
     Simulates multiple episodes of the entire game
@@ -50,7 +88,10 @@ def generate_question_dataset() -> List[DatasetRow]:
     rows: List[DatasetRow] = []
     for sim_id in range(num_required_episodes):
         print(f"Simulating {sim_id} / {num_required_episodes}")
-        simulated_game = sim_game.sim_game_with_images()
+
+        simulated_game = simulate_game_preferring_winner(
+        (generate_next_move_probabilistic, generate_next_move_probabilistic), 15, 5
+        )
 
         perception_rows: List[DatasetRow] = generate_perception_questions_for_episode(
             sim_id, simulated_game

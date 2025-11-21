@@ -39,10 +39,10 @@ def simulate_game(
 
         winner = get_winner(board, n)
         if winner != 0:
-            if winner == -1:
-                print("Game ended in a draw.")
-            else:
-                print(f"Player {winner} wins!")
+            # if winner == -1:
+            #     print("Game ended in a draw.")
+            # else:
+            #     print(f"Player {winner} wins!")
             break
 
         current_player = (current_player % 2) + 1
@@ -72,15 +72,3 @@ def render_game_step(state: np.ndarray) -> Image.Image:
         state,
         calc_coords=calc_coords_gomoku_wrapper,
     )
-
-
-def sim_game_with_images(size: int = 15, n: int = 5) -> np.ndarray:
-    game_states = simulate_game(generate_next_move_random, size, n)
-    game_states = simulate_game(
-        (generate_next_move_greedy, generate_next_move_probabilistic), size, n
-    )
-    img = render_game_step(
-        game_states[index]
-    )  # <- example function/needs styling customization
-
-    return game_states

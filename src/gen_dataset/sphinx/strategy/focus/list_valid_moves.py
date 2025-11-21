@@ -110,3 +110,71 @@ def gen_question_q700_sample(sim_id: int, simulated_game: np.ndarray) -> Dataset
 
     dataset_row.question = question_text
     return dataset_row
+
+
+def gen_question_q701_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+    """
+    Generate a single Q701 sample:
+    focus: "list_valid_moves"
+    """
+    q_id = "Q701"
+
+    color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
+
+    question_text = (
+        "This image shows a Gomoku position partway through a game. "
+        "Stones of one player are black, and stones of the other player are white. "
+        f"It is {color}'s turn to move. "
+        "Identify every empty board intersection where a stone could legally be played next. "
+        "Output ALL such moves as a comma-separated list of 0-based coordinates in the format "
+        "'row col, row col, row col, ...' with no extra text."
+    )
+
+    dataset_row.question = question_text
+    return dataset_row
+
+
+def gen_question_q702_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+    """
+    Generate a single Q702 sample:
+    focus: "list_valid_moves"
+    """
+    q_id = "Q702"
+
+    color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
+
+    question_text = (
+        "You are given a snapshot of an ongoing Gomoku game. "
+        "Player 1 places black stones and Player 2 places white stones. "
+        f"In this position, it is {color}'s turn to play. "
+        "Your task is to list every legal move, i.e. every empty intersection where a new stone "
+        "can still be placed. "
+        "Return your answer as a comma-separated list of 0-based 'row col' pairs, for example: "
+        "'0 4, 1 3, 7 7'. Do not add any additional explanation."
+    )
+
+    dataset_row.question = question_text
+    return dataset_row
+
+
+def gen_question_q703_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+    """
+    Generate a single Q703 sample:
+    focus: "list_valid_moves"
+    """
+    q_id = "Q703"
+
+    color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
+
+    question_text = (
+        "Consider the shown Gomoku board position. "
+        f"It is {color}'s turn, and you must decide where a stone could legally be placed. "
+        "Treat every currently empty intersection as a possible move, and every occupied "
+        "intersection as invalid. "
+        "List ALL valid moves as a comma-separated list of coordinates in 0-based '(row col)' "
+        "format, written as 'row col, row col, row col, ...'. "
+        "Only output this list of coordinates, nothing else."
+    )
+
+    dataset_row.question = question_text
+    return dataset_row

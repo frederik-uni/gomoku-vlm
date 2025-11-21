@@ -65,8 +65,7 @@
       "Q20": {
         "focus": "print_board_matrix",
         "min_turns": 999,
-        "max_turns": 999,
-        "num_samples": 20
+        "max_turns": 999
       },
       "Q21": { "focus": "determine_who_won" },
       "Q22": { "focus": "determine_who_won" },
@@ -77,44 +76,37 @@
       "Q500": {
         "focus": "win_next_turn",
         "min_turns": 999,
-        "max_turns": 999,
-        "num_samples": 20
+        "max_turns": 999
       },
       "Q501": {
         "focus": "win_next_turn",
         "min_turns": 999,
-        "max_turns": 999,
-        "num_samples": 20
+        "max_turns": 999
       },
       "Q502": {
         "focus": "win_next_turn",
         "min_turns": 999,
-        "max_turns": 999,
-        "num_samples": 20
+        "max_turns": 999
       },
       "Q503": {
         "focus": "win_next_turn",
         "min_turns": 999,
-        "max_turns": 999,
-        "num_samples": 20
+        "max_turns": 999
       },
       "Q600": {
         "focus": "best_next_move",
         "min_turns": 2,
-        "max_turns": 999,
-        "num_samples": 20
+        "max_turns": 999
       },
       "Q601": {
         "focus": "best_next_move",
         "min_turns": 2,
-        "max_turns": 999,
-        "num_samples": 20
+        "max_turns": 999
       },
       "Q602": {
         "focus": "best_next_move",
         "min_turns": 2,
-        "max_turns": 999,
-        "num_samples": 20
+        "max_turns": 999
       },
       "Q603": {
         "focus": "best_next_move",
@@ -123,10 +115,16 @@
         "num_samples": 20
       },
       "Q700": {
-        "focus": "list_valid_moves",
-        "min_turns": 1,
-        "max_turns": 999,
-        "num_samples": 20
+        "focus": "list_valid_moves"
+      },
+      "Q701": {
+        "focus": "list_valid_moves"
+      },
+      "Q702": {
+        "focus": "list_valid_moves"
+      },
+      "Q703": {
+        "focus": "list_valid_moves"
       }
     }
   }
