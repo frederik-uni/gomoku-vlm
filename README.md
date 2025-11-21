@@ -2,19 +2,22 @@
 
 ## Installation
 ```bash
-pip install -r requirements.txt
+pip install -e .
+```
+```bash
+pip install "git+https://github.com/frederik-uni/gomoku-vlm.git"
 ```
 
-## Running the Game
+## Usage
 ```bash
 # Standard (15x15, bot vs. human)
-python pygame_gomoku.py
+python -m game
 
 # custom board size
-python pygame_gomoku.py --size 9
+python -m game --size 9
 
 # 2-Player mode
-python pygame_gomoku.py --bot none
+python -m game --bot none
 ```
 
 ## PyGame Controls

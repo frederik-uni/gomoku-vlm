@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 
-from .utils.game_utils import in_bounds
+from utils.game_utils import in_bounds
 
 
 def create_board(size: int = 15):
