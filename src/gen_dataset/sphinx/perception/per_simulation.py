@@ -9,9 +9,7 @@ from gen_dataset.sphinx.perception.focus import (
     count_empty_intersections,
     color_at_position,
     print_board_matrix,
-    determine_who_won,
-    can_you_win,
-    can_you_lose
+    determine_who_won
 )
 
 
