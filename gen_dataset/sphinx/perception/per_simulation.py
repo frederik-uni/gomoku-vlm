@@ -11,9 +11,7 @@ from gen_dataset.sphinx.perception.focus import (
     print_board_matrix,
     determine_who_won,
     can_you_win,
-    can_you_lose,
-    where_are_the_black_stones,
-    where_are_the_white_stones
+    can_you_lose
 )
 
 

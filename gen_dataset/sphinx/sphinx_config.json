@@ -121,6 +121,12 @@
         "min_turns": 2,
         "max_turns": 999,
         "num_samples": 20
+      },
+      "Q700": {
+        "focus": "perform_valid_move",
+        "min_turns": 1,
+        "max_turns": 999,
+        "num_samples": 20
       }
     }
   }
