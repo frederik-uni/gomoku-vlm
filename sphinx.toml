@@ -1,0 +1,219 @@
+[general]
+output_dir = "out/sphinx/dataset"
+default_num_samples = 20
+default_min_turns = 1
+default_max_turns = 999
+
+[general.split_ratios]
+train = 0.8
+eval = 0.1
+test = 0.1
+
+[[question]]
+id = "Q1"
+kind = "perception"
+focus = "count_black_stones"
+
+[[question]]
+id = "Q2"
+kind = "perception"
+focus = "count_black_stones"
+
+[[question]]
+id = "Q3"
+kind = "perception"
+focus = "count_black_stones"
+
+[[question]]
+id = "Q4"
+kind = "perception"
+focus = "count_black_stones"
+
+[[question]]
+id = "Q5"
+kind = "perception"
+focus = "count_white_stones"
+
+[[question]]
+id = "Q6"
+kind = "perception"
+focus = "count_white_stones"
+
+[[question]]
+id = "Q7"
+kind = "perception"
+focus = "count_white_stones"
+
+[[question]]
+id = "Q8"
+kind = "perception"
+focus = "count_white_stones"
+
+[[question]]
+id = "Q9"
+kind = "perception"
+focus = "count_empty_intersections"
+
+[[question]]
+id = "Q10"
+kind = "perception"
+focus = "count_empty_intersections"
+
+[[question]]
+id = "Q11"
+kind = "perception"
+focus = "count_empty_intersections"
+
+[[question]]
+id = "Q12"
+kind = "perception"
+focus = "count_empty_intersections"
+
+[[question]]
+id = "Q13"
+kind = "perception"
+focus = "color_at_position"
+min_turns = 25
+max_turns = 999
+
+[[question]]
+id = "Q14"
+kind = "perception"
+focus = "color_at_position"
+min_turns = 999
+max_turns = 999
+
+[[question]]
+id = "Q15"
+kind = "perception"
+focus = "color_at_position"
+min_turns = 25
+max_turns = 999
+
+[[question]]
+id = "Q16"
+kind = "perception"
+focus = "color_at_position"
+min_turns = 999
+max_turns = 999
+
+[[question]]
+id = "Q17"
+kind = "perception"
+focus = "print_board_matrix"
+min_turns = 1
+max_turns = 999
+
+[[question]]
+id = "Q18"
+kind = "perception"
+focus = "print_board_matrix"
+min_turns = 25
+max_turns = 999
+
+[[question]]
+id = "Q19"
+kind = "perception"
+focus = "print_board_matrix"
+min_turns = 50
+max_turns = 999
+
+[[question]]
+id = "Q20"
+kind = "perception"
+focus = "print_board_matrix"
+min_turns = 999
+max_turns = 999
+num_samples = 20
+
+[[question]]
+id = "Q21"
+kind = "perception"
+focus = "determine_who_won"
+
+[[question]]
+id = "Q22"
+kind = "perception"
+focus = "determine_who_won"
+
+[[question]]
+id = "Q23"
+kind = "perception"
+focus = "determine_who_won"
+
+[[question]]
+id = "Q24"
+kind = "perception"
+focus = "determine_who_won"
+
+[[question]]
+id = "Q500"
+kind = "strategy"
+focus = "win_next_turn"
+min_turns = 999
+max_turns = 999
+num_samples = 20
+
+[[question]]
+id = "Q501"
+kind = "strategy"
+focus = "win_next_turn"
+min_turns = 999
+max_turns = 999
+num_samples = 20
+
+[[question]]
+id = "Q502"
+kind = "strategy"
+focus = "win_next_turn"
+min_turns = 999
+max_turns = 999
+num_samples = 20
+
+[[question]]
+id = "Q503"
+kind = "strategy"
+focus = "win_next_turn"
+min_turns = 999
+max_turns = 999
+num_samples = 20
+
+[[question]]
+id = "Q600"
+kind = "strategy"
+focus = "best_next_move"
+min_turns = 2
+max_turns = 999
+num_samples = 20
+
+[[question]]
+id = "Q601"
+kind = "strategy"
+focus = "best_next_move"
+min_turns = 2
+max_turns = 999
+num_samples = 20
+
+[[question]]
+id = "Q602"
+kind = "strategy"
+focus = "best_next_move"
+min_turns = 2
+max_turns = 999
+num_samples = 20
+
+[[question]]
+id = "Q603"
+kind = "strategy"
+focus = "best_next_move"
+min_turns = 2
+max_turns = 999
+num_samples = 20
+
+[[question]]
+id = "Q700"
+kind = "strategy"
+focus = "list_valid_moves"
+min_turns = 1
+max_turns = 999
+num_samples = 20

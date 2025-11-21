@@ -22,6 +22,19 @@ options:
   --bot {random,ai,none}
 ```
 
+### Dataset Generator
+```bash
+usage: python -m gen_dataset.runner [-h] [--output OUTPUT] [--config CONFIG]
+
+Simulate multiple Gomoku games, generate all configured perception and strategy questions, assign train/eval/test splits, and write a single dataset.parquet
+file plus images.
+
+options:
+  -h, --help       show this help message and exit
+  --output OUTPUT  Path where parquet file will be stored
+  --config CONFIG  Path where the config file is stored
+```
+
 ## PyGame Controls
 
 - **Mouse click**: Place a stone (as white player)
