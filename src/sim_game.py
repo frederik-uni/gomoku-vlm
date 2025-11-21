@@ -51,19 +51,20 @@ def simulate_game(
 
 
 def render_game_step(state: np.ndarray) -> Image.Image:
+    size = 68
     board_img = create_gomoku_board(
         size=15,  # fields
-        cell_size=40,  # pixel for cell
+        cell_size=size,  # pixel for cell
         margin=20,  # margin on all sides in px
         line_width=2,  # line width
         color=(238, 178, 73),  # board color
         line_color=(0, 0, 0),  # line color
     )
-    pieces = create_pieces(40)  # 40 cell size in px
+    pieces = create_pieces(size)  # 40 cell size in px
 
     def calc_coords_gomoku_wrapper(i: int, j: int):
         return calc_coords_gomoku(
-            i, j, 40, (20, 20)
+            i, j, size, (size//2, size//2)
         )  # 40 cell size in px, (20, 20) margin in px
 
     return render(
