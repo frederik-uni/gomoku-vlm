@@ -11,7 +11,7 @@ bot1 = None
 bot2 = None
 current_file = Path(__file__)
 
-home_dir = current_file.parent.parent.parent
+home_dir = current_file.parent.parent
 policy = CNNPolicy.load_model(join(home_dir, "models", "gobang.pth"))
 
 

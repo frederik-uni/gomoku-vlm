@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.typing as npt
-from .utils.game_utils import in_bounds
+
+from utils.game_utils import in_bounds
 
 
 def create_board(size: int = 15):
@@ -9,6 +10,10 @@ def create_board(size: int = 15):
 
 def position_is_empty(board: npt.NDArray[np.int8], y: int, x: int) -> bool:
     return board[y, x] == 0
+
+
+def valid_moves(board: npt.NDArray[np.int8]):
+    return np.argwhere(board == 0)
 
 
 def is_board_full(board: npt.NDArray[np.int8]) -> bool:
@@ -29,12 +34,50 @@ def make_move(board: npt.NDArray[np.int8], y: int, x: int, player: int):
     board[y, x] = player
 
 
+def count_almost_wins(board: npt.NDArray[np.int8], n: int, player: int) -> int:
+    win_windows = np.lib.stride_tricks.sliding_window_view(board, n)
+    player_count = (win_windows == player).sum(axis=1)
+    empty_count = (win_windows == 0).sum(axis=1)
+    mask = (player_count == n - 1) & (empty_count == 1)
+    return int(mask.sum())
+
+
+def count_wins(board: npt.NDArray[np.int8], n: int, player: int):
+    mask = (board == player).astype(int)
+    kernel = np.ones(n, dtype=int)
+
+    conv = np.convolve(mask, kernel, mode="valid")
+    return np.count_nonzero(conv == n)
+
+
 def _has_player_won_helper(board: npt.NDArray[np.int8], n: int, player: int):
     mask = (board == player).astype(int)
     kernel = np.ones(n, dtype=int)  # dim of win condition
 
     conv = np.convolve(mask, kernel, mode="valid")
     return np.any(conv == n)
+
+
+def count(board: npt.NDArray[np.int8], n: int, player: int, almost: bool) -> int:
+    """
+    returns true if the win condition is satisfied by the given player (n in a row), otherwise false
+    """
+    func = count_almost_wins if almost else count_wins
+    counter = 0
+    size = board.shape[0]
+    for i in range(0, size):
+        col = board[:, i]
+        counter += func(col, n, player)
+        row = board[i, :]
+        counter += func(row, n, player)
+
+    for offset in range(-size + n, size - n + 1):
+        diag1 = np.diag(board, k=offset)
+        counter += func(diag1, n, player)
+
+        diag2 = np.diag(np.fliplr(board), k=offset)
+        counter += func(diag2, n, player)
+    return int(counter)
 
 
 def has_player_won(board: npt.NDArray[np.int8], n: int, player: int) -> bool:
