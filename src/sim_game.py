@@ -1,4 +1,3 @@
-import shutil
 from pathlib import Path
 from typing import Callable
 
@@ -10,12 +9,17 @@ from .bots.random_bot import generate_next_move_random
 from .game_logic import create_board, get_winner, make_move
 from .renderer import calc_coords_gomoku, render
 
-IMG_TMP_PATH = Path(__file__).resolve().parent / "tmp" / "sim_game"
-IMG_TMP_PATH.mkdir(parents=True, exist_ok=True)
+Func = Callable[[np.ndarray], tuple[int, int]]
+
+
+def get_func(f: Func | tuple[Func, Func], index: int = 0) -> Func:
+    if isinstance(f, tuple):
+        return f[index]
+    return f
 
 
 def simulate_game(
-    function: Callable[[np.ndarray], tuple[int, int]],
+    function: Func | tuple[Func, Func],
     size: int = 15,
     n: int = 5,
 ) -> np.ndarray:
@@ -26,9 +30,8 @@ def simulate_game(
     board = create_board(size)
     game_states = []
     current_player = 1
-
     while True:
-        y, x = function(board)
+        y, x = get_func(function, ((current_player) - 1 % 2))(board)
         make_move(board, y, x, current_player)
         # print(f"Player {current_player} placed at (y={y}, x={x})")
 
@@ -125,45 +128,37 @@ def create_pieces(cell_size=40):
     return [black_piece, white_piece]
 
 
-def render_game_steps(game_states: np.ndarray):
-    prev_state = None
-    board_img = create_gomoku_board()
-    pieces = create_pieces()
+def render_game_step(state: np.ndarray) -> Image.Image:
+    board_img = create_gomoku_board(
+        size=15,  # fields
+        cell_size=40,  # pixel for cell
+        margin=20,  # margin on all sides in px
+        line_width=2,  # line width
+        color=(238, 178, 73),  # board color
+        line_color=(0, 0, 0),  # line color
+    )
+    pieces = create_pieces(40)  # 40 cell size in px
 
     def calc_coords_gomoku_wrapper(i: int, j: int):
-        return calc_coords_gomoku(i, j, 40, (20, 20))
+        return calc_coords_gomoku(
+            i, j, 40, (20, 20)
+        )  # 40 cell size in px, (20, 20) margin in px
 
-    for i, state in enumerate(game_states):
-        # print(f"Rendering move {i}...")
-
-        board_img = render(
-            board_img,
-            pieces,
-            state,
-            prev_state.astype(np.int8) if prev_state is not None else None,
-            calc_coords=calc_coords_gomoku_wrapper,
-        )
-
-        filename = f"turn_{i:03d}.png"
-        board_img.save(IMG_TMP_PATH / filename)
-
-        prev_state = state
-
-
-def _delete_img_out_dir():
-    if IMG_TMP_PATH.exists():
-        shutil.rmtree(IMG_TMP_PATH)
-    IMG_TMP_PATH.mkdir(parents=True, exist_ok=True)
+    return render(
+        board_img,
+        pieces,
+        state,
+        calc_coords=calc_coords_gomoku_wrapper,
+    )
 
 
 def sim_game_with_images(size: int = 15, n: int = 5) -> np.ndarray:
-    _delete_img_out_dir()
     game_states = simulate_game(generate_next_move_random, size, n)
-    render_game_steps(game_states)
+    game_states = simulate_game(
+        (generate_next_move_greedy, generate_next_move_probabilistic), size, n
+    )
+    img = render_game_step(
+        game_states[index]
+    )  # <- example function/needs styling customization
 
     return game_states
-
-
-if __name__ == "__main__":
-    game_states = play_random_game()
-    render_game_steps(game_states)
