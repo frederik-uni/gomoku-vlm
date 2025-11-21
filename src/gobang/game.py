@@ -44,8 +44,7 @@ class GameState(object):
             self.board = board
 
         steps = (self.board != 0).sum()
-        if steps > 0:
-            self._update_types_for_all()
+
         self.__current_player = BLACK if steps % 2 == 0 else WHITE
 
         self.history = [(0, 0)] * steps
@@ -63,25 +62,25 @@ class GameState(object):
         self.start_banned = start_banned
 
         # 2 colors, 4 directions
-        self.blank_types = np.zeros((size, size, 2, 4), dtype=int)
+        self.blank_types = np.zeros((size, size, 2, 4), dtype=np.int32)
         self.black_banes = np.full((size, size), False)
+        if steps > 0:
+            self._update_types_for_all()
 
     def print_board(self):
         cs = {-1: "-", 1: "+", 0: " "}
         for y in range(self.size):
             for x in range(self.size):
                 print(cs[self.board[x][y]], end=" ")
-            print(' ')
+            print(" ")
 
     def _on_board(self, position):
-        """simply return True iff position is within the bounds of [0, self.size)
-        """
+        """simply return True iff position is within the bounds of [0, self.size)"""
         (x, y) = position
         return 0 <= x < self.size and 0 <= y < self.size
 
     def copy(self):
-        """get a copy of this Game state
-        """
+        """get a copy of this Game state"""
         other = GameState(self.size)
         other.board = self.board.copy()
         other.__current_player = self.__current_player
@@ -102,9 +101,17 @@ class GameState(object):
         elif color_count > 5:
             return PATTERN_LINK6
         elif color_count == 5:
-            return PATTERN_LINK5 if stones6[0] != color or stones6[-1] != color else PATTERN_NONE
+            return (
+                PATTERN_LINK5
+                if stones6[0] != color or stones6[-1] != color
+                else PATTERN_NONE
+            )
         elif color_count == 3:
-            return PATTERN_LIVE3 if stones6[0] == 0 and stones6[-1] == 0 and reverse_color_count == 0 else PATTERN_NONE
+            return (
+                PATTERN_LIVE3
+                if stones6[0] == 0 and stones6[-1] == 0 and reverse_color_count == 0
+                else PATTERN_NONE
+            )
         elif color_count == 4:
             if stones6[0] == 0 and stones6[-1] == 0:
                 return PATTERN_LIVE4
@@ -112,9 +119,17 @@ class GameState(object):
                 if reverse_color_count > 1:
                     return PATTERN_NONE
                 elif reverse_color_count == 1:
-                    return PATTERN_RUSH4 if stones6[0] == r_color or stones6[-1] == r_color else PATTERN_NONE
+                    return (
+                        PATTERN_RUSH4
+                        if stones6[0] == r_color or stones6[-1] == r_color
+                        else PATTERN_NONE
+                    )
                 else:
-                    return PATTERN_RUSH4 if stones6[0] == 0 or stones6[-1] == 0 else PATTERN_NONE
+                    return (
+                        PATTERN_RUSH4
+                        if stones6[0] == 0 or stones6[-1] == 0
+                        else PATTERN_NONE
+                    )
 
     def _stones6_from_board(self, action, color=None):
         """iterate over four direction, yield 6 continuous stones each time
@@ -124,10 +139,14 @@ class GameState(object):
         :return: (direction, stones)
         """
         ox, oy = action
-        for direction, (dx, dy) in enumerate([(1, 0), (0, 1), (1, 1), (1, -1)]):  # 4 directions
+        for direction, (dx, dy) in enumerate(
+            [(1, 0), (0, 1), (1, 1), (1, -1)]
+        ):  # 4 directions
             for i in range(5, -1, -1):
                 x, y = ox - dx * i, oy - dy * i
-                if not self._on_board((x, y)) or not self._on_board((x + dx * 5, y + dy * 5)):
+                if not self._on_board((x, y)) or not self._on_board(
+                    (x + dx * 5, y + dy * 5)
+                ):
                     continue
                 stones6 = [self.board[x + dx * j][y + dy * j] for j in range(6)]
                 if color is not None:
@@ -209,8 +228,7 @@ class GameState(object):
             return dx <= 2 and dy <= 2
 
     def is_legal(self, action):
-        """determine if the given action (x,y) is a legal move
-        """
+        """determine if the given action (x,y) is a legal move"""
         if not self._on_board(action):
             return False
         if self.board[action] != EMPTY:
@@ -254,8 +272,7 @@ class GameState(object):
 
     @property
     def current_player(self):
-        """Returns the color of the player who will make the next move.
-        """
+        """Returns the color of the player who will make the next move."""
         return self.__current_player
 
     def do_move(self, action, verbose=False):
