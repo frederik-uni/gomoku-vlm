@@ -1,13 +1,12 @@
-from pathlib import Path
 from typing import Callable
 
 import numpy as np
 from PIL import Image, ImageDraw
 
-from .bots.ai_bot import generate_next_move_greedy, generate_next_move_probabilistic
-from .bots.random_bot import generate_next_move_random
-from .game_logic import create_board, get_winner, make_move
-from .renderer import calc_coords_gomoku, render
+from bots.ai_bot import generate_next_move_greedy, generate_next_move_probabilistic
+from bots.random_bot import generate_next_move_random
+from game_logic import create_board, get_winner, make_move
+from renderer import calc_coords_gomoku, render
 
 Func = Callable[[np.ndarray], tuple[int, int]]
 
