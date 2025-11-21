@@ -1,12 +1,13 @@
 from typing import Callable
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
 
 from bots.ai_bot import generate_next_move_greedy, generate_next_move_probabilistic
 from bots.random_bot import generate_next_move_random
 from game_logic import create_board, get_winner, make_move
-from renderer import calc_coords_gomoku, render
+from gomoku_renderer import calc_coords_gomoku, create_gomoku_board, create_pieces
+from renderer import render
 
 Func = Callable[[np.ndarray], tuple[int, int]]
 
@@ -47,84 +48,6 @@ def simulate_game(
         current_player = (current_player % 2) + 1
 
     return np.stack(game_states)
-
-
-def create_gomoku_board(
-    size: int = 15,
-    cell_size: int = 40,
-    margin: int = 20,
-    line_width: int = 2,
-    color=(238, 178, 73),
-    line_color=(0, 0, 0),
-):
-    size = size - 1
-    board_px = size * cell_size + 2 * margin
-    img = Image.new("RGB", (board_px, board_px), color=color)
-    draw = ImageDraw.Draw(img)
-
-    for i in range(size + 1):
-        offset = margin + i * cell_size
-        draw.line(
-            (margin, offset, board_px - margin, offset),
-            width=line_width,
-            fill=line_color,
-        )
-        draw.line(
-            (offset, margin, offset, board_px - margin),
-            width=line_width,
-            fill=line_color,
-        )
-
-    if size == 15:
-        star_positions = [(3, 3), (3, 11), (7, 7), (11, 3), (11, 11)]
-        star_radius = max(2, cell_size // 8)
-        for r, c in star_positions:
-            cx = margin + c * cell_size
-            cy = margin + r * cell_size
-            draw.ellipse(
-                (
-                    cx - star_radius,
-                    cy - star_radius,
-                    cx + star_radius,
-                    cy + star_radius,
-                ),
-                fill=line_color,
-            )
-
-    return img
-
-
-def create_gomoku_stone(
-    color: str = "black",
-    size: int = 40,
-    outline="black",
-    shadow_color=(255, 255, 255, 100),
-) -> Image.Image:
-    scale = 4
-    large_size = size * scale
-
-    img = Image.new("RGBA", (large_size, large_size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-
-    draw.ellipse((0, 0, large_size - 1, large_size - 1), fill=color, outline=outline)
-
-    highlight = Image.new("RGBA", (large_size, large_size), (0, 0, 0, 0))
-    hdraw = ImageDraw.Draw(highlight)
-    hdraw.ellipse(
-        (large_size * 0.1, large_size * 0.1, large_size * 0.6, large_size * 0.6),
-        fill=shadow_color,
-    )
-    img = Image.alpha_composite(img, highlight)
-
-    img = img.resize((size, size), Image.Resampling.LANCZOS)
-    return img
-
-
-def create_pieces(cell_size=40):
-    black_piece = create_gomoku_stone("black", cell_size)
-    white_piece = create_gomoku_stone("white", cell_size)
-
-    return [black_piece, white_piece]
 
 
 def render_game_step(state: np.ndarray) -> Image.Image:

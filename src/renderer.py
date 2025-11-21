@@ -1,8 +1,11 @@
-import numpy as np
-from PIL import Image
-import numpy.typing as npt
-from typing import Callable
 from enum import Enum
+from typing import Callable
+
+import numpy as np
+import numpy.typing as npt
+from PIL import Image
+
+from gomoku_renderer import calc_coords_gomoku
 
 
 class Anchor(Enum):
@@ -12,22 +15,21 @@ class Anchor(Enum):
     CENTER = 0.5
     MAX = 1.0
 
+    @classmethod
+    def from_string(cls, value: str) -> "Anchor":
+        v = value.strip().lower()
 
-CalcCoordsFn = Callable[[int, int], tuple[int, int, int, int, Anchor, Anchor]]
+        if v in ("min", "top", "t", "left", "l"):
+            return cls.MIN
+        if v in ("max", "right", "r", "bottom", "b"):
+            return cls.MAX
+        if v in ("c", "center", "centre"):
+            return cls.CENTER
+
+        raise ValueError(f"Unknown anchor string: {value!r}")
 
 
-def calc_coords_gomoku(
-    i: int, j: int, cell_size: int = 40, board_origin: tuple[int, int] = (0, 0)
-):
-    """
-    Calculate the coordinates of a piece on the game board.
-    """
-    x0, y0 = board_origin
-    w = h = cell_size
-
-    x = x0 + j * cell_size
-    y = y0 + i * cell_size
-    return x, y, w, h, Anchor.CENTER, Anchor.CENTER
+CalcCoordsFn = Callable[[int, int], tuple[int, int, int, int, str, str]]
 
 
 def adjust_xy(
@@ -49,7 +51,7 @@ def render_single(
     Render a single piece on the game board.
     """
     x, y, w, h, x_a, y_a = calc_coords(i, j)
-    x, y = adjust_xy(x, y, w, h, x_a, y_a)
+    x, y = adjust_xy(x, y, w, h, Anchor.from_string(x_a), Anchor.from_string(y_a))
     piece = (
         piece.resize((w, h), Image.Resampling.LANCZOS) if img.size != (w, h) else piece
     )
