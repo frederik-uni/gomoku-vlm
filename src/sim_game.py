@@ -1,19 +1,24 @@
 import shutil
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
 from PIL import Image, ImageDraw
 
+from .bots.ai_bot import generate_next_move_greedy, generate_next_move_probabilistic
 from .bots.random_bot import generate_next_move_random
 from .game_logic import create_board, get_winner, make_move
 from .renderer import calc_coords_gomoku, render
-
 
 IMG_TMP_PATH = Path(__file__).resolve().parent / "tmp" / "sim_game"
 IMG_TMP_PATH.mkdir(parents=True, exist_ok=True)
 
 
-def play_random_game(size: int = 15, n: int = 5) -> np.ndarray:
+def simulate_game(
+    function: Callable[[np.ndarray], tuple[int, int]],
+    size: int = 15,
+    n: int = 5,
+) -> np.ndarray:
     """
     Play a random Gomoku game with 2 random actors.
     Returns a 3D array of shape (num_moves, size, size) representing the board after each move.
@@ -23,7 +28,7 @@ def play_random_game(size: int = 15, n: int = 5) -> np.ndarray:
     current_player = 1
 
     while True:
-        y, x = generate_next_move_random(board)
+        y, x = function(board)
         make_move(board, y, x, current_player)
         # print(f"Player {current_player} placed at (y={y}, x={x})")
 
@@ -153,7 +158,7 @@ def _delete_img_out_dir():
 
 def sim_game_with_images(size: int = 15, n: int = 5) -> np.ndarray:
     _delete_img_out_dir()
-    game_states = play_random_game(size, n)
+    game_states = simulate_game(generate_next_move_random, size, n)
     render_game_steps(game_states)
 
     return game_states
