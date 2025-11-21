@@ -27,8 +27,14 @@ def generate_strategy_questions_for_episode(
 
     # focus: best_next_move
     rows.append(best_next_move.gen_question_q600_sample(sim_id, simulated_game))
+    rows.append(best_next_move.gen_question_q601_sample(sim_id, simulated_game))
+    rows.append(best_next_move.gen_question_q602_sample(sim_id, simulated_game))
+    rows.append(best_next_move.gen_question_q603_sample(sim_id, simulated_game))
 
     # focus: list_valid_moves
     rows.append(list_valid_moves.gen_question_q700_sample(sim_id, simulated_game))
+    rows.append(list_valid_moves.gen_question_q701_sample(sim_id, simulated_game))
+    rows.append(list_valid_moves.gen_question_q702_sample(sim_id, simulated_game))
+    rows.append(list_valid_moves.gen_question_q703_sample(sim_id, simulated_game))
 
     return rows
