@@ -11,10 +11,10 @@ from gen_dataset.sphinx.core import (
 from src.game_logic import get_winner
 
 
-def _focus_perform_valid_move(q_id: str, sim_id: int, simulated_game: np.ndarray) -> tuple[str, DatasetRow]:
+def _focus_list_valid_moves(q_id: str, sim_id: int, simulated_game: np.ndarray) -> tuple[str, DatasetRow]:
     """
     Helper function for any question that has the
-    focus: "perform_valid_move".
+    focus: "list_valid_moves".
 
     It picks a random, not-final turn,
     and then returns all empty board positions as the answer.
@@ -92,11 +92,11 @@ def _focus_perform_valid_move(q_id: str, sim_id: int, simulated_game: np.ndarray
 def gen_question_q700_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
     Generate a single Q700 sample:
-    focus: "perform_valid_move"
+    focus: "list_valid_moves"
     """
     q_id = "Q700"
 
-    color, dataset_row = _focus_perform_valid_move(q_id, sim_id, simulated_game)
+    color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
 
     question_text = (
         "You are looking at a Gomoku board position in the middle of a game. "

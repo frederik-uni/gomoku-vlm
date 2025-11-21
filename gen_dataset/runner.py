@@ -13,6 +13,8 @@ from gen_dataset.sphinx.perception.per_simulation import generate_perception_que
 from gen_dataset.sphinx.strategy.per_simulation import generate_strategy_questions_for_episode
 from src import sim_game
 
+import sys
+
 
 def _determine_num_of_required_episodes() -> int:
     """
@@ -133,7 +135,33 @@ def assign_splits(rows: List[DatasetRow]) -> None:
 
 
 if __name__ == "__main__":
-    sphinx.core.init_output_dirs() # sets SPHINX_IMG_OUT_PATH / SPHINX_PARQUET_OUT_PATH
+    # -------------------------------------------------
+    # CLI help
+    # -------------------------------------------------
+    if len(sys.argv) > 1 and sys.argv[1] in ("-h", "--help"):
+        print("Usage:")
+        print("  python -m gen_dataset.runner")
+        print()
+        print("Description:")
+        print("  Simulate multiple Gomoku games, generate all configured")
+        print("  perception and strategy questions, assign train/eval/test")
+        print("  splits, and write a single dataset.parquet file plus images.")
+        print()
+        print("Output:")
+        print("  Creates a new dataset_NNN directory under:")
+        print(f"    {sphinx_core.SPHINX_BASE_OUT}")
+        print("  with subfolders:")
+        print("    images/  -> Persisted PNGs for each simulation + turn")
+        print("    parquet/ -> dataset.parquet with all DatasetRow entries")
+        print()
+        print("Requirements (Python packages):")
+        print("  numpy, pandas, pyarrow, pillow")
+        sys.exit(0)
+
+    # -------------------------------------------------
+    # Normal run (PyCharm or terminal with no args)
+    # -------------------------------------------------
+    sphinx_core.init_output_dirs()  # sets SPHINX_IMG_OUT_PATH / SPHINX_PARQUET_OUT_PATH
     rows = generate_question_dataset()
     assign_splits(rows)
     assemble_parquet_file(rows)
