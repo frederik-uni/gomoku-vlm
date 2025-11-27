@@ -2,6 +2,8 @@
 
 ## Installation
 ```bash
+git clone https://github.com/frederik-uni/gomoku-vlm.git
+cd gomoku-vlm
 pip install -e .
 ```
 or 
