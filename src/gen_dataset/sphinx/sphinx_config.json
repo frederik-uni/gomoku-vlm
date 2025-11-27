@@ -1,7 +1,7 @@
 {
   "general": {
     "output_dir": "out/sphinx/dataset",
-    "default_num_samples": 20,
+    "default_num_samples": 50,
     "default_min_turns": 1,
     "default_max_turns": 999,
     "split_ratios": {
@@ -111,8 +111,7 @@
       "Q603": {
         "focus": "best_next_move",
         "min_turns": 2,
-        "max_turns": 999,
-        "num_samples": 20
+        "max_turns": 999
       },
       "Q700": {
         "focus": "list_valid_moves"

@@ -70,17 +70,5 @@ def generate_perception_questions_for_episode(
     # rows.append(can_you_loose.gen_question_q105_sample(sim_id, simulated_game))
     # rows.append(can_you_loose.gen_question_q106_sample(sim_id, simulated_game))
     # rows.append(can_you_loose.gen_question_q107_sample(sim_id, simulated_game))
-    #
-    # # focus: where_are_the_white_stones
-    # rows.append(where_are_the_white_stones.gen_question_q108_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_white_stones.gen_question_q109_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_white_stones.gen_question_q110_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_white_stones.gen_question_q111_sample(sim_id, simulated_game))
-    #
-    # # focus: where_are_the_black_stones
-    # rows.append(where_are_the_black_stones.gen_question_q112_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_black_stones.gen_question_q113_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_black_stones.gen_question_q114_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_black_stones.gen_question_q115_sample(sim_id, simulated_game))
 
     return rows

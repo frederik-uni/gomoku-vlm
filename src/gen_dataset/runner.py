@@ -90,7 +90,7 @@ def generate_question_dataset() -> List[DatasetRow]:
         print(f"Simulating {sim_id} / {num_required_episodes}")
 
         simulated_game = simulate_game_preferring_winner(
-        (generate_next_move_probabilistic, generate_next_move_probabilistic), 15, 5
+        (generate_next_move_probabilistic, generate_next_move_probabilistic), 15, 5, 8
         )
 
         perception_rows: List[DatasetRow] = generate_perception_questions_for_episode(
