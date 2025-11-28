@@ -2,6 +2,8 @@
 
 ## Installation
 ```bash
+git clone https://github.com/frederik-uni/gomoku-vlm.git
+cd gomoku-vlm
 pip install -e .
 ```
 or 
@@ -33,6 +35,25 @@ options:
   -h, --help       show this help message and exit
   --output OUTPUT  Path where parquet file will be stored
   --config CONFIG  Path where the config file is stored
+```
+
+### Evaluation
+```bash
+python -m eval --model-id "Qwen/Qwen2.5-VL-7B-Instruct" --parquet-path ./datasets/initial_eval.parquet
+usage: python -m eval [-h] --model-id MODEL_ID --parquet-path PARQUET_PATH [--match-mode {exact,fuzzy}]
+                   [--max-new-tokens MAX_NEW_TOKENS]
+
+Evaluate a VLM model on a parquet dataset.
+
+options:
+  -h, --help            show this help message and exit
+  --model-id MODEL_ID   HuggingFace model identifier (e.g., 'google/paligemma-3b').
+  --parquet-path PARQUET_PATH
+                        Path to the parquet file to evaluate.
+  --match-mode {exact,fuzzy}
+                        Answer-matching mode. Default: exact.
+  --max-new-tokens MAX_NEW_TOKENS
+                        Max new tokens to generate.
 ```
 
 ## PyGame Controls

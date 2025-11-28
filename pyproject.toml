@@ -14,7 +14,9 @@ dependencies = [
     "torch",
     "pygame",
     "pandas",
-    "pyarrow"
+    "pyarrow",
+    "transformers",
+    "torchvision"
 ]
 
 [tool.setuptools]
