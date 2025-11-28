@@ -117,7 +117,7 @@ if __name__ == "__main__":
     # -------------------------------------------------
     if len(sys.argv) == 1:
         # Hard-coded defaults for quick debugging
-        q_id = "Q700"
+        q_id = "Q100"
         q_row_idx = 0
         dataset_idx = _find_latest_dataset_idx()
         if dataset_idx is None:

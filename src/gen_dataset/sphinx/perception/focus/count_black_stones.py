@@ -3,117 +3,103 @@ import numpy as np
 from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.core import (
     QuestionFamily,
-    build_basic_dataset_row,
-    select_random_turn_and_store_image,
-    get_question_meta,
+    get_random_turn_index,
+    persist_turn_image,
+    persist_turn_game_state,
+    get_question_text
 )
 
-
-def _focus_count_black_stones(q_id: str, sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def _focus_count_black_stones(
+    q_id: str,
+    sim_id: int,
+    game: np.ndarray,
+    min_turns: int = 0,
+    max_turns: int = 999
+) -> DatasetRow:
     """
     Helper function for any question that has the
     focus: "count_black_stones"
     """
-    family, focus = get_question_meta(QuestionFamily.PERCEPTION, q_id)
+    FOCUS = "count_black_stones"
+    FAMILY = QuestionFamily.PERCEPTION
 
-    # choose turn, get board, store image
-    turn_index, board, img_path, img_bytes = select_random_turn_and_store_image(
-        family=family,
-        q_id=q_id,
-        sim_id=sim_id,
-        simulated_game=simulated_game,
-    )
+    # Sample random turn
+    turn_index = get_random_turn_index(game, min_turns, max_turns)
+    board = game[turn_index]
+    # Persist the image and get img_bytes
+    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id)
+    # Persist game state for easier debugging
+    persist_turn_game_state(board, turn_index, sim_id)
 
     # count black stones (=1) as ground truth
     num_black = int(np.count_nonzero(board == 1))
-    answer_text = str(num_black)
+    answer = str(num_black)
+    valid_answers = [answer]
 
-    return build_basic_dataset_row(
-        img_path=img_path,
+    return DatasetRow(
+        img_path=str(img_path),
         img_bytes=img_bytes,
-        family=family,
+
+        family=FAMILY,
         q_id=q_id,
-        focus=focus,
-        answer=answer_text,
+        focus=FOCUS,
+
+        answer=answer,
+        valid_answers=valid_answers,
+
+        # Will be assigned later in the creation process
+        question=None,
+        split=None
     )
 
 
-def gen_question_q1_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q100_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q1 sample:
+    Generate a single Q100 sample:
     focus: "count_black_stones"
     """
-    q_id = "Q1"
-    question_text = (
-        "You are looking at a Gomoku game position. "
-        "Black is player 1 and white is player 2. "
-        "Count ONLY the black stones already placed on the board. "
-        "How many black stones are there in total? Answer with a single integer."
-    )
+    q_id = "Q100"
 
     dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
-    dataset_row.question = question_text
-
-    # Optionally, add additional valid answers here
+    dataset_row.question = get_question_text(q_id)
 
     return dataset_row
 
 
-def gen_question_q2_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q101_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q2 sample:
+    Generate a single Q101 sample:
     focus: "count_black_stones"
     """
-    q_id = "Q2"
-    question_text = (
-        "Your task is to analyze this Gomoku board position. "
-        "Player 1 is represented by black stones, player 2 by white stones. "
-        "Ignore all empty intersections and all white stones. "
-        "How many black stones belonging to player 1 are currently on the board? "
-        "Answer with a single integer (for example: 7)."
-    )
+    q_id = "Q101"
 
     dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
-    dataset_row.question = question_text
+    dataset_row.question = get_question_text(q_id)
 
     return dataset_row
 
 
-def gen_question_q3_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q102_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q3 sample:
+    Generate a single Q102 sample:
     focus: "count_black_stones"
     """
-    q_id = "Q3"
-    question_text = (
-        "This image shows a snapshot of a Gomoku game in progress. "
-        "Black stones belong to player 1, white stones belong to player 2. "
-        "Count how many board intersections are occupied by black stones only. "
-        "What is the total number of black stones on the board? "
-        "Respond using only one integer and no additional text."
-    )
+    q_id = "Q102"
 
     dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
-    dataset_row.question = question_text
+    dataset_row.question = get_question_text(q_id)
 
     return dataset_row
 
 
-def gen_question_q4_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q103_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q4 sample:
+    Generate a single Q103 sample:
     focus: "count_black_stones"
     """
-    q_id = "Q4"
-    question_text = (
-        "You are inspecting a partially played Gomoku position. "
-        "Player 1 uses black stones, and player 2 uses white stones. "
-        "Determine how many black stones player 1 has placed on the board so far. "
-        "Do not count white stones or empty cells. "
-        "Return only the total number of black stones as a single integer value."
-    )
+    q_id = "Q103"
 
     dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
-    dataset_row.question = question_text
+    dataset_row.question = get_question_text(q_id)
 
     return dataset_row

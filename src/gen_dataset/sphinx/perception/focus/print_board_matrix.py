@@ -1,7 +1,13 @@
 import numpy as np
 
 from gen_dataset.dataset_schema import DatasetRow
-from gen_dataset.sphinx.core import QuestionFamily, build_basic_dataset_row, select_random_turn_and_store_image, get_question_meta
+from gen_dataset.sphinx.core import (
+    QuestionFamily,
+    get_random_turn_index,
+    persist_turn_image,
+    persist_turn_game_state,
+    get_question_text
+)
 
 
 def _board_to_matrix_string(board: np.ndarray) -> str:
@@ -30,113 +36,88 @@ def _board_to_matrix_string(board: np.ndarray) -> str:
     return "\n".join(lines)
 
 
-def _print_board_matrix(q_id: str, sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def _focus_print_board_matrix(
+    q_id: str,
+    sim_id: int,
+    game: np.ndarray,
+    min_turns: int = 0,
+    max_turns: int = 999
+) -> DatasetRow:
     """
     Helper function for any question that has the
     focus: 'print_board_matrix'.
     """
-    family, focus = get_question_meta(QuestionFamily.PERCEPTION, q_id)
+    FOCUS = "print_board_matrix"
+    FAMILY = QuestionFamily.PERCEPTION
 
-    # choose turn, get board, store image
-    turn_index, board, img_path, img_bytes = select_random_turn_and_store_image(family=family, q_id=q_id, sim_id=sim_id, simulated_game=simulated_game)
+    # Sample random turn
+    turn_index = get_random_turn_index(game, min_turns, max_turns)
+    board = game[turn_index]
+    # Persist the image and get img_bytes
+    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id)
+    # Persist game state for easier debugging
+    persist_turn_game_state(board, turn_index, sim_id)
 
     # serialize the board as text matrix
-    answer_text = _board_to_matrix_string(board)
-    valid_answers = [answer_text]
+    answer = _board_to_matrix_string(board)
+    valid_answers = [answer]
 
-    return build_basic_dataset_row(
-        img_path=img_path,
+    return DatasetRow(
+        img_path=str(img_path),
         img_bytes=img_bytes,
-        family=family,
+
+        family=FAMILY,
         q_id=q_id,
-        focus=focus,
-        answer=answer_text,
+        focus=FOCUS,
+
+        answer=answer,
         valid_answers=valid_answers,
+
+        # Will be assigned later in the creation process
+        question=None,
+        split=None
     )
 
 
-def gen_question_q17_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q500_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q17 sample:
+    Generate a single Q500 sample:
     focus: "print_board_matrix"
     """
-    q_id = "Q17"
-    dataset_row = _print_board_matrix(q_id, sim_id, simulated_game)
-
-    question_text = (
-        "You are looking at a Gomoku board position. "
-        "The board is a 15×15 grid. "
-        "Encode the entire board as a 15×15 matrix of integers. "
-        "Use the following encoding: 0 for empty intersections, "
-        "1 for black stones (player 1), and 2 for white stones (player 2). "
-        "Output exactly 15 rows, each row containing 15 integers separated by a single space. "
-        "Do not include any extra text, explanation, brackets, or punctuation. "
-        "Answer ONLY with the matrix."
-    )
-
-    dataset_row.question = question_text
+    q_id = "Q500"
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game)
+    dataset_row.question = get_question_text(q_id)
     return dataset_row
 
 
-def gen_question_q18_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q501_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q18 sample:
+    Generate a single Q501 sample:
     focus: "print_board_matrix"
     """
-    q_id = "Q18"
-    dataset_row = _print_board_matrix(q_id, sim_id, simulated_game)
-
-    question_text = (
-        "This image shows a Gomoku position on a 15×15 board. "
-        "Represent the current board state as a numeric matrix. "
-        "Use 0 for an empty cell, 1 for a black stone (player 1), and 2 for a white stone (player 2). "
-        "Write the matrix row by row from top to bottom. "
-        "Each row must contain exactly 15 integers separated by a single space. "
-        "Return ONLY the 15 lines of numbers, with no additional commentary or symbols."
-    )
-
-    dataset_row.question = question_text
+    q_id = "Q501"
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game)
+    dataset_row.question = get_question_text(q_id)
     return dataset_row
 
 
-def gen_question_q19_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q502_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q19 sample:
+    Generate a single Q502 sample:
     focus: "print_board_matrix"
     """
-    q_id = "Q19"
-    dataset_row = _print_board_matrix(q_id, sim_id, simulated_game)
-
-    question_text = (
-        "Consider the displayed Gomoku game state on a 15×15 grid. "
-        "Convert the full board into a textual 15×15 matrix. "
-        "For each intersection, output 0 if it is empty, 1 if it contains a black stone (player 1), "
-        "or 2 if it contains a white stone (player 2). "
-        "Write one row per line, from the top row to the bottom row, with 15 space-separated integers in each row. "
-        "Your answer must consist ONLY of these 15 numeric rows."
-    )
-
-    dataset_row.question = question_text
+    q_id = "Q502"
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game)
+    dataset_row.question = get_question_text(q_id)
     return dataset_row
 
 
-def gen_question_q20_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q503_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q20 sample:
+    Generate a single Q503 sample:
     focus: "print_board_matrix"
     """
-    q_id = "Q20"
-    dataset_row = _print_board_matrix(q_id, sim_id, simulated_game)
-
-    question_text = (
-        "You are given an image of a Gomoku board (15×15). "
-        "Encode the board configuration as a matrix of integers using this scheme: "
-        "0 = empty intersection, 1 = black stone (player 1), 2 = white stone (player 2). "
-        "Output the complete board as 15 lines, each line containing 15 integers separated by single spaces. "
-        "Do not add brackets, commas, words, or any explanation. "
-        "Respond strictly with the 15-line matrix."
-    )
-
-    dataset_row.question = question_text
+    q_id = "Q503"
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game)
+    dataset_row.question = get_question_text(q_id)
     return dataset_row
-

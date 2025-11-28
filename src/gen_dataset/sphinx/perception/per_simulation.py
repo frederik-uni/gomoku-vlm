@@ -11,6 +11,7 @@ from gen_dataset.sphinx.perception.focus import (
     print_board_matrix,
     determine_who_won
 )
+from ..core import is_question_configured
 
 
 def generate_perception_questions_for_episode(
@@ -23,40 +24,64 @@ def generate_perception_questions_for_episode(
 
     # === Eugen ===
     # focus: count_black_stones
-    rows.append(count_black_stones.gen_question_q1_sample(sim_id, simulated_game))
-    rows.append(count_black_stones.gen_question_q2_sample(sim_id, simulated_game))
-    rows.append(count_black_stones.gen_question_q3_sample(sim_id, simulated_game))
-    rows.append(count_black_stones.gen_question_q4_sample(sim_id, simulated_game))
+    if is_question_configured("Q100"):
+        rows.append(count_black_stones.gen_question_q100_sample(sim_id, simulated_game))
+    if is_question_configured("Q101"):
+        rows.append(count_black_stones.gen_question_q101_sample(sim_id, simulated_game))
+    if is_question_configured("Q102"):
+        rows.append(count_black_stones.gen_question_q102_sample(sim_id, simulated_game))
+    if is_question_configured("Q103"):
+        rows.append(count_black_stones.gen_question_q103_sample(sim_id, simulated_game))
 
     # focus: count_white_stones
-    rows.append(count_white_stones.gen_question_q5_sample(sim_id, simulated_game))
-    rows.append(count_white_stones.gen_question_q6_sample(sim_id, simulated_game))
-    rows.append(count_white_stones.gen_question_q7_sample(sim_id, simulated_game))
-    rows.append(count_white_stones.gen_question_q8_sample(sim_id, simulated_game))
+    if is_question_configured("Q200"):
+        rows.append(count_white_stones.gen_question_q200_sample(sim_id, simulated_game))
+    if is_question_configured("Q201"):
+        rows.append(count_white_stones.gen_question_q201_sample(sim_id, simulated_game))
+    if is_question_configured("Q202"):
+        rows.append(count_white_stones.gen_question_q202_sample(sim_id, simulated_game))
+    if is_question_configured("Q203"):
+        rows.append(count_white_stones.gen_question_q203_sample(sim_id, simulated_game))
 
-    # focus: count_empty_intersections
-    rows.append(count_empty_intersections.gen_question_q9_sample(sim_id, simulated_game))
-    rows.append(count_empty_intersections.gen_question_q10_sample(sim_id, simulated_game))
-    rows.append(count_empty_intersections.gen_question_q11_sample(sim_id, simulated_game))
-    rows.append(count_empty_intersections.gen_question_q12_sample(sim_id, simulated_game))
+    # # focus: count_empty_intersections
+    if is_question_configured("Q300"):
+        rows.append(count_empty_intersections.gen_question_q300_sample(sim_id, simulated_game))
+    if is_question_configured("Q301"):
+        rows.append(count_empty_intersections.gen_question_q301_sample(sim_id, simulated_game))
+    if is_question_configured("Q302"):
+        rows.append(count_empty_intersections.gen_question_q302_sample(sim_id, simulated_game))
+    if is_question_configured("Q303"):
+        rows.append(count_empty_intersections.gen_question_q303_sample(sim_id, simulated_game))
 
     # focus: color_at_position
-    rows.append(color_at_position.gen_question_q13_sample(sim_id, simulated_game))
-    rows.append(color_at_position.gen_question_q14_sample(sim_id, simulated_game))
-    rows.append(color_at_position.gen_question_q15_sample(sim_id, simulated_game))
-    rows.append(color_at_position.gen_question_q16_sample(sim_id, simulated_game))
+    if is_question_configured("Q400"):
+        rows.append(color_at_position.gen_question_q400_sample(sim_id, simulated_game))
+    if is_question_configured("Q401"):
+        rows.append(color_at_position.gen_question_q401_sample(sim_id, simulated_game))
+    if is_question_configured("Q402"):
+        rows.append(color_at_position.gen_question_q402_sample(sim_id, simulated_game))
+    if is_question_configured("Q403"):
+        rows.append(color_at_position.gen_question_q403_sample(sim_id, simulated_game))
 
     # focus: print_board_matrix
-    rows.append(print_board_matrix.gen_question_q17_sample(sim_id, simulated_game))
-    rows.append(print_board_matrix.gen_question_q18_sample(sim_id, simulated_game))
-    rows.append(print_board_matrix.gen_question_q19_sample(sim_id, simulated_game))
-    rows.append(print_board_matrix.gen_question_q20_sample(sim_id, simulated_game))
+    if is_question_configured("Q500"):
+        rows.append(print_board_matrix.gen_question_q500_sample(sim_id, simulated_game))
+    if is_question_configured("Q501"):
+        rows.append(print_board_matrix.gen_question_q501_sample(sim_id, simulated_game))
+    if is_question_configured("Q502"):
+        rows.append(print_board_matrix.gen_question_q502_sample(sim_id, simulated_game))
+    if is_question_configured("Q503"):
+        rows.append(print_board_matrix.gen_question_q503_sample(sim_id, simulated_game))
 
     # focus: determine_who_won
-    rows.append(determine_who_won.gen_question_q21_sample(sim_id, simulated_game))
-    rows.append(determine_who_won.gen_question_q22_sample(sim_id, simulated_game))
-    rows.append(determine_who_won.gen_question_q23_sample(sim_id, simulated_game))
-    rows.append(determine_who_won.gen_question_q24_sample(sim_id, simulated_game))
+    if is_question_configured("Q600"):
+        rows.append(determine_who_won.gen_question_q600_sample(sim_id, simulated_game))
+    if is_question_configured("Q601"):
+        rows.append(determine_who_won.gen_question_q601_sample(sim_id, simulated_game))
+    if is_question_configured("Q602"):
+        rows.append(determine_who_won.gen_question_q602_sample(sim_id, simulated_game))
+    if is_question_configured("Q603"):
+        rows.append(determine_who_won.gen_question_q603_sample(sim_id, simulated_game))
 
     # # === Frederik ===
     # # focus: can_you_win
@@ -70,17 +95,5 @@ def generate_perception_questions_for_episode(
     # rows.append(can_you_loose.gen_question_q105_sample(sim_id, simulated_game))
     # rows.append(can_you_loose.gen_question_q106_sample(sim_id, simulated_game))
     # rows.append(can_you_loose.gen_question_q107_sample(sim_id, simulated_game))
-    #
-    # # focus: where_are_the_white_stones
-    # rows.append(where_are_the_white_stones.gen_question_q108_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_white_stones.gen_question_q109_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_white_stones.gen_question_q110_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_white_stones.gen_question_q111_sample(sim_id, simulated_game))
-    #
-    # # focus: where_are_the_black_stones
-    # rows.append(where_are_the_black_stones.gen_question_q112_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_black_stones.gen_question_q113_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_black_stones.gen_question_q114_sample(sim_id, simulated_game))
-    # rows.append(where_are_the_black_stones.gen_question_q115_sample(sim_id, simulated_game))
 
     return rows

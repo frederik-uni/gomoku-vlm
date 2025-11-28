@@ -2,16 +2,21 @@ import numpy as np
 
 from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.core import (
-    get_question_meta,
     QuestionFamily,
-    select_fixed_turn_and_store_image,
-    random_turn_index,
-    build_basic_dataset_row
+    get_random_turn_index,
+    persist_turn_image,
+    persist_turn_game_state,
+    get_question_text
 )
-from src.game_logic import get_winner
+from src import game_logic
 
-
-def _focus_list_valid_moves(q_id: str, sim_id: int, simulated_game: np.ndarray) -> tuple[str, DatasetRow]:
+def _focus_list_valid_moves(
+    q_id: str,
+    sim_id: int,
+    game: np.ndarray,
+    min_turns: int = 0,
+    max_turns: int = 999
+) -> tuple[str, DatasetRow]:
     """
     Helper function for any question that has the
     focus: "list_valid_moves".
@@ -27,20 +32,20 @@ def _focus_list_valid_moves(q_id: str, sim_id: int, simulated_game: np.ndarray) 
         - str: The color of the player who has to perform this move.
         - DatasetRow: The pre-constructed dataset row for the dataset.
     """
-    family, focus = get_question_meta(QuestionFamily.STRATEGY, q_id)
+    FOCUS = "list_valid_moves"
+    FAMILY = QuestionFamily.STRATEGY
 
-    num_turns = simulated_game.shape[0]
+    num_turns = game.shape[0]
     if num_turns < 1:
-        # miss configured config, game had no turns.
-        raise ValueError(f"Need at least 1 turn for 'focus: perform_valid_move', got num_turns={num_turns}. "
-                         f"Miss configured sphinx_config file, make sure the min_turns is at least 1.")
+        # miss configured question, game had no turns.
+        raise ValueError(f"Need at least 1 turn for 'focus: list_valid_moves', got num_turns={num_turns}. ")
 
     # Random 0-based index of the board.
-    turn_index = random_turn_index(QuestionFamily.STRATEGY, q_id, simulated_game)
+    turn_index = get_random_turn_index(game, min_turns, max_turns)
 
     # Make sure the game is not already finished at this position.
-    board_at_turn = simulated_game[turn_index]
-    winner = get_winner(board_at_turn, 5)
+    board_at_turn = game[turn_index]
+    winner = game_logic.get_winner(board_at_turn, 5)
     if winner != 0:
         # If the game already ended at this turn:
         if turn_index == 0:
@@ -52,11 +57,9 @@ def _focus_list_valid_moves(q_id: str, sim_id: int, simulated_game: np.ndarray) 
         turn_index -= 1
 
     # get board for this turn_index
-    board, img_path, img_bytes = select_fixed_turn_and_store_image(
-        sim_id=sim_id,
-        simulated_game=simulated_game,
-        turn_index=turn_index,
-    )
+    board = game[turn_index]
+    # Persist the image and get img_bytes
+    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id)
 
     # Collect all valid moves = all empty cells (0's)
     mask = board == 0  # shape (15, 15)
@@ -78,103 +81,78 @@ def _focus_list_valid_moves(q_id: str, sim_id: int, simulated_game: np.ndarray) 
     else:
         color = "white"
 
-    return color, build_basic_dataset_row(
-        img_path=img_path,
+    return color, DatasetRow(
+        img_path=str(img_path),
         img_bytes=img_bytes,
-        family=family,
+
+        family=FAMILY,
         q_id=q_id,
-        focus=focus,
+        focus=FOCUS,
+
         answer=answer,
         valid_answers=valid_answers,
+
+        # Will be assigned later in the creation process
+        question=None,
+        split=None
     )
 
 
-def gen_question_q700_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q102000_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q700 sample:
+    Generate a single Q102000 sample:
     focus: "list_valid_moves"
     """
-    q_id = "Q700"
+    q_id = "Q102000"
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
 
-    question_text = (
-        "You are looking at a Gomoku board position in the middle of a game. "
-        "Player 1 uses black stones and Player 2 uses white stones. "
-        f"It is {color}'s turn to move. "
-        "List ALL currently valid moves, i.e. all empty intersections where a stone can still be placed. "
-        "Output them as a comma-separated list of 0-based coordinates in the format "
-        "'row col, row col, row col, ...' and nothing else. "
-        "For example: '0 0, 0 3, 1 5'."
-    )
+    template = get_question_text(q_id)
+    dataset_row.question = template.format(color=color)
 
-    dataset_row.question = question_text
     return dataset_row
 
 
-def gen_question_q701_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q102001_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q701 sample:
+    Generate a single Q102001 sample:
     focus: "list_valid_moves"
     """
-    q_id = "Q701"
+    q_id = "Q102001"
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
 
-    question_text = (
-        "This image shows a Gomoku position partway through a game. "
-        "Stones of one player are black, and stones of the other player are white. "
-        f"It is {color}'s turn to move. "
-        "Identify every empty board intersection where a stone could legally be played next. "
-        "Output ALL such moves as a comma-separated list of 0-based coordinates in the format "
-        "'row col, row col, row col, ...' with no extra text."
-    )
+    template = get_question_text(q_id)
+    dataset_row.question = template.format(color=color)
 
-    dataset_row.question = question_text
     return dataset_row
 
 
-def gen_question_q702_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q102002_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q702 sample:
+    Generate a single Q102002 sample:
     focus: "list_valid_moves"
     """
-    q_id = "Q702"
+    q_id = "Q102002"
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
 
-    question_text = (
-        "You are given a snapshot of an ongoing Gomoku game. "
-        "Player 1 places black stones and Player 2 places white stones. "
-        f"In this position, it is {color}'s turn to play. "
-        "Your task is to list every legal move, i.e. every empty intersection where a new stone "
-        "can still be placed. "
-        "Return your answer as a comma-separated list of 0-based 'row col' pairs, for example: "
-        "'0 4, 1 3, 7 7'. Do not add any additional explanation."
-    )
+    template = get_question_text(q_id)
+    dataset_row.question = template.format(color=color)
 
-    dataset_row.question = question_text
     return dataset_row
 
 
-def gen_question_q703_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q102003_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q703 sample:
+    Generate a single Q102003 sample:
     focus: "list_valid_moves"
     """
-    q_id = "Q703"
+    q_id = "Q102003"
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
 
-    question_text = (
-        "Consider the shown Gomoku board position. "
-        f"It is {color}'s turn, and you must decide where a stone could legally be placed. "
-        "Treat every currently empty intersection as a possible move, and every occupied "
-        "intersection as invalid. "
-        "List ALL valid moves as a comma-separated list of coordinates in 0-based '(row col)' "
-        "format, written as 'row col, row col, row col, ...'. "
-        "Only output this list of coordinates, nothing else."
-    )
+    template = get_question_text(q_id)
+    dataset_row.question = template.format(color=color)
 
-    dataset_row.question = question_text
     return dataset_row
