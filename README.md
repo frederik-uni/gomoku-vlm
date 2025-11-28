@@ -26,15 +26,37 @@ options:
 
 ### Dataset Generator
 ```bash
-usage: python -m gen_dataset.runner [-h] [--output OUTPUT] [--config CONFIG]
+usage: python -m gen_dataset.runner [-h] [--config CONFIG] [--questions QUESTIONS]
+                 [--output OUTPUT]
 
 Simulate multiple Gomoku games, generate all configured perception and strategy questions, assign train/eval/test splits, and write a single dataset.parquet
 file plus images.
 
 options:
-  -h, --help       show this help message and exit
-  --output OUTPUT  Path where parquet file will be stored
-  --config CONFIG  Path where the config file is stored
+  -h, --help            show this help message and exit
+  --config CONFIG       Path where the config file is stored
+  --questions QUESTIONS
+                        Path where the question text for the questions is stored.
+  --output OUTPUT       Path where parquet file will be stored
+```
+
+### Evaluation
+```bash
+python -m eval --model-id "Qwen/Qwen2.5-VL-7B-Instruct" --parquet-path ./datasets/initial_eval.parquet
+usage: python -m eval [-h] --model-id MODEL_ID --parquet-path PARQUET_PATH [--match-mode {exact,fuzzy}]
+                   [--max-new-tokens MAX_NEW_TOKENS]
+
+Evaluate a VLM model on a parquet dataset.
+
+options:
+  -h, --help            show this help message and exit
+  --model-id MODEL_ID   HuggingFace model identifier (e.g., 'google/paligemma-3b').
+  --parquet-path PARQUET_PATH
+                        Path to the parquet file to evaluate.
+  --match-mode {exact,fuzzy}
+                        Answer-matching mode. Default: exact.
+  --max-new-tokens MAX_NEW_TOKENS
+                        Max new tokens to generate.
 ```
 
 ### Evaluation
@@ -63,3 +85,12 @@ options:
 - **ESC**: Quit game
 
 **Note**: Game states > automatically exported as .npy files to `game_data/` folder > when the game ends.
+
+## Adjusting the Dataset
+
+### sphinx_config.toml
+**Avoiding draws**: Due to the fact that the algorithmic bots are too good, matches often end in draws. To avoid this adjust the `max_simulation_attempts` variable. This adjusts how many times to re-simulate per round to get a game that did not end in a draw.
+
+**Adjusting split-ratios**: Adjust the `split_ratios` variable. `train, eval, test` need to sum = 1.
+
+### sphinx_question.toml
