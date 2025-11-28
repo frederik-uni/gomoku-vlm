@@ -106,7 +106,7 @@ def gen_question_q401_sample(sim_id: int, simulated_game: np.ndarray) -> Dataset
     focus: "color_at_position"
     """
     q_id = "Q401"
-    min_turns = 0
+    min_turns = 25
     max_turns = 999
 
     dataset_row, row_idx, col_idx = _focus_color_at_position(
@@ -125,7 +125,7 @@ def gen_question_q402_sample(sim_id: int, simulated_game: np.ndarray) -> Dataset
     focus: "color_at_position"
     """
     q_id = "Q402"
-    min_turns = 0
+    min_turns = 50
     max_turns = 999
 
     dataset_row, row_idx, col_idx = _focus_color_at_position(
@@ -144,7 +144,7 @@ def gen_question_q403_sample(sim_id: int, simulated_game: np.ndarray) -> Dataset
     focus: "color_at_position"
     """
     q_id = "Q403"
-    min_turns = 0
+    min_turns = 75
     max_turns = 999
 
     dataset_row, row_idx, col_idx = _focus_color_at_position(
