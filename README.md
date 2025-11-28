@@ -26,15 +26,18 @@ options:
 
 ### Dataset Generator
 ```bash
-usage: python -m gen_dataset.runner [-h] [--output OUTPUT] [--config CONFIG]
+usage: python -m gen_dataset.runner [-h] [--config CONFIG] [--questions QUESTIONS]
+                 [--output OUTPUT]
 
 Simulate multiple Gomoku games, generate all configured perception and strategy questions, assign train/eval/test splits, and write a single dataset.parquet
 file plus images.
 
 options:
-  -h, --help       show this help message and exit
-  --output OUTPUT  Path where parquet file will be stored
-  --config CONFIG  Path where the config file is stored
+  -h, --help            show this help message and exit
+  --config CONFIG       Path where the config file is stored
+  --questions QUESTIONS
+                        Path where the question text for the questions is stored.
+  --output OUTPUT       Path where parquet file will be stored
 ```
 
 ### Evaluation
@@ -63,3 +66,12 @@ options:
 - **ESC**: Quit game
 
 **Note**: Game states > automatically exported as .npy files to `game_data/` folder > when the game ends.
+
+## Adjusting the Dataset
+
+### sphinx_config.toml
+**Avoiding draws**: Due to the fact that the algorithmic bots are too good, matches often end in draws. To avoid this adjust the `max_simulation_attempts` variable. This adjusts how many times to re-simulate per round to get a game that did not end in a draw.
+
+**Adjusting split-ratios**: Adjust the `split_ratios` variable. `train, eval, test` need to sum = 1.
+
+### sphinx_question.toml
