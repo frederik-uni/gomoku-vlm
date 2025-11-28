@@ -2,15 +2,20 @@ import numpy as np
 
 from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.core import (
-    get_question_meta,
     QuestionFamily,
-    select_fixed_turn_and_store_image,
-    build_basic_dataset_row
+    persist_turn_image,
+    get_question_text
 )
-from src.game_logic import get_winner
+from src import game_logic
 
 
-def _focus_win_next_turn(q_id: str, sim_id: int, simulated_game: np.ndarray) -> tuple[int, DatasetRow]:
+def _focus_win_next_turn(
+    q_id: str,
+    sim_id: int,
+    game: np.ndarray,
+    min_turns: int = 999,
+    max_turns: int = 999
+) -> tuple[int, DatasetRow]:
     """
     Helper function for any question that has the
     focus: "win_next_turn"
@@ -20,27 +25,28 @@ def _focus_win_next_turn(q_id: str, sim_id: int, simulated_game: np.ndarray) -> 
             - int: The winner of that game.
             - DatasetRow: The pre-constructed dataset row for the dataset.
     """
-    family, focus = get_question_meta(QuestionFamily.STRATEGY, q_id)
+    FOCUS = "win_next_turn"
+    FAMILY = QuestionFamily.STRATEGY
 
-    last_turn = simulated_game.shape[0] - 1
-    second_to_last_turn = simulated_game.shape[0] - 2
-    winner = get_winner(simulated_game[last_turn], 5)
+    # get last turn and second to last turn
+    last_turn = game.shape[0] - 1
+    second_to_last_turn = game.shape[0] - 2
+    winner = game_logic.get_winner(game[last_turn], 5)
     if winner == 0:
         raise ValueError(
             f"The game did not end. winner={winner}."
         )
 
-    # choose second to last turn, get board, store image for training
-    board_before, img_path, img_bytes = select_fixed_turn_and_store_image(
-        sim_id=sim_id,
-        simulated_game=simulated_game,
-        turn_index=second_to_last_turn,
-    )
+    # get board for second to last turn
+    board = game[second_to_last_turn]
+    # Persist the image and get img_bytes
+    img_path, img_bytes = persist_turn_image(board, last_turn, sim_id)
+
     # also get the last board, to compare against
-    board_after = simulated_game[last_turn]
+    board_after = game[last_turn]
 
     # compare boards to get target (row, col)
-    mask = board_before != board_after  # shape (15, 15)
+    mask = board != board_after  # shape (15, 15)
     changed_positions = np.argwhere(mask)  # shape (N, 2)
     num_changes = changed_positions.shape[0]
     if num_changes != 1:
@@ -60,177 +66,116 @@ def _focus_win_next_turn(q_id: str, sim_id: int, simulated_game: np.ndarray) -> 
         f"{row_idx},{col_idx}",  # "r,c"
         f"({row_idx}, {col_idx})"  # "(r, c)"
     ]
-    return winner, build_basic_dataset_row(
-        img_path=img_path,
+
+    return winner, DatasetRow(
+        img_path=str(img_path),
         img_bytes=img_bytes,
-        family=family,
+
+        family=FAMILY,
         q_id=q_id,
-        focus=focus,
+        focus=FOCUS,
+
         answer=answer,
         valid_answers=valid_answers,
+
+        # Will be assigned later in the creation process
+        question=None,
+        split=None
     )
 
 
-def gen_question_q500_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+
+def _build_outcome_context(winner: int, game: np.ndarray) -> dict[str, str]:
     """
-    Generate a single Q500 sample:
+    Compute the context used to format question texts for win_next_turn.
+    Provides:
+      - outcome_phrase
+      - player_color
+      - goal_phrase
+    """
+    last_turn = game.shape[0] - 1
+
+    if winner == 1:
+        # Black wins
+        return {
+            "outcome_phrase": "win for black",
+            "player_color": "black",
+            "goal_phrase": "win the game",
+        }
+    elif winner == 2:
+        # White wins
+        return {
+            "outcome_phrase": "win for white",
+            "player_color": "white",
+            "goal_phrase": "win the game",
+        }
+    elif winner == -1:
+        # Draw; work out whose move it was on the final move
+        player_color = "black" if last_turn % 2 == 0 else "white"
+        return {
+            "outcome_phrase": "draw",
+            "player_color": player_color,
+            "goal_phrase": "bring the game to a draw",
+        }
+    else:
+        raise ValueError(f"Unexpected winner value: {winner}")
+
+
+def gen_question_q10000_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+    """
+    Generate a single Q10000 sample:
     focus: "win_next_turn"
     """
-    q_id = "Q500"
-
+    q_id = "Q10000"
     winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game)
-    match winner:
-        case 1:
-            outcome_phrase = "win for black"
-            player_color = "black"
-            goal_phrase = "win the game"
-        case 2:
-            outcome_phrase = "win for white"
-            player_color = "white"
-            goal_phrase = "win the game"
-        case -1:
-            outcome_phrase = "draw"
-            last_turn = simulated_game.shape[0] - 1
-            if last_turn % 2 == 0:
-                player_color = "black"
-            else:
-                player_color = "white"
-            goal_phrase = "bring the game to a draw"
-        case _:
-            raise ValueError(f"Unexpected winner, game may still be in progress.")
+    context = _build_outcome_context(winner, simulated_game)
 
-    question_text = (
-        f"You are looking at the Gomoku board position just before the final move of the game. "
-        f"Player 1 is black; Player 2 is white."
-        f"The game ended in a {outcome_phrase}. "
-        f"You are currently playing as {player_color}. "
-        f"What is your next, best move to {goal_phrase}? "
-        f"Answer with two 0-based integers in the format 'row col', and nothing else."
-    )
-    dataset_row.question = question_text
+    template = get_question_text(q_id)  # from sphinx_questions.toml
+    dataset_row.question = template.format(**context)
 
     return dataset_row
 
 
-def gen_question_q501_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q10001_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q501 sample:
+    Generate a single Q10001 sample:
     focus: "win_next_turn"
     """
-    q_id = "Q501"
-
+    q_id = "Q10001"
     winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game)
-    last_turn = simulated_game.shape[0] - 1
+    context = _build_outcome_context(winner, simulated_game)
 
-    match winner:
-        case 1:
-            outcome_phrase = "victory for the black player"
-            player_color = "black"
-            goal_phrase = "secure the win"
-        case 2:
-            outcome_phrase = "victory for the white player"
-            player_color = "white"
-            goal_phrase = "secure the win"
-        case -1:
-            outcome_phrase = "draw between both players"
-            if last_turn % 2 == 0:
-                player_color = "black"
-            else:
-                player_color = "white"
-            goal_phrase = "force the game into a draw"
-        case _:
-            raise ValueError(f"Unexpected winner value: {winner}")
+    template = get_question_text(q_id)
+    dataset_row.question = template.format(**context)
 
-    question_text = (
-        "You are viewing the Gomoku position just before the decisive last move. "
-        "Player 1 uses black stones, and player 2 uses white stones. "
-        f"In the final result, the game was a {outcome_phrase}. "
-        f"Now imagine you are playing as {player_color} and it is your turn. "
-        f"What move should you play to {goal_phrase}? "
-        "Answer with two 0-based integers in the format 'row col' and nothing else."
-    )
-
-    dataset_row.question = question_text
     return dataset_row
 
 
-def gen_question_q502_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q10002_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q502 sample:
+    Generate a single Q10002 sample:
     focus: "win_next_turn"
     """
-    q_id = "Q502"
-
+    q_id = "Q10002"
     winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game)
-    last_turn = simulated_game.shape[0] - 1
+    context = _build_outcome_context(winner, simulated_game)
 
-    match winner:
-        case 1:
-            outcome_phrase = "won by the black player"
-            player_color = "black"
-            goal_phrase = "achieve this winning outcome"
-        case 2:
-            outcome_phrase = "won by the white player"
-            player_color = "white"
-            goal_phrase = "achieve this winning outcome"
-        case -1:
-            outcome_phrase = "ended in a draw"
-            if last_turn % 2 == 0:
-                player_color = "black"
-            else:
-                player_color = "white"
-            goal_phrase = "reach this drawn result"
-        case _:
-            raise ValueError(f"Unexpected winner value: {winner}")
+    template = get_question_text(q_id)
+    dataset_row.question = template.format(**context)
 
-    question_text = (
-        "This board shows a Gomoku position one move before the game ended. "
-        f"The final game result was {outcome_phrase}. "
-        f"Assume you are the player using {player_color} stones and it is your move. "
-        f"Which single move must you play now to {goal_phrase}? "
-        "Respond with exactly two 0-based coordinates in the form 'row col'."
-    )
-
-    dataset_row.question = question_text
     return dataset_row
 
 
-def gen_question_q503_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q10003_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q503 sample:
+    Generate a single Q10003 sample:
     focus: "win_next_turn"
     """
-    q_id = "Q503"
-
+    q_id = "Q10003"
     winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game)
-    last_turn = simulated_game.shape[0] - 1
+    context = _build_outcome_context(winner, simulated_game)
 
-    match winner:
-        case 1:
-            outcome_phrase = "a winning position for black"
-            player_color = "black"
-            goal_phrase = "convert this position into a win"
-        case 2:
-            outcome_phrase = "a winning position for white"
-            player_color = "white"
-            goal_phrase = "convert this position into a win"
-        case -1:
-            outcome_phrase = "a drawn final position"
-            if last_turn % 2 == 0:
-                player_color = "black"
-            else:
-                player_color = "white"
-            goal_phrase = "force the final result to be a draw"
-        case _:
-            raise ValueError(f"Unexpected winner value: {winner}")
+    template = get_question_text(q_id)
+    dataset_row.question = template.format(**context)
 
-    question_text = (
-        "You are given a Gomoku board state right before the last move of the game. "
-        f"The final outcome of the game was {outcome_phrase}. "
-        f"You are playing as {player_color}, and it is your turn in this position. "
-        f"Choose the one move that will {goal_phrase}. "
-        "Output your answer as two 0-based integers 'row col' with no extra text."
-    )
-
-    dataset_row.question = question_text
     return dataset_row

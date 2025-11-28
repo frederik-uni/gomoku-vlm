@@ -5,13 +5,19 @@ import numpy as np
 from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.core import (
     QuestionFamily,
-    build_basic_dataset_row,
-    select_random_turn_and_store_image,
-    get_question_meta,
+    get_random_turn_index,
+    persist_turn_image,
+    persist_turn_game_state,
+    get_question_text
 )
-import random
 
-def _focus_color_at_position(q_id: str, sim_id: int, simulated_game: np.ndarray) -> tuple[DatasetRow, int, int]:
+def _focus_color_at_position(
+    q_id: str,
+    sim_id: int,
+    game: np.ndarray,
+    min_turns: int = 0,
+    max_turns: int = 999
+) -> tuple[DatasetRow, int, int]:
     """
     Helper function for any question that has the
     focus: "color_at_position".
@@ -22,15 +28,16 @@ def _focus_color_at_position(q_id: str, sim_id: int, simulated_game: np.ndarray)
             - row_idx: 0-based row index on the board (to get vertical, "y")
             - col_idx: 0-based column index on the board (to get horizontal, "x")
     """
-    family, focus = get_question_meta(QuestionFamily.PERCEPTION, q_id)
+    FOCUS = "color_at_position"
+    FAMILY = QuestionFamily.PERCEPTION
 
-    # choose turn, get board, store image
-    turn_index, board, img_path, img_bytes = select_random_turn_and_store_image(
-        family=family,
-        q_id=q_id,
-        sim_id=sim_id,
-        simulated_game=simulated_game,
-    )
+    # Sample random turn
+    turn_index = get_random_turn_index(game, min_turns, max_turns)
+    board = game[turn_index]
+    # Persist the image and get img_bytes
+    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id)
+    # Persist game state for easier debugging
+    persist_turn_game_state(board, turn_index, sim_id)
 
     # pick a random board coordinate (row, col) in 0-based indexing
     num_rows, num_cols = board.shape
@@ -55,94 +62,96 @@ def _focus_color_at_position(q_id: str, sim_id: int, simulated_game: np.ndarray)
         case _:
             raise ValueError(f"Unexpected board value {value} at ({row_idx}, {col_idx})")
 
-    row = build_basic_dataset_row(
-        img_path=img_path,
+    row = DatasetRow(
+        img_path=str(img_path),
         img_bytes=img_bytes,
-        family=family,
+
+        family=FAMILY,
         q_id=q_id,
-        focus=focus,
+        focus=FOCUS,
+
         answer=answer,
         valid_answers=valid_answers,
+
+        # Will be assigned later in the creation process
+        question=None,
+        split=None
     )
 
     return row, row_idx, col_idx
 
 
-def gen_question_q13_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q400_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q13 sample:
+    Generate a single Q400 sample:
     focus: "color_at_position"
     """
-    q_id = "Q13"
-    dataset_row, row_idx, col_idx = _focus_color_at_position(q_id, sim_id, simulated_game)
+    q_id = "Q400"
+    min_turns = 0
+    max_turns = 999
 
-    question_text = (
-        "You are looking at a Gomoku game position. "
-        "Black stones belong to player 1 and white stones belong to player 2. "
-        f"Consider the board intersection at row {row_idx}, column {col_idx} (0-based indexing). "
-        "Which piece is placed on that intersection? "
-        "Answer with exactly one word: 'black', 'white', or 'empty'."
+    dataset_row, row_idx, col_idx = _focus_color_at_position(
+        q_id, sim_id, simulated_game, min_turns, max_turns
     )
 
-    dataset_row.question = question_text
+    template = get_question_text(q_id)
+    dataset_row.question = template.format(row=row_idx, col=col_idx)
+
     return dataset_row
 
 
-def gen_question_q14_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q401_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q14 sample:
+    Generate a single Q401 sample:
     focus: "color_at_position"
     """
-    q_id = "Q14"
-    dataset_row, row_idx, col_idx = _focus_color_at_position(q_id, sim_id, simulated_game)
+    q_id = "Q401"
+    min_turns = 0
+    max_turns = 999
 
-    question_text = (
-        "You are looking at a Gomoku game position. "
-        "Black stones belong to player 1 and white stones belong to player 2. "
-        f"Consider the board intersection at row {row_idx}, column {col_idx} (0-based indexing). "
-        "Which piece is placed on that intersection? "
-        "Answer with exactly one word: 'black', 'white', or 'empty'."
+    dataset_row, row_idx, col_idx = _focus_color_at_position(
+        q_id, sim_id, simulated_game, min_turns, max_turns
     )
 
-    dataset_row.question = question_text
+    template = get_question_text(q_id)
+    dataset_row.question = template.format(row=row_idx, col=col_idx)
+
     return dataset_row
 
 
-def gen_question_q15_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q402_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q15 sample:
+    Generate a single Q402 sample:
     focus: "color_at_position"
     """
-    q_id = "Q15"
-    dataset_row, row_idx, col_idx = _focus_color_at_position(q_id, sim_id, simulated_game)
+    q_id = "Q402"
+    min_turns = 0
+    max_turns = 999
 
-    question_text = (
-        "You are inspecting a partially played Gomoku game. "
-        "Some intersections are occupied by black or white stones, others are empty. "
-        f"Consider the intersection located at row {row_idx}, column {col_idx} (0-based indexing). "
-        "Which piece occupies this intersection: 'black', 'white', or 'empty'? "
-        "Reply with exactly one of these three words."
+    dataset_row, row_idx, col_idx = _focus_color_at_position(
+        q_id, sim_id, simulated_game, min_turns, max_turns
     )
 
-    dataset_row.question = question_text
+    template = get_question_text(q_id)
+    dataset_row.question = template.format(row=row_idx, col=col_idx)
+
     return dataset_row
 
 
-def gen_question_q16_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q403_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q16 sample:
+    Generate a single Q403 sample:
     focus: "color_at_position"
     """
-    q_id = "Q16"
-    dataset_row, row_idx, col_idx = _focus_color_at_position(q_id, sim_id, simulated_game)
+    q_id = "Q403"
+    min_turns = 0
+    max_turns = 999
 
-    question_text = (
-        "You are inspecting a partially played Gomoku game. "
-        "Some intersections are occupied by black or white stones, others are empty. "
-        f"Consider the intersection located at row {row_idx}, column {col_idx} (0-based indexing). "
-        "Which piece occupies this intersection: 'black', 'white', or 'empty'? "
-        "Reply with exactly one of these three words."
+    dataset_row, row_idx, col_idx = _focus_color_at_position(
+        q_id, sim_id, simulated_game, min_turns, max_turns
     )
 
-    dataset_row.question = question_text
+    template = get_question_text(q_id)
+    dataset_row.question = template.format(row=row_idx, col=col_idx)
+
     return dataset_row
