@@ -71,7 +71,7 @@ def parse_args():
     parser.add_argument(
         "--sample_idx",
         default=0,
-        type=str,
+        type=int,
         help="the sample of the particular question to be evaluated. If none is provided the first sample (idx = 0) will be used.",
     )
     return parser.parse_args()
