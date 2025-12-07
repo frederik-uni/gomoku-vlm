@@ -59,6 +59,25 @@ options:
                         Max new tokens to generate.
 ```
 
+### Evaluation
+```bash
+python -m eval --model-id "Qwen/Qwen2.5-VL-7B-Instruct" --parquet-path ./datasets/initial_eval.parquet
+usage: python -m eval [-h] --model-id MODEL_ID --parquet-path PARQUET_PATH [--match-mode {exact,fuzzy}]
+                   [--max-new-tokens MAX_NEW_TOKENS]
+
+Evaluate a VLM model on a parquet dataset.
+
+options:
+  -h, --help            show this help message and exit
+  --model-id MODEL_ID   HuggingFace model identifier (e.g., 'google/paligemma-3b').
+  --parquet-path PARQUET_PATH
+                        Path to the parquet file to evaluate.
+  --match-mode {exact,fuzzy}
+                        Answer-matching mode. Default: exact.
+  --max-new-tokens MAX_NEW_TOKENS
+                        Max new tokens to generate.
+```
+
 ## PyGame Controls
 
 - **Mouse click**: Place a stone (as white player)
