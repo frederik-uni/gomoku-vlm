@@ -82,6 +82,7 @@ def _focus_best_next_move(
         f"{row_idx},{col_idx}",  # "r,c"
         f"({row_idx}, {col_idx})"  # "(r, c)"
     ]
+
     return color, DatasetRow(
         img_path=str(img_path),
         img_bytes=img_bytes,
