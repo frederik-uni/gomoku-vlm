@@ -1,0 +1,131 @@
+[general]
+num_samples_per_question = 10
+
+# Optional global context that will be prepended to every question text.
+# If you leave this empty or remove it, nothing extra is added.
+context = """
+You are a vision-language model analysing Gomoku game positions.
+Carefully follow the instructions below for each question and answer
+exactly in the requested format.
+"""
+
+[questions.Q10000]
+text = """
+You are looking at the Gomoku board position just before the final move of the game.
+Player 1 is black; Player 2 is white.
+The game ended in a {outcome_phrase}.
+You are currently playing as {player_color}.
+What is your next, best move to {goal_phrase}?
+Answer with two 0-based integers in the format "row col", and nothing else.
+"""
+
+[questions.Q10001]
+text = """
+You are viewing the Gomoku position just before the decisive final move.
+Player 1 uses black stones, and Player 2 uses white stones.
+In the final result, the game was a {outcome_phrase}.
+Now imagine you are playing as {player_color} and it is your turn.
+What move should you play to {goal_phrase}?
+Answer with two 0-based integers in the format "row col" and nothing else.
+"""
+
+[questions.Q10002]
+text = """
+This board shows a Gomoku position one move before the game ended.
+The final game result was a {outcome_phrase}.
+Assume you are the player using {player_color} stones and it is your move.
+Which single move must you play now to {goal_phrase}?
+Respond with exactly two 0-based coordinates in the form "row col".
+"""
+
+[questions.Q10003]
+text = """
+You are given a Gomoku board state right before the last move of the game.
+The final outcome of the game was a {outcome_phrase}.
+You are playing as {player_color}, and it is your turn in this position.
+Choose the one move that will {goal_phrase}.
+Output your answer as two 0-based integers "row col" with no extra text.
+"""
+
+# focus: best_next_move
+
+[questions.Q10100]
+text = """
+You are looking at a Gomoku board position in the middle of a game.
+Player 1 uses black stones and Player 2 uses white stones.
+It is {color}'s turn to move.
+You are {color}. What is the best next move for you to perform?
+Answer with two 0-based integers in the format "row col", and nothing else.
+"""
+
+[questions.Q10101]
+text = """
+This image shows a Gomoku position in the middle of a game.
+Player 1 places black stones and Player 2 places white stones.
+It is {color}'s turn to move in this position.
+Select the best move for the current player.
+Give your answer as two 0-based integers in the format "row col", and nothing else.
+"""
+
+[questions.Q10102]
+text = """
+You are analyzing an ongoing Gomoku game.
+You are playing as {color} in the position shown.
+Assume standard Gomoku rules on a 15×15 board.
+Choose the strongest available move for your side in this position.
+Answer with two 0-based coordinates in the form "row col" (no extra text).
+"""
+
+[questions.Q10103]
+text = """
+Consider the displayed Gomoku board state.
+It is {color}'s turn to move.
+Your goal is to play the move that gives your side the best continuation
+according to the position on the board.
+Respond with exactly two 0-based integers "row col" indicating your chosen move.
+"""
+
+# focus: list_valid_moves
+
+[questions.Q102000]
+text = """
+You are looking at a Gomoku board position in the middle of a game.
+Player 1 uses black stones and Player 2 uses white stones.
+It is {color}'s turn to move.
+List ALL currently valid moves, i.e. all empty intersections where a stone can still be placed.
+Output them as a comma-separated list of 0-based coordinates in the format
+"row col, row col, row col, ..." and nothing else.
+For example: "0 0, 0 3, 1 5".
+"""
+
+[questions.Q102001]
+text = """
+This image shows a Gomoku position partway through a game.
+Stones of one player are black, and stones of the other player are white.
+It is {color}'s turn to move.
+Identify every empty board intersection where a stone could legally be played next.
+Output ALL such moves as a comma-separated list of 0-based coordinates in the format
+"row col, row col, row col, ..." with no extra text.
+"""
+
+[questions.Q102002]
+text = """
+You are given a snapshot of an ongoing Gomoku game.
+Player 1 places black stones and Player 2 places white stones.
+In this position, it is {color}'s turn to play.
+Your task is to list every legal move, i.e. every empty intersection where a new stone
+can still be placed.
+Return your answer as a comma-separated list of 0-based "row col" pairs, for example:
+"0 4, 1 3, 7 7". Do not add any additional explanation.
+"""
+
+[questions.Q102003]
+text = """
+Consider the shown Gomoku board position.
+It is {color}'s turn, and you must decide where a stone could legally be placed.
+Treat every currently empty intersection as a possible move, and every occupied
+intersection as invalid.
+List ALL valid moves as a comma-separated list of coordinates in 0-based "row col"
+format, written as "row col, row col, row col, ...".
+Only output this list of coordinates, nothing else.
+"""

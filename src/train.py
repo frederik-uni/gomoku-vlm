@@ -7,6 +7,7 @@ from peft import LoraConfig
 from PIL import Image
 from transformers import AutoModelForCausalLM
 from trl import SFTConfig, SFTTrainer
+from typing_extensions import Literal
 
 
 def init_model(model_id):
@@ -19,15 +20,15 @@ def init_model(model_id):
     )
 
 
-def init_lora(r, target_modules):
+def init_lora(r, target_modules, modules_to_save):
     return LoraConfig(
         r=r,
         lora_alpha=int(r * 1.5),
         lora_dropout=0.05,
         bias="none",
         target_modules=target_modules,
+        modules_to_save=modules_to_save,
         task_type="CAUSAL_LM",
-        fan_in_fan_out=True,
     )
 
 
@@ -99,6 +100,47 @@ def load_our_dataset(parquet_path: str) -> Dataset:
     return sft_dataset
 
 
+Mode = Literal["visual", "logic"]
+
+
+def target(mode: Mode):
+    if mode == "visual":
+        return [
+            "q_proj",
+            "k_proj",
+            "v_proj",
+        ]
+    else:
+        return [
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ]
+
+
+def modules(mode: Mode):
+    if mode == "visual":
+        return [
+            "vision_tower",
+            "multi_modal_projector",
+        ]
+    else:
+        return [
+            "embed_tokens",
+            "lm_head",
+        ]
+
+
+def freeze_lora(model, modules: list[str]):
+    for name, param in model.named_parameters():
+        if "lora_" in name and any([module in name for module in modules]):
+            param.requires_grad = False
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -125,20 +167,22 @@ if __name__ == "__main__":
     )
     parser.add_argument("--lora_r", type=int, default=16, help="LoRA rank")
     parser.add_argument(
-        "--lora_target_modules",
-        nargs="+",
-        default=[],
+        "--mode",
+        default="visual",
+        choices=["visual", "logic"],
         help="Target modules for LoRA",
     )
 
     args = parser.parse_args()
     resume_path = latest_valid_checkpoint(args.output_dir)
 
+    model = init_model(args.model_id)
+
     trainer = SFTTrainer(
-        model=init_model(args.model_id),
+        model=model,
         train_dataset=load_our_dataset(args.data_file),
         args=init_train(args.output_dir, args.num_epochs, args.batch_size),
-        peft_config=init_lora(args.lora_r, args.lora_target_modules),
+        peft_config=init_lora(args.lora_r, target(args.mode), modules(args.mode)),
     )
 
     trainer.train(resume_from_checkpoint=resume_path)

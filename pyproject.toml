@@ -16,7 +16,8 @@ dependencies = [
     "pandas",
     "pyarrow",
     "transformers",
-    "torchvision"
+    "torchvision",
+    "trl"
 ]
 
 [tool.setuptools]
