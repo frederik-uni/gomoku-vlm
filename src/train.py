@@ -125,7 +125,6 @@ def target(mode: Mode):
 def modules(mode: Mode):
     if mode == "visual":
         return [
-            "vision_tower",
             "multi_modal_projector",
         ]
     else:
