@@ -81,6 +81,7 @@ def load_our_dataset(parquet_path: str) -> Dataset:
     df = pd.read_parquet(parquet_path)
 
     df = df[["question", "img_bytes", "answer"]]
+    df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 
     def preprocess_row(row):
         prompt_content = f"{row['question']}"
