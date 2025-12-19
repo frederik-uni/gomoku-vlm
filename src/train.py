@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 from datasets import Dataset
-from peft import LoraConfig
+from peft import LoraConfig, PeftModel
 from PIL import Image
 from transformers import AutoModelForCausalLM
 from trl import SFTConfig, SFTTrainer
@@ -124,9 +124,7 @@ def target(mode: Mode):
 
 def modules(mode: Mode):
     if mode == "visual":
-        return [
-            "multi_modal_projector",
-        ]
+        return ["multi_modal_projector"]
     else:
         return [
             "embed_tokens",
@@ -177,6 +175,12 @@ if __name__ == "__main__":
 
     model = init_model(args.model_id)
 
+    final_dir = os.path.join(args.output_dir, "final-adapter")
+    if os.path.isdir(final_dir) and resume_path:
+        model = PeftModel.from_pretrained(
+            model, resume_path, is_trainable=True, ignore_mismatched_sizes=True
+        )
+
     trainer = SFTTrainer(
         model=model,
         train_dataset=load_our_dataset(args.data_file),
@@ -184,9 +188,8 @@ if __name__ == "__main__":
         peft_config=init_lora(args.lora_r, target(args.mode), modules(args.mode)),
     )
 
-    trainer.train(resume_from_checkpoint=resume_path)
+    trainer.train()  # resume_from_checkpoint=resume_path)
 
-    final_dir = os.path.join(args.output_dir, "final-adapter")
     Path(final_dir).mkdir(parents=True, exist_ok=True)
     trainer.model.save_pretrained(final_dir)
     print("Saved to:", final_dir)
