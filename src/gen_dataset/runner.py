@@ -172,6 +172,9 @@ def assemble_parquet_file(rows: List[DatasetRow]) -> None:
     # build DataFrame
     df = pd.DataFrame(data)
 
+    # shuffle DataFrame
+    df = df.sample(frac=1.0).reset_index(drop=True)
+
     # get output path for Q1
     out_path = (
             sphinx_core.SPHINX_PARQUET_PATH / "dataset.parquet"
