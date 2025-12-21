@@ -137,7 +137,7 @@ def persist_turn_game_state(board: np.ndarray, turn_index: int, sim_id: int) -> 
     return out_path
 
 
-def _init_output_dirs() -> None:
+def _init_output_dirs(gen_subfolder: bool = True) -> None:
     """
     Create dataset_<NNN>/images, game_states, parquet under SPHINX_BASE_OUT_PATH
     and write the paths into SPHINX_IMG_OUT_PATH, SPHINX_PARQUET_OUT_PATH, etc.
@@ -150,15 +150,18 @@ def _init_output_dirs() -> None:
     base = SPHINX_OUT_ROOT_PATH
     base.mkdir(parents=True, exist_ok=True)
 
-    # find first free index of existing dataset_XXX dirs
-    next_idx = 0
-    while True:
+    if gen_subfolder:
+        # find first free index of existing dataset_XXX dirs
+        next_idx = 0
+        while True:
+            dataset_root = base / f"dataset_{next_idx:03d}"
+            if not dataset_root.exists():
+                break
+            next_idx += 1
         dataset_root = base / f"dataset_{next_idx:03d}"
-        if not dataset_root.exists():
-            break
-        next_idx += 1
+    else:
+        dataset_root = base
 
-    dataset_root = base / f"dataset_{next_idx:03d}"
     img_dir = dataset_root / "images"
     game_states_dir = dataset_root / "game_states"
     parquet_dir = dataset_root / "parquet"
@@ -178,6 +181,7 @@ def init_sphinx_environment(
     config_path: Path | str = DEFAULT_SPHINX_CONFIG_PATH,
     questions_path: Path | str = DEFAULT_SPHINX_QUESTION_PATH,
     output_path: Path | str = DEFAULT_SPHINX_OUT_ROOT_PATH,
+    gen_subfolder: bool = True,
 ) -> None:
     """
     Load the sphinx_config TOML, initialize all SPHINX_* paths,
@@ -207,7 +211,7 @@ def init_sphinx_environment(
     SPHINX_QUESTIONS_PATH = questions_path
     SPHINX_OUT_ROOT_PATH = output_path
 
-    _init_output_dirs()
+    _init_output_dirs(gen_subfolder)
 
 
 def is_question_configured(q_id: str) -> bool:

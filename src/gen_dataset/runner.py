@@ -273,6 +273,14 @@ def parse_args():
         type=str,
         help="Path where parquet file will be stored",
     )
+    parser.add_argument(
+        "--no_gen_subfolder",
+        dest="gen_subfolder",
+        action="store_false",
+        help="Do not generate dataset_NNNN subfolder under output folder.",
+    )
+    parser.set_defaults(gen_subfolder=True)
+
     return parser.parse_args()
 
 
@@ -287,6 +295,7 @@ if __name__ == "__main__":
         config_path=config_path,
         questions_path=questions_path,
         output_path=output_path,
+        gen_subfolder=args.gen_subfolder,
     )
 
     rows = generate_question_dataset()

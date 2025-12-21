@@ -30,6 +30,13 @@ def parse_args():
         type=str,
         help="Path to the base output folder.",
     )
+    parser.add_argument(
+        "--no_gen_subfolder",
+        dest="gen_subfolder",
+        action="store_false",
+        help="Do not generate dataset_NNNN subfolder under output folder.",
+    )
+    parser.set_defaults(gen_subfolder=True)
 
     return parser.parse_args()
 
@@ -52,20 +59,23 @@ if __name__ == "__main__":
         raise SystemExit(f"No \"*.toml\" files in {questions_dir_path}")
 
     for f in files:
-        # / out /
-        #       q1 /
-        #           parquet / dataset.parquet
-        #           images / ...
-        #           states / ...
-        #       q2 /
         run_out = out_base_path / f.stem
-        run_out.mkdir(parents=True, exist_ok=True)
+        # do not overwrite / mix with existing outputs
+        if run_out.exists():
+            raise SystemExit(
+                f"Refusing to run: output path already exists:\n  {run_out}\n"
+                "Please delete/move it or choose a different --output."
+            )
+        run_out.mkdir(parents=True, exist_ok=False)
 
         print(f"\n=== Running for {f.name} -> {run_out} ===")
-        subprocess.run(
-            [sys.executable, "-m", "gen_dataset.runner",
-             "--config", str(config_path),
-             "--questions", str(f),
-             "--output", str(run_out)],
-            check=True
-        )
+        cmd = [
+            sys.executable, "-m", "gen_dataset.runner",
+            "--config", str(config_path),
+            "--questions", str(f),
+            "--output", str(run_out),
+        ]
+        if not args.gen_subfolder:
+            cmd.append("--no_gen_subfolder")
+
+        subprocess.run(cmd, check=True)
