@@ -26,7 +26,7 @@ def parse_args():
     )
     parser.add_argument(
         "--output",
-        default=str(DEFAULT_SPHINX_OUT_ROOT_PATH),
+        required=True,
         type=str,
         help="Path to the base output folder.",
     )

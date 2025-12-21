@@ -15,10 +15,6 @@ DEFAULT_SPHINX_CONFIG_PATH = PROJECT_ROOT / "sphinx_config.toml"
 DEFAULT_SPHINX_QUESTION_PATH = PROJECT_ROOT / "sphinx_questions.toml"
 DEFAULT_SPHINX_OUT_ROOT_PATH = PROJECT_ROOT / "out"
 
-# how the dataset is structured *inside* the OUT_ROOT path
-# <output_root> / sphinx / dataset / dataset_000 / ...
-DATASET_PATH_SUFFIX = Path("sphinx") / "dataset"
-
 # dynamic, will be set via init_sphinx_environment() in runner.py
 SPHINX_CONFIG: dict | None = None
 SPHINX_CONFIG_PATH: Path | None = None
@@ -209,7 +205,7 @@ def init_sphinx_environment(
 
     SPHINX_CONFIG_PATH = config_path
     SPHINX_QUESTIONS_PATH = questions_path
-    SPHINX_OUT_ROOT_PATH = output_path / DATASET_PATH_SUFFIX
+    SPHINX_OUT_ROOT_PATH = output_path
 
     _init_output_dirs()
 
