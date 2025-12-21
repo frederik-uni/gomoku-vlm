@@ -24,7 +24,9 @@ options:
   --bot {random,ai,none}
 ```
 
-### Dataset Generator
+## Dataset Generation
+
+### Single questions.toml file
 ```bash
 usage: python -m gen_dataset.runner [-h] [--config CONFIG] [--questions QUESTIONS]
                  [--output OUTPUT]
@@ -38,6 +40,20 @@ options:
   --questions QUESTIONS
                         Path where the question text for the questions is stored.
   --output OUTPUT       Path where parquet file will be stored
+```
+
+### Batch question generation for folder containing *.toml files
+```bash
+usage: batch_runner.py [-h] [--config CONFIG] --questions_dir QUESTIONS_DIR [--output OUTPUT]
+
+Runs the dataset runner for all question.toml files in a folder.
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to the sphinx config file.
+  --questions_dir QUESTIONS_DIR
+                        Folder with question files (e.g. *.toml)
+  --output OUTPUT       Path to the base output folder.
 ```
 
 ### Evaluation
