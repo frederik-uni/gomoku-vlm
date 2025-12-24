@@ -3,6 +3,8 @@ import shutil
 import tomllib
 import warnings
 from enum import Enum
+from typing import Dict
+
 import numpy as np
 from pathlib import Path
 import json
@@ -259,3 +261,50 @@ def get_question_text(q_id: str) -> str:
         result = base_text
 
     return result
+
+def num_required_samples(q_id: str) -> int:
+    """
+    Return required sample count for a specific q_id.
+    Uses [questions.<q_id>].num_samples if set, otherwise [general].num_samples_per_question.
+    """
+    if SPHINX_QUESTIONS is None:
+        raise RuntimeError("SPHINX_QUESTIONS is not loaded. Call init_sphinx_environment() first.")
+
+    qcfg = SPHINX_QUESTIONS
+
+    general = qcfg.get("general", {}) or {}
+    raw_default = general.get("num_samples_per_question")
+    if raw_default is None:
+        raise ValueError('Missing [general].num_samples_per_question in sphinx_questions.toml')
+
+    try:
+        default_n = int(raw_default)
+    except (TypeError, ValueError):
+        raise ValueError(f"num_samples_per_question must be an int >= 0, got {raw_default!r}")
+    if default_n < 0:
+        raise ValueError(f"num_samples_per_question must be >= 0, got {default_n}")
+
+    questions = qcfg.get("questions", {}) or {}
+    qc = questions.get(q_id) or {}
+
+    raw_n = qc.get("num_samples")
+    if raw_n is None:
+        return default_n
+
+    try:
+        n = int(raw_n)
+    except (TypeError, ValueError):
+        raise ValueError(f"num_samples for {q_id} must be an int >= 0, got {raw_n!r}")
+    if n < 0:
+        raise ValueError(f"num_samples for {q_id} must be >= 0, got {n}")
+    return n
+
+def should_generate_question(qid: str, generated_questions_count: Dict[str, int]) -> bool:
+    """
+    Returns for a specific q_id if the question should be generated based on the config.toml file.
+    """
+    generated_questions_count.setdefault(qid, 0)
+    if is_question_configured(qid) and generated_questions_count[qid] < num_required_samples(qid):
+        return True
+    else:
+        return False

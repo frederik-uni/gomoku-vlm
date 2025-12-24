@@ -3,7 +3,7 @@ import math
 from collections import defaultdict
 from dataclasses import asdict
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 import numpy as np
 import pandas as pd
@@ -143,6 +143,7 @@ def generate_question_dataset() -> List[DatasetRow]:
     slowly creating the entire dataset
     """
     num_required_episodes = _determine_num_of_required_episodes()
+    generated_questions_count: Dict[str, int] = {}
     rows: List[DatasetRow] = []
     for sim_id in range(num_required_episodes):
         print(f"Simulating {sim_id} / {num_required_episodes}")
@@ -153,12 +154,16 @@ def generate_question_dataset() -> List[DatasetRow]:
         )
 
         perception_rows: List[DatasetRow] = generate_perception_questions_for_episode(
-            sim_id, simulated_game
+            sim_id,
+            simulated_game,
+            generated_questions_count,
         )
         rows.extend(perception_rows)
 
         strategy_rows: List[DatasetRow] = generate_strategy_questions_for_episode(
-            sim_id, simulated_game
+            sim_id,
+            simulated_game,
+            generated_questions_count,
         )
         rows.extend(strategy_rows)
 

@@ -98,12 +98,12 @@ def _focus_list_valid_moves(
     )
 
 
-def gen_question_q102000_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q10200_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q102000 sample:
+    Generate a single Q10200 sample:
     focus: "list_valid_moves"
     """
-    q_id = "Q102000"
+    q_id = "Q10200"
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
 
@@ -113,12 +113,12 @@ def gen_question_q102000_sample(sim_id: int, simulated_game: np.ndarray) -> Data
     return dataset_row
 
 
-def gen_question_q102001_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q10201_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q102001 sample:
+    Generate a single Q10201 sample:
     focus: "list_valid_moves"
     """
-    q_id = "Q102001"
+    q_id = "Q10201"
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
 
@@ -128,12 +128,12 @@ def gen_question_q102001_sample(sim_id: int, simulated_game: np.ndarray) -> Data
     return dataset_row
 
 
-def gen_question_q102002_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q10202_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q102002 sample:
+    Generate a single Q10202 sample:
     focus: "list_valid_moves"
     """
-    q_id = "Q102002"
+    q_id = "Q10202"
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
 
@@ -143,12 +143,12 @@ def gen_question_q102002_sample(sim_id: int, simulated_game: np.ndarray) -> Data
     return dataset_row
 
 
-def gen_question_q102003_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q10203_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
     """
-    Generate a single Q102003 sample:
+    Generate a single Q10203 sample:
     focus: "list_valid_moves"
     """
-    q_id = "Q102003"
+    q_id = "Q10203"
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game)
 

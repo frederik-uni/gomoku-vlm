@@ -87,7 +87,7 @@ Respond with exactly two 0-based integers "row col" indicating your chosen move.
 
 # focus: list_valid_moves
 
-[questions.Q102000]
+[questions.Q10200]
 text = """
 You are looking at a Gomoku board position in the middle of a game.
 Player 1 uses black stones and Player 2 uses white stones.
@@ -98,7 +98,7 @@ Output them as a comma-separated list of 0-based coordinates in the format
 For example: "0 0, 0 3, 1 5".
 """
 
-[questions.Q102001]
+[questions.Q10201]
 text = """
 This image shows a Gomoku position partway through a game.
 Stones of one player are black, and stones of the other player are white.
@@ -108,7 +108,7 @@ Output ALL such moves as a comma-separated list of 0-based coordinates in the fo
 "row col, row col, row col, ..." with no extra text.
 """
 
-[questions.Q102002]
+[questions.Q10202]
 text = """
 You are given a snapshot of an ongoing Gomoku game.
 Player 1 places black stones and Player 2 places white stones.
@@ -119,7 +119,7 @@ Return your answer as a comma-separated list of 0-based "row col" pairs, for exa
 "0 4, 1 3, 7 7". Do not add any additional explanation.
 """
 
-[questions.Q102003]
+[questions.Q10203]
 text = """
 Consider the shown Gomoku board position.
 It is {color}'s turn, and you must decide where a stone could legally be placed.
