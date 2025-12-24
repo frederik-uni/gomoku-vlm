@@ -4,123 +4,119 @@
 #
 # from gen_dataset.dataset_schema import DatasetRow
 # from gen_dataset.sphinx.core import (
-#     QuestionFamily,
-#     build_basic_dataset_row,
-#     get_question_meta,
+#     QuestionFamily, persist_turn_image, persist_turn_game_state, get_question_text
 # )
 #
 #
 # def _focus_can_you_lose(
-#     q_id: str, sim_id: int, simulated_game: np.ndarray
+#         q_id: str,
+#         sim_id: int,
+#         game: np.ndarray,
+#         min_turns: int = 0,
+#         max_turns: int = 999
 # ) -> tuple[int, DatasetRow]:
 #     """
 #     Helper function for any question that has the
 #     focus: "can_you_lose"
+#
+#     Returns:
+#         tuple[int, DatasetRow]:
+#             - int: 1 if player 1 should be determined, 2 if player 2 should be determined.
+#             - DatasetRow with answer + valid_answers filled (question still None)
 #     """
-#     family, focus = get_question_meta(QuestionFamily.PERCEPTION, q_id)
+#     FOCUS = "can_you_lose"
+#     FAMILY = QuestionFamily.PERCEPTION
 #
 #     win = random.random() < 0.5
 #     if win:
-#         board = simulated_game[-1]
+#         idx = game.shape[0] - 1
+#         board = game[idx]
 #         player = 1 if (board != 0).sum() % 2 == 0 else 2
 #     else:
-#         N = simulated_game.shape[0]
+#         N = game.shape[0]
 #         idx = np.random.randint(0, N - 1)
-#         board = simulated_game[idx]
+#         board = game[idx]
 #         player = 1 if random.random() < 0.5 else 2
 #
+#     # WRONG LOGIC!
 #     # count black stones (=1) as ground truth
 #     num_black = int(np.count_nonzero(board == 1))
-#     answer_text = str(num_black)
+#     answer = str(num_black)
 #
-#     return player, build_basic_dataset_row(
-#         img_path=None,
+#     # Persist the image and get img_bytes
+#     img_path, img_bytes = persist_turn_image(board, idx, sim_id)
+#     # Persist game state for easier debugging
+#     persist_turn_game_state(board, idx, sim_id)
+#
+#     return player, DatasetRow(
+#         img_path=str(img_path),
 #         img_bytes=img_bytes,
-#         family=family,
+#
+#         family=FAMILY,
 #         q_id=q_id,
-#         focus=focus,
-#         answer=answer_text,
+#         focus=FOCUS,
+#
+#         answer=answer,
+#         valid_answers=[answer],
+#
+#         # Will be assigned later in the creation process
+#         question=None,
+#         split=None
 #     )
 #
 #
-# def gen_question_q104_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+# def gen_question_q800_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
 #     """
-#     Generate a single Q1 sample:
-#     focus: "count_black_stones"
+#     Generate a single Q800 sample:
+#     focus: "can_you_lose"
 #     """
-#     q_id = "Q1"
-#     player, dataset_row = _focus_can_you_lose(q_id, sim_id, simulated_game)
+#     q_id = "Q800"
+#     player, row = _focus_can_you_lose(q_id, sim_id, simulated_game)
 #     player = "Player 1" if player == 2 else "Player 2"
-#     question_text = (
-#         "“Analyze the position in this Gomoku game."
-#         "Player 1 is black; Player 2 is white."
-#         f"Determine whether a victory for {player} remains achievable under optimal play."
-#         "Answer strictly with ‘yes’ or ‘no’.”"
-#     )
 #
-#     dataset_row.question = question_text
+#     template = get_question_text(q_id)
+#     row.question = template.format(player=player)
 #
-#     # Optionally, add additional valid answers here
+#     return row
 #
-#     return dataset_row
-#
-#
-# def gen_question_q105_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+# def gen_question_q801_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
 #     """
-#     Generate a single Q2 sample:
-#     focus: "count_black_stones"
+#     Generate a single Q801 sample:
+#     focus: "can_you_lose"
 #     """
-#     q_id = "Q2"
-#
-#     player, dataset_row = _focus_can_you_lose(q_id, sim_id, simulated_game)
+#     q_id = "Q801"
+#     player, row = _focus_can_you_lose(q_id, sim_id, simulated_game)
 #     player = "Player 1" if player == 2 else "Player 2"
-#     question_text = (
-#         "“You are analyzing the current Gomoku game state."
-#         "Player 1 uses black stones and Player 2 uses white stones."
-#         f"Evaluate the position and determine whether ${player} has a forced win from this position, assuming optimal play by both sides."
-#         "Answer with either ‘yes’ or ‘no’.”"
-#     )
-#     dataset_row.question = question_text
 #
-#     return dataset_row
+#     template = get_question_text(q_id)
+#     row.question = template.format(player=player)
 #
+#     return row
 #
-# def gen_question_q106_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+# def gen_question_q802_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
 #     """
-#     Generate a single Q3 sample:
-#     focus: "count_black_stones"
+#     Generate a single Q802 sample:
+#     focus: "can_you_lose"
 #     """
-#     q_id = "Q3"
-#
-#     player, dataset_row = _focus_can_you_lose(q_id, sim_id, simulated_game)
+#     q_id = "Q802"
+#     player, row = _focus_can_you_lose(q_id, sim_id, simulated_game)
 #     player = "Player 1" if player == 2 else "Player 2"
-#     question_text = (
-#         "“Consider the following Gomoku position."
-#         "Black represents Player 1 and white represents Player 2."
-#         f"Your task is to assess the position and state whether {player} can still win the game from here."
-#         "Respond with a single word: ‘yes’ or ‘no’.”"
-#     )
 #
-#     dataset_row.question = question_text
+#     template = get_question_text(q_id)
+#     row.question = template.format(player=player)
 #
-#     return dataset_row
+#     return row
 #
-#
-# def gen_question_q107_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+# def gen_question_q803_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
 #     """
-#     Generate a single Q4 sample:
-#     focus: "count_black_stones"
+#     Generate a single Q803 sample:
+#     focus: "can_you_lose"
 #     """
-#     q_id = "Q4"
-#
-#     player, dataset_row = _focus_can_you_lose(q_id, sim_id, simulated_game)
+#     q_id = "Q803"
+#     player, row = _focus_can_you_lose(q_id, sim_id, simulated_game)
 #     player = "Player 1" if player == 2 else "Player 2"
-#     question_text = (
-#         "“You are reviewing a Gomoku board position."
-#         "Player 1 (black stones) and Player 2 (white stones) have already played several moves."
-#         f"Based solely on the current configuration, determine if a winning sequence for {player} is still possible."
-#         "Provide a one-word answer: ‘yes’ or ‘no’.”"
-#     )
-#     dataset_row.question = question_text
 #
-#     return dataset_row
+#     template = get_question_text(q_id)
+#     row.question = template.format(player=player)
+#
+#     return row

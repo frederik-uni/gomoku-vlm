@@ -9,7 +9,9 @@ from gen_dataset.sphinx.perception.focus import (
     count_empty_intersections,
     color_at_position,
     print_board_matrix,
-    determine_who_won
+    determine_who_won,
+    can_you_win,
+    can_you_lose
 )
 from ..core import is_question_configured
 
@@ -85,15 +87,23 @@ def generate_perception_questions_for_episode(
 
     # # === Frederik ===
     # # focus: can_you_win
-    # rows.append(can_you_win.gen_question_q100_sample(sim_id, simulated_game))
-    # rows.append(can_you_win.gen_question_q101_sample(sim_id, simulated_game))
-    # rows.append(can_you_win.gen_question_q102_sample(sim_id, simulated_game))
-    # rows.append(can_you_win.gen_question_q103_sample(sim_id, simulated_game))
+    # if is_question_configured("Q700"):
+    #     rows.append(can_you_win.gen_question_q700_sample(sim_id, simulated_game))
+    # if is_question_configured("Q701"):
+    #     rows.append(can_you_win.gen_question_q701_sample(sim_id, simulated_game))
+    # if is_question_configured("Q702"):
+    #     rows.append(can_you_win.gen_question_q702_sample(sim_id, simulated_game))
+    # if is_question_configured("Q703"):
+    #     rows.append(can_you_win.gen_question_q703_sample(sim_id, simulated_game))
     #
     # # focus: can_you_loose
-    # rows.append(can_you_loose.gen_question_q104_sample(sim_id, simulated_game))
-    # rows.append(can_you_loose.gen_question_q105_sample(sim_id, simulated_game))
-    # rows.append(can_you_loose.gen_question_q106_sample(sim_id, simulated_game))
-    # rows.append(can_you_loose.gen_question_q107_sample(sim_id, simulated_game))
+    # if is_question_configured("Q800"):
+    #     rows.append(can_you_lose.gen_question_q800_sample(sim_id, simulated_game))
+    # if is_question_configured("Q801"):
+    #     rows.append(can_you_lose.gen_question_q801_sample(sim_id, simulated_game))
+    # if is_question_configured("Q802"):
+    #     rows.append(can_you_lose.gen_question_q802_sample(sim_id, simulated_game))
+    # if is_question_configured("Q803"):
+    #     rows.append(can_you_lose.gen_question_q803_sample(sim_id, simulated_game))
 
     return rows
