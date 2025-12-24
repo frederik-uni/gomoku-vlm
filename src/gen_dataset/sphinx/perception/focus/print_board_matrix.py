@@ -10,7 +10,7 @@ from gen_dataset.sphinx.core import (
 )
 
 
-def _board_to_matrix_string(board: np.ndarray) -> str:
+def board_to_matrix_string(board: np.ndarray) -> str:
     """
     Convert a 2D board array into a plain text matrix:
 
@@ -59,7 +59,7 @@ def _focus_print_board_matrix(
     persist_turn_game_state(board, turn_index, sim_id)
 
     # serialize the board as text matrix
-    answer = _board_to_matrix_string(board)
+    answer = board_to_matrix_string(board)
     valid_answers = [answer]
 
     return DatasetRow(

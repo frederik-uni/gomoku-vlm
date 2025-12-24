@@ -13,7 +13,7 @@ def _focus_best_next_move(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
-    min_turns: int = 0,
+    min_turns: int = 2,
     max_turns: int = 999
 ) -> tuple[str, DatasetRow]:
     """
@@ -32,7 +32,7 @@ def _focus_best_next_move(
     if num_turns < 2:
         # Impossible to compare two states, if less than two turns have been performed
         raise ValueError(f"Need at least 2 turns for 'focus: best_next_move', got num_turns={num_turns}. "
-                         f"Miss configured sphinx_config file, make sure the min_turns is at least 2.")
+                         f"Miss configured focus, make sure the min_turns is at least 2.")
 
     # Random 0-based index of the "before" board.
     turn_index = get_random_turn_index(game, min_turns, max_turns)
@@ -59,7 +59,7 @@ def _focus_best_next_move(
     # also get the next board (to determine the actually performed move by the bot)
     board_after = game[next_turn]
     # persist the image for debugging only, not for the dataset
-    persist_turn_image(board_after, turn_index, sim_id)
+    persist_turn_image(board_after, next_turn, sim_id)
 
     # compare boards to get target (row, col)
     mask = board != board_after  # shape (15, 15)

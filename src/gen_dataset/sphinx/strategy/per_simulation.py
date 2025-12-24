@@ -6,7 +6,7 @@ from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.strategy.focus import (
     win_next_turn,
     best_next_move,
-    list_valid_moves
+    list_valid_moves, reason_next_move
 )
 from ..core import should_generate_question
 
@@ -72,5 +72,22 @@ def generate_strategy_questions_for_episode(
     if should_generate_question("Q10203", generated_questions_count):
         rows.append(list_valid_moves.gen_question_q10203_sample(sim_id, simulated_game))
         generated_questions_count["Q10203"] = generated_questions_count.get("Q10203", 0) + 1
+
+    # focus: reason_next_move
+    if should_generate_question("Q10300", generated_questions_count):
+        rows.append(reason_next_move.gen_question_q10300_sample(sim_id, simulated_game))
+        generated_questions_count["Q10300"] = generated_questions_count.get("Q10300", 0) + 1
+
+    if should_generate_question("Q10301", generated_questions_count):
+        rows.append(reason_next_move.gen_question_q10301_sample(sim_id, simulated_game))
+        generated_questions_count["Q10301"] = generated_questions_count.get("Q10301", 0) + 1
+
+    if should_generate_question("Q10302", generated_questions_count):
+        rows.append(reason_next_move.gen_question_q10302_sample(sim_id, simulated_game))
+        generated_questions_count["Q10302"] = generated_questions_count.get("Q10302", 0) + 1
+
+    if should_generate_question("Q10303", generated_questions_count):
+        rows.append(reason_next_move.gen_question_q10303_sample(sim_id, simulated_game))
+        generated_questions_count["Q10303"] = generated_questions_count.get("Q10303", 0) + 1
 
     return rows
