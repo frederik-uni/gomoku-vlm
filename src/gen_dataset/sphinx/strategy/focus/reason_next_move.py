@@ -47,7 +47,7 @@ def _focus_reason_next_move(
     num_turns = game.shape[0]
     if num_turns < 2:
         # Impossible to compare two states, if less than two turns have been performed
-        raise ValueError(f"Need at least 2 turns for 'focus: best_next_move', got num_turns={num_turns}. "
+        raise ValueError(f"Need at least 2 turns for 'focus: reason_next_move', got num_turns={num_turns}. "
                          f"Miss configured focus, make sure the min_turns is at least 2.")
 
     # turn_index is a random, 0-based index of the "before" board.

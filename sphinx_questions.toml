@@ -17,7 +17,6 @@ Important:
 """
 
 [questions.Q100]
-num_samples = 15
 text = """
 You are looking at a Gomoku game position.
 Black is player 1 and white is player 2.
@@ -243,36 +242,67 @@ From the pattern of stones, decide who has won the game, or if it is a draw.
 Reply with exactly one word: 'black', 'white', or 'draw'.
 """
 
+# focus: can_you_win
+[questions.Q700]
+text = """
+This image shows a mid-game Gomoku position (15×15 board).
+Player 1 plays black; Player 2 plays white.
+
+You are Player {player}. Your stones are {color}. It is your turn.
+
+Determine if you can finish the game on this move:
+Is there at least one legal placement of a {color} stone that completes a 5-in-a-row
+pattern immediately?
+
+Answer format: exactly one word, either 'yes' or 'no'.
+"""
+
+# focus: can_you_lose
 [questions.Q800]
 text = """
-Analyze the position in this Gomoku game.
-Player 1 is black; Player 2 is white.
-Determine whether a victory for {player} remains achievable under optimal play.
-Answer strictly with 'yes' or 'no'.
+You are looking at a Gomoku position on a 15×15 board.
+Player 1 = black, Player 2 = white.
+It is {player}'s turn (you are playing {color}).
+
+Question:
+Does your opponent currently have an immediate winning threat (a move that would win on their next turn),
+meaning you must block right now?
+
+Answer with exactly one word: 'yes' or 'no'.
 """
 
-[questions.Q801]
+# focus: three_in_a_row
+[questions.Q900]
 text = """
-You are analyzing the current Gomoku game state.
+This image shows a mid-game Gomoku position on a 15×15 board.
 Player 1 uses black stones and Player 2 uses white stones.
-Evaluate the position and determine whether {player} has a forced win from this position, assuming optimal play by both sides.
-Answer with either 'yes' or 'no'.
+
+You are Player {player}. Your stones are {color}. It is your turn.
+
+Task:
+Count how many separate three-in-a-row lines you currently have for your color.
+A three-in-a-row line is a contiguous straight line (horizontal, vertical, or diagonal)
+containing at least 3 of your stones.
+Count each continuous line only once.
+
+Answer with a single integer and nothing else.
 """
 
-[questions.Q802]
+# focus: four_in_a_row
+[questions.Q1000]
 text = """
-Consider the following Gomoku position.
-Black represents Player 1 and white represents Player 2.
-Your task is to assess the position and state whether {player} can still win the game from here.
-Respond with a single word: 'yes' or 'no'.
-"""
+This image shows a mid-game Gomoku position on a 15×15 board.
+Player 1 uses black stones and Player 2 uses white stones.
 
-[questions.Q803]
-text = """
-You are reviewing a Gomoku board position.
-Player 1 (black stones) and Player 2 (white stones) have already played several moves.
-Based solely on the current configuration, determine if a winning sequence for {player} is still possible.
-Provide a one-word answer: 'yes' or 'no'.
+You are Player {player}. Your stones are {color}. It is your turn.
+
+Task:
+Count how many separate four-in-a-row lines you currently have for your color.
+A four-in-a-row line is a contiguous straight line (horizontal, vertical, or diagonal)
+containing at least 4 of your stones.
+Count each continuous line only once.
+
+Answer with a single integer and nothing else.
 """
 
 [questions.Q10000]

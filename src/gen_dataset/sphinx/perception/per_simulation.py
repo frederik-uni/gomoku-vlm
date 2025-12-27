@@ -11,7 +11,9 @@ from gen_dataset.sphinx.perception.focus import (
     print_board_matrix,
     determine_who_won,
     can_you_win,
-    can_you_lose
+    can_you_lose,
+    three_in_a_row,
+    four_in_a_row,
 )
 from ..core import is_question_configured, should_generate_question
 
@@ -26,7 +28,6 @@ def generate_perception_questions_for_episode(
     """
     rows: List[DatasetRow] = []
 
-    # === Eugen ===
     # focus: count_black_stones
     if should_generate_question("Q100", generated_questions_count):
         rows.append(count_black_stones.gen_question_q100_sample(sim_id, simulated_game))
@@ -43,6 +44,27 @@ def generate_perception_questions_for_episode(
     if should_generate_question("Q103", generated_questions_count):
         rows.append(count_black_stones.gen_question_q103_sample(sim_id, simulated_game))
         generated_questions_count["Q103"] = generated_questions_count.get("Q103", 0) + 1
+
+    # focus: can_you_win
+    if should_generate_question("Q700", generated_questions_count):
+        rows.append(can_you_win.gen_question_q700_sample(sim_id, simulated_game))
+        generated_questions_count["Q700"] = generated_questions_count.get("Q700", 0) + 1
+
+    # focus: can_you_lose
+    if should_generate_question("Q800", generated_questions_count):
+        rows.append(can_you_lose.gen_question_q800_sample(sim_id, simulated_game))
+        generated_questions_count["Q800"] = generated_questions_count.get("Q800", 0) + 1
+
+    # focus: three_in_a_row
+    if should_generate_question("Q900", generated_questions_count):
+        rows.append(three_in_a_row.gen_question_q900_sample(sim_id, simulated_game))
+        generated_questions_count["Q900"] = generated_questions_count.get("Q900", 0) + 1
+
+    # focus: four_in_a_row
+    if should_generate_question("Q1000", generated_questions_count):
+        rows.append(four_in_a_row.gen_question_q1000_sample(sim_id, simulated_game))
+        generated_questions_count["Q1000"] = generated_questions_count.get("Q1000", 0) + 1
+
 
     # # focus: count_white_stones
     # if is_question_configured("Q200"):
