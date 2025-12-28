@@ -113,12 +113,8 @@ def target(mode: Mode):
     else:
         return [
             "q_proj",
-            "k_proj",
             "v_proj",
-            "o_proj",
-            "gate_proj",
             "up_proj",
-            "down_proj",
         ]
 
 
@@ -126,10 +122,7 @@ def modules(mode: Mode):
     if mode == "visual":
         return ["multi_modal_projector"]
     else:
-        return [
-            "embed_tokens",
-            "lm_head",
-        ]
+        return ["lm_head"]
 
 
 def freeze_lora(model, modules: list[str]):
