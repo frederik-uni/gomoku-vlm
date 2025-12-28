@@ -95,7 +95,12 @@ def _get_sim_game_state_dir(sim_id: int) -> Path:
     return sim_dir
 
 
-def persist_turn_image(board: np.ndarray, turn_index: int, sim_id: int) -> tuple[Path, bytes]:
+def persist_turn_image(
+        board: np.ndarray,
+        turn_index: int,
+        sim_id: int,
+        *,
+        non_rand: bool = False) -> tuple[Path, bytes]:
     """
     Renders the provided board as a .png image and then saves it.
 
@@ -103,6 +108,7 @@ def persist_turn_image(board: np.ndarray, turn_index: int, sim_id: int) -> tuple
         board: (np.ndarray): The 2D-board of the turn.
         turn_index (int): Zero-based turn index used to correctly name the file.
         sim_id (int): Zero-based sim id index (episode) to correctly locate the folder.
+        non_rand: (bool) Whether to exclude image alterations, like rotation or discoloration from the image rendering process.
 
     Returns:
         tuple[Path, bytes]: A tuple containing:
@@ -111,7 +117,8 @@ def persist_turn_image(board: np.ndarray, turn_index: int, sim_id: int) -> tuple
     """
     filename = f"turn_{turn_index:03d}.png"
     img_path = _get_sim_image_dir(sim_id) / filename
-    img = sim_game.render_game_step(board)
+    # img = sim_game.render_game_step(board)
+    img = sim_game.render_game_step_rand(board, non_rand)
     img.save(img_path)
 
     # read image bytes (PNG-encoded)
