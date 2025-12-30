@@ -13,6 +13,7 @@ def _focus_four_in_a_row(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
+    non_rand_img: bool,
     *,
     min_turn = 0,
     max_turn = 999,
@@ -54,7 +55,7 @@ def _focus_four_in_a_row(
     answer = str(num_four_in_a_row)
 
     # Persist the image and get img_bytes
-    img_path, img_bytes = persist_turn_image(board, idx, sim_id)
+    img_path, img_bytes = persist_turn_image(board, idx, sim_id, non_rand_img=non_rand_img)
 
     return player, color, num_four_in_a_row, DatasetRow(
         img_path=str(img_path),
@@ -68,10 +69,41 @@ def _focus_four_in_a_row(
         split=None,
     )
 
-def gen_question_q1000_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
-    q_id = "Q1000"
+
+def gen_question_q501_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    q_id = "Q501"
     player, color, _count, row = _focus_four_in_a_row(
-        q_id, sim_id, simulated_game, player=1
+        q_id, sim_id, simulated_game, non_rand_img
+    )
+    template = get_question_text(q_id)
+    row.question = template.format(player=player, color=color)
+    return row
+
+
+def gen_question_q502_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    q_id = "Q502"
+    player, color, _count, row = _focus_four_in_a_row(
+        q_id, sim_id, simulated_game, non_rand_img
+    )
+    template = get_question_text(q_id)
+    row.question = template.format(player=player, color=color)
+    return row
+
+
+def gen_question_q503_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    q_id = "Q503"
+    player, color, _count, row = _focus_four_in_a_row(
+        q_id, sim_id, simulated_game, non_rand_img
+    )
+    template = get_question_text(q_id)
+    row.question = template.format(player=player, color=color)
+    return row
+
+
+def gen_question_q504_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    q_id = "Q504"
+    player, color, _count, row = _focus_four_in_a_row(
+        q_id, sim_id, simulated_game, non_rand_img
     )
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)

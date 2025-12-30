@@ -136,7 +136,7 @@ def _get_max_simulation_attempts() -> int:
     return value
 
 
-def generate_question_dataset() -> List[DatasetRow]:
+def generate_question_dataset(non_rand_img: bool) -> List[DatasetRow]:
     """
     Simulates multiple episodes of the entire game
     and generates one of each question per episode,
@@ -157,6 +157,7 @@ def generate_question_dataset() -> List[DatasetRow]:
             sim_id,
             simulated_game,
             generated_questions_count,
+            non_rand_img
         )
         rows.extend(perception_rows)
 
@@ -164,6 +165,7 @@ def generate_question_dataset() -> List[DatasetRow]:
             sim_id,
             simulated_game,
             generated_questions_count,
+            non_rand_img
         )
         rows.extend(strategy_rows)
 
@@ -285,6 +287,13 @@ def parse_args():
         help="Do not generate dataset_NNNN subfolder under output folder.",
     )
     parser.set_defaults(gen_subfolder=True)
+    parser.add_argument(
+        "--no_rand_img",
+        dest="non_rand_img",
+        action="store_true",
+        help="Do not add randomness to the images (e.g. discoloration, rotation, etc.).",
+    )
+    parser.set_defaults(non_rand_img=False)
 
     return parser.parse_args()
 
@@ -302,7 +311,9 @@ if __name__ == "__main__":
         output_path=output_path,
         gen_subfolder=args.gen_subfolder,
     )
+    non_rand_img = args.non_rand_img
+    print("DEBUG args.non_rand_img =", args.non_rand_img)
 
-    rows = generate_question_dataset()
+    rows = generate_question_dataset(non_rand_img)
     assign_splits(rows)
     assemble_parquet_file(rows)

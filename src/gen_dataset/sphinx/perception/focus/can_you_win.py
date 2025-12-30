@@ -13,6 +13,7 @@ def _focus_can_you_win(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
+    non_rand_img: bool,
     *,
     can_win_bias = 0.01,
     max_resamples: int = 2000,
@@ -93,9 +94,9 @@ def _focus_can_you_win(
                            f"but has been classified as {can_win} for turn {before_idx} -> {after_idx}.")
 
     # Persist the image and get img_bytes
-    img_path, img_bytes = persist_turn_image(before_board, before_idx, sim_id)
+    img_path, img_bytes = persist_turn_image(before_board, before_idx, sim_id, non_rand_img=non_rand_img)
     # Persist after board for debugging only
-    _, _ = persist_turn_image(after_board, after_idx, sim_id)
+    _, _ = persist_turn_image(after_board, after_idx, sim_id, non_rand_img=True)
     color = "black" if player == 1 else "white"
     answer = "yes" if can_win else "no"
 
@@ -111,14 +112,69 @@ def _focus_can_you_win(
         split=None,
     )
 
-def gen_question_q700_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+
+def gen_question_q701_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q700 sample:
+    Generate a single Q701 sample:
     focus: "can_you_win"
     """
-    q_id = "Q700"
+    q_id = "Q701"
 
-    player, color, can_win, row = _focus_can_you_win(q_id, sim_id, simulated_game)
+    player, color, can_win, row = _focus_can_you_win(q_id, sim_id, simulated_game, non_rand_img)
+
+    template = get_question_text(q_id)
+    row.question = template.format(
+        player=f"Player {player}",
+        color=color,
+    )
+
+    return row
+
+
+def gen_question_q702_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q702 sample:
+    focus: "can_you_win"
+    """
+    q_id = "Q702"
+
+    player, color, can_win, row = _focus_can_you_win(q_id, sim_id, simulated_game, non_rand_img)
+
+    template = get_question_text(q_id)
+    row.question = template.format(
+        player=f"Player {player}",
+        color=color,
+    )
+
+    return row
+
+
+def gen_question_q703_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q703 sample:
+    focus: "can_you_win"
+    """
+    q_id = "Q703"
+
+    player, color, can_win, row = _focus_can_you_win(q_id, sim_id, simulated_game, non_rand_img)
+
+    template = get_question_text(q_id)
+    row.question = template.format(
+        player=f"Player {player}",
+        color=color,
+    )
+
+    return row
+
+
+def gen_question_q704_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q704 sample:
+    focus: "can_you_win"
+    """
+    q_id = "Q704"
+
+    player, color, can_win, row = _focus_can_you_win(q_id, sim_id, simulated_game, non_rand_img)
 
     template = get_question_text(q_id)
     row.question = template.format(

@@ -1,5 +1,5 @@
 [general]
-max_simulation_attempts = 8  # how many times to re-simulate to avoid draws
+max_simulation_attempts = 50  # how many times to re-simulate to avoid draws
 
 [general.split_ratios]
 train = 0.8

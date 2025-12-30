@@ -37,6 +37,13 @@ def parse_args():
         help="Do not generate dataset_NNNN subfolder under output folder.",
     )
     parser.set_defaults(gen_subfolder=True)
+    parser.add_argument(
+        "--no_rand_img",
+        dest="non_rand_img",
+        action="store_true",
+        help="Do not add randomness to the images (e.g. discoloration, rotation, etc.).",
+    )
+    parser.set_defaults(non_rand_img=False)
 
     return parser.parse_args()
 
@@ -77,5 +84,7 @@ if __name__ == "__main__":
         ]
         if not args.gen_subfolder:
             cmd.append("--no_gen_subfolder")
+        if args.non_rand_img:
+            cmd.append("--no_rand_img")
 
         subprocess.run(cmd, check=True)

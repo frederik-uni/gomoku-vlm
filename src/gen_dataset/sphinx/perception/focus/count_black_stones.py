@@ -13,6 +13,7 @@ def _focus_count_black_stones(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
+    non_rand_img: bool,
     min_turns: int = 0,
     max_turns: int = 999
 ) -> DatasetRow:
@@ -27,7 +28,7 @@ def _focus_count_black_stones(
     turn_index = get_random_turn_index(game, min_turns, max_turns)
     board = game[turn_index]
     # Persist the image and get img_bytes
-    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id)
+    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id, non_rand_img=non_rand_img)
     # Persist game state for easier debugging
     persist_turn_game_state(board, turn_index, sim_id)
 
@@ -52,54 +53,50 @@ def _focus_count_black_stones(
         split=None
     )
 
-
-def gen_question_q100_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
-    """
-    Generate a single Q100 sample:
-    focus: "count_black_stones"
-    """
-    q_id = "Q100"
-
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
-    dataset_row.question = get_question_text(q_id)
-
-    return dataset_row
-
-
-def gen_question_q101_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q101_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
     Generate a single Q101 sample:
     focus: "count_black_stones"
     """
     q_id = "Q101"
 
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img)
     dataset_row.question = get_question_text(q_id)
 
     return dataset_row
 
-
-def gen_question_q102_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q102_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
     Generate a single Q102 sample:
     focus: "count_black_stones"
     """
     q_id = "Q102"
 
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img)
     dataset_row.question = get_question_text(q_id)
 
     return dataset_row
 
-
-def gen_question_q103_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q103_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
     Generate a single Q103 sample:
     focus: "count_black_stones"
     """
     q_id = "Q103"
 
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game)
+    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img)
+    dataset_row.question = get_question_text(q_id)
+
+    return dataset_row
+
+def gen_question_q104_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q104 sample:
+    focus: "count_black_stones"
+    """
+    q_id = "Q104"
+
+    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img)
     dataset_row.question = get_question_text(q_id)
 
     return dataset_row

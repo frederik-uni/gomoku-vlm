@@ -40,6 +40,7 @@ def _focus_print_board_matrix(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
+    non_rand_img: bool,
     min_turns: int = 0,
     max_turns: int = 999
 ) -> DatasetRow:
@@ -54,7 +55,7 @@ def _focus_print_board_matrix(
     turn_index = get_random_turn_index(game, min_turns, max_turns)
     board = game[turn_index]
     # Persist the image and get img_bytes
-    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id)
+    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id, non_rand_img=non_rand_img)
     # Persist game state for easier debugging
     persist_turn_game_state(board, turn_index, sim_id)
 
@@ -79,45 +80,45 @@ def _focus_print_board_matrix(
     )
 
 
-def gen_question_q500_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q901_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q500 sample:
+    Generate a single Q901 sample:
     focus: "print_board_matrix"
     """
-    q_id = "Q500"
-    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game)
+    q_id = "Q901"
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img)
     dataset_row.question = get_question_text(q_id)
     return dataset_row
 
 
-def gen_question_q501_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q902_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q501 sample:
+    Generate a single Q902 sample:
     focus: "print_board_matrix"
     """
-    q_id = "Q501"
-    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game)
+    q_id = "Q902"
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img)
     dataset_row.question = get_question_text(q_id)
     return dataset_row
 
 
-def gen_question_q502_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q903_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q502 sample:
+    Generate a single Q903 sample:
     focus: "print_board_matrix"
     """
-    q_id = "Q502"
-    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game)
+    q_id = "Q903"
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img)
     dataset_row.question = get_question_text(q_id)
     return dataset_row
 
 
-def gen_question_q503_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q904_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q503 sample:
+    Generate a single Q904 sample:
     focus: "print_board_matrix"
     """
-    q_id = "Q503"
-    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game)
+    q_id = "Q904"
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img)
     dataset_row.question = get_question_text(q_id)
     return dataset_row

@@ -17,6 +17,7 @@ def _focus_reason_next_move(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
+    non_rand_img: bool,
     min_turns: int = 0,
     max_turns: int = 999
 ) -> tuple[int, str, bool, bool, str, DatasetRow]:
@@ -74,12 +75,12 @@ def _focus_reason_next_move(
     # get board before performing the turn
     board = game[turn_index]
     # Persist the image and get img_bytes
-    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id)
+    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id, non_rand_img=non_rand_img)
 
     # also get the next board (to determine the actually performed move by the bot)
     board_after = game[next_turn]
     # persist the image for debugging only, not for the dataset
-    persist_turn_image(board_after, next_turn, sim_id)
+    persist_turn_image(board_after, next_turn, sim_id, non_rand_img=True)
 
     # Part 1) Print the board matrix
     board_as_matrix_string = board_to_matrix_string(board)
@@ -138,56 +139,56 @@ def _focus_reason_next_move(
     )
 
 
-def gen_question_q10300_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1301_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10300 sample:
+    Generate a single Q1301 sample:
     focus: "reason_next_move"
     """
-    q_id = "Q10300"
+    q_id = "Q1301"
 
-    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game)
+    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game, non_rand_img)
 
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)
 
     return row
 
-def gen_question_q10301_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1302_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10301 sample:
+    Generate a single Q1302 sample:
     focus: "reason_next_move"
     """
-    q_id = "Q10301"
+    q_id = "Q1302"
 
-    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game)
+    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game, non_rand_img)
 
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)
 
     return row
 
-def gen_question_q10302_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1303_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10302 sample:
+    Generate a single Q1303 sample:
     focus: "reason_next_move"
     """
-    q_id = "Q10302"
+    q_id = "Q1303"
 
-    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game)
+    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game, non_rand_img)
 
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)
 
     return row
 
-def gen_question_q10303_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1304_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10303 sample:
+    Generate a single Q1304 sample:
     focus: "reason_next_move"
     """
-    q_id = "Q10303"
+    q_id = "Q1304"
 
-    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game)
+    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game, non_rand_img)
 
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)

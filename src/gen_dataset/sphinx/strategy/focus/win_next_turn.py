@@ -13,6 +13,7 @@ def _focus_win_next_turn(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
+    non_rand_img: bool,
     min_turns: int = 999,
     max_turns: int = 999
 ) -> tuple[int, DatasetRow]:
@@ -40,7 +41,7 @@ def _focus_win_next_turn(
     # get board for second to last turn
     board = game[second_to_last_turn]
     # Persist the image and get img_bytes
-    img_path, img_bytes = persist_turn_image(board, last_turn, sim_id)
+    img_path, img_bytes = persist_turn_image(board, last_turn, sim_id, non_rand_img=non_rand_img)
 
     # also get the last board, to compare against
     board_after = game[last_turn]
@@ -100,6 +101,7 @@ def _build_outcome_context(winner: int, game: np.ndarray) -> dict[str, str]:
         return {
             "outcome_phrase": "win for black",
             "player_color": "black",
+            "color": "black",
             "goal_phrase": "win the game",
         }
     elif winner == 2:
@@ -107,6 +109,7 @@ def _build_outcome_context(winner: int, game: np.ndarray) -> dict[str, str]:
         return {
             "outcome_phrase": "win for white",
             "player_color": "white",
+            "color": "white",
             "goal_phrase": "win the game",
         }
     elif winner == -1:
@@ -115,19 +118,20 @@ def _build_outcome_context(winner: int, game: np.ndarray) -> dict[str, str]:
         return {
             "outcome_phrase": "draw",
             "player_color": player_color,
+            "color": player_color,
             "goal_phrase": "bring the game to a draw",
         }
     else:
         raise ValueError(f"Unexpected winner value: {winner}")
 
 
-def gen_question_q10000_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1101_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10000 sample:
+    Generate a single Q1101 sample:
     focus: "win_next_turn"
     """
-    q_id = "Q10000"
-    winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game)
+    q_id = "Q1101"
+    winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game, non_rand_img)
     context = _build_outcome_context(winner, simulated_game)
 
     template = get_question_text(q_id)  # from sphinx_questions.toml
@@ -136,13 +140,13 @@ def gen_question_q10000_sample(sim_id: int, simulated_game: np.ndarray) -> Datas
     return dataset_row
 
 
-def gen_question_q10001_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1102_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10001 sample:
+    Generate a single Q1102 sample:
     focus: "win_next_turn"
     """
-    q_id = "Q10001"
-    winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game)
+    q_id = "Q1102"
+    winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game, non_rand_img)
     context = _build_outcome_context(winner, simulated_game)
 
     template = get_question_text(q_id)
@@ -151,13 +155,13 @@ def gen_question_q10001_sample(sim_id: int, simulated_game: np.ndarray) -> Datas
     return dataset_row
 
 
-def gen_question_q10002_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1103_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10002 sample:
+    Generate a single Q1103 sample:
     focus: "win_next_turn"
     """
-    q_id = "Q10002"
-    winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game)
+    q_id = "Q1103"
+    winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game, non_rand_img)
     context = _build_outcome_context(winner, simulated_game)
 
     template = get_question_text(q_id)
@@ -166,13 +170,13 @@ def gen_question_q10002_sample(sim_id: int, simulated_game: np.ndarray) -> Datas
     return dataset_row
 
 
-def gen_question_q10003_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1104_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10003 sample:
+    Generate a single Q1104 sample:
     focus: "win_next_turn"
     """
-    q_id = "Q10003"
-    winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game)
+    q_id = "Q1104"
+    winner, dataset_row = _focus_win_next_turn(q_id, sim_id, simulated_game, non_rand_img)
     context = _build_outcome_context(winner, simulated_game)
 
     template = get_question_text(q_id)

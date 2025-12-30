@@ -13,6 +13,7 @@ def _focus_can_you_lose(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
+    non_rand_img: bool,
     *,
     max_resamples: int = 2000,
     late_game_bias_prob: float = 0.1,
@@ -85,7 +86,7 @@ def _focus_can_you_lose(
         chosen_idx, chosen_player, chosen_board, chosen_can_lose = idx, player, board, can_lose
 
     color = "black" if chosen_player == 1 else "white"
-    img_path, img_bytes = persist_turn_image(chosen_board, chosen_idx, sim_id)
+    img_path, img_bytes = persist_turn_image(chosen_board, chosen_idx, sim_id, non_rand_img=non_rand_img)
 
     answer = "yes" if chosen_can_lose else "no"
 
@@ -102,14 +103,71 @@ def _focus_can_you_lose(
     )
 
 
-def gen_question_q800_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q801_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q800 sample:
+    Generate a single Q801 sample:
     focus: "can_you_lose"
     """
-    q_id = "Q800"
+    q_id = "Q801"
 
-    player, color, can_lose, row = _focus_can_you_lose(q_id, sim_id, simulated_game)
+    player, color, can_lose, row = _focus_can_you_lose(q_id, sim_id, simulated_game, non_rand_img)
+
+    template = get_question_text(q_id)
+
+    row.question = template.format(
+        player=f"Player {player}",
+        color=color,              # safe even if template doesn't use it
+    )
+
+    return row
+
+
+def gen_question_q802_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q802 sample:
+    focus: "can_you_lose"
+    """
+    q_id = "Q802"
+
+    player, color, can_lose, row = _focus_can_you_lose(q_id, sim_id, simulated_game, non_rand_img)
+
+    template = get_question_text(q_id)
+
+    row.question = template.format(
+        player=f"Player {player}",
+        color=color,              # safe even if template doesn't use it
+    )
+
+    return row
+
+
+def gen_question_q803_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q803 sample:
+    focus: "can_you_lose"
+    """
+    q_id = "Q803"
+
+    player, color, can_lose, row = _focus_can_you_lose(q_id, sim_id, simulated_game, non_rand_img)
+
+    template = get_question_text(q_id)
+
+    row.question = template.format(
+        player=f"Player {player}",
+        color=color,              # safe even if template doesn't use it
+    )
+
+    return row
+
+
+def gen_question_q804_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q804 sample:
+    focus: "can_you_lose"
+    """
+    q_id = "Q804"
+
+    player, color, can_lose, row = _focus_can_you_lose(q_id, sim_id, simulated_game, non_rand_img)
 
     template = get_question_text(q_id)
 
