@@ -62,7 +62,7 @@ def gen_question_q301_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     """
     q_id = "Q301"
     min_turns = 0
-    max_turns = 55
+    max_turns = 30
 
     row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     row.question = get_question_text(q_id)
@@ -75,8 +75,8 @@ def gen_question_q302_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "count_empty_intersections"
     """
     q_id = "Q302"
-    min_turns = 55
-    max_turns = 110
+    min_turns = 31
+    max_turns = 75
 
     row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     row.question = get_question_text(q_id)
@@ -89,8 +89,8 @@ def gen_question_q303_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "count_empty_intersections"
     """
     q_id = "Q303"
-    min_turns = 110
-    max_turns = 165
+    min_turns = 76
+    max_turns = 150
 
     row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     row.question = get_question_text(q_id)
@@ -103,8 +103,8 @@ def gen_question_q304_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "count_empty_intersections"
     """
     q_id = "Q304"
-    min_turns = 165
-    max_turns = 225
+    min_turns = 151
+    max_turns = 224
 
     row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     row.question = get_question_text(q_id)

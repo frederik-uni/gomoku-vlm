@@ -109,7 +109,7 @@ def gen_question_q1001_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     """
     q_id = "Q1001"
     min_turn = 0
-    max_turn = 55
+    max_turn = 30
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
@@ -125,8 +125,8 @@ def gen_question_q1002_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     focus: "list_valid_moves"
     """
     q_id = "Q1002"
-    min_turn = 55
-    max_turn = 110
+    min_turn = 31
+    max_turn = 75
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
@@ -142,8 +142,8 @@ def gen_question_q1003_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     focus: "list_valid_moves"
     """
     q_id = "Q1003"
-    min_turn = 110
-    max_turn = 165
+    min_turn = 76
+    max_turn = 150
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
@@ -159,8 +159,8 @@ def gen_question_q1004_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     focus: "list_valid_moves"
     """
     q_id = "Q1004"
-    min_turn = 165
-    max_turn = 225
+    min_turn = 151
+    max_turn = 224
 
     color, dataset_row = _focus_list_valid_moves(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 

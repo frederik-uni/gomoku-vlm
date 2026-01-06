@@ -89,7 +89,7 @@ def gen_question_q1_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img
     """
     q_id = "Q1"
     min_turns = 0
-    max_turns = 55
+    max_turns = 30
 
     dataset_row, row_idx, col_idx = _focus_color_at_position(
         q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns
@@ -107,8 +107,8 @@ def gen_question_q2_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img
     focus: "color_at_position"
     """
     q_id = "Q2"
-    min_turns = 55
-    max_turns = 110
+    min_turns = 31
+    max_turns = 75
 
     dataset_row, row_idx, col_idx = _focus_color_at_position(
         q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns
@@ -126,8 +126,8 @@ def gen_question_q3_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img
     focus: "color_at_position"
     """
     q_id = "Q3"
-    min_turns = 110
-    max_turns = 165
+    min_turns = 76
+    max_turns = 150
 
     dataset_row, row_idx, col_idx = _focus_color_at_position(
         q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns
@@ -145,8 +145,8 @@ def gen_question_q4_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img
     focus: "color_at_position"
     """
     q_id = "Q4"
-    min_turns = 165
-    max_turns = 225
+    min_turns = 151
+    max_turns = 224
 
     dataset_row, row_idx, col_idx = _focus_color_at_position(
         q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns

@@ -108,7 +108,7 @@ def gen_question_q1201_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     """
     q_id = "Q1201"
     min_turn = 0
-    max_turn = 55
+    max_turn = 30
 
     color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
@@ -124,8 +124,8 @@ def gen_question_q1202_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     focus: "best_next_move"
     """
     q_id = "Q1202"
-    min_turn = 55
-    max_turn = 110
+    min_turn = 31
+    max_turn = 75
 
     color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
@@ -141,8 +141,8 @@ def gen_question_q1203_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     focus: "best_next_move"
     """
     q_id = "Q1203"
-    min_turn = 110
-    max_turn = 165
+    min_turn = 76
+    max_turn = 150
 
     color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
@@ -158,8 +158,8 @@ def gen_question_q1204_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     focus: "best_next_move"
     """
     q_id = "Q1204"
-    min_turn = 165
-    max_turn = 225
+    min_turn = 151
+    max_turn = 224
 
     color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 

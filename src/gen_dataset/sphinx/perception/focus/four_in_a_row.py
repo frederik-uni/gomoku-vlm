@@ -73,7 +73,7 @@ def _focus_four_in_a_row(
 def gen_question_q501_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     q_id = "Q501"
     min_turn = 0
-    max_turn = 55
+    max_turn = 30
 
     player, color, _count, row = _focus_four_in_a_row(
         q_id, sim_id, simulated_game, non_rand_img, min_turn=min_turn, max_turn=max_turn
@@ -85,8 +85,8 @@ def gen_question_q501_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
 
 def gen_question_q502_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     q_id = "Q502"
-    min_turn = 55
-    max_turn = 110
+    min_turn = 31
+    max_turn = 75
 
     player, color, _count, row = _focus_four_in_a_row(
         q_id, sim_id, simulated_game, non_rand_img, min_turn=min_turn, max_turn=max_turn
@@ -98,8 +98,8 @@ def gen_question_q502_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
 
 def gen_question_q503_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     q_id = "Q503"
-    min_turn = 110
-    max_turn = 165
+    min_turn = 76
+    max_turn = 150
 
     player, color, _count, row = _focus_four_in_a_row(
         q_id, sim_id, simulated_game, non_rand_img, min_turn=min_turn, max_turn=max_turn
@@ -111,8 +111,8 @@ def gen_question_q503_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
 
 def gen_question_q504_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     q_id = "Q504"
-    min_turn = 165
-    max_turn = 225
+    min_turn = 151
+    max_turn = 224
 
     player, color, _count, row = _focus_four_in_a_row(
         q_id, sim_id, simulated_game, non_rand_img, min_turn=min_turn, max_turn=max_turn
