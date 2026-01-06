@@ -8,6 +8,7 @@ from PIL import Image
 from game_logic import create_board, get_winner, make_move
 from gomoku_renderer import calc_coords_gomoku, create_gomoku_board, create_pieces
 from renderer import render
+from src.bots.ai_bot import generate_next_move_greedy
 
 Func = Callable[[np.ndarray], tuple[int, int]]
 
@@ -48,17 +49,6 @@ def simulate_game(
         current_player = (current_player % 2) + 1
 
     return np.stack(game_states)
-
-
-def rotation_safe_scale(w: int, h: int, deg: float) -> float:
-    theta = math.radians(deg)
-    c = abs(math.cos(theta))
-    s = abs(math.sin(theta))
-
-    w_rot = w * c + h * s
-    h_rot = w * s + h * c
-
-    return min(w / w_rot, h / h_rot)
 
 
 def _generate_distinct_colors():
@@ -119,31 +109,20 @@ def render_game_step(
     img = render(board_img, pieces, state, calc_coords=calc_coords_gomoku_wrapper)
     w, h = img.size
     if rotate_deg is not None and rotate_deg != 0:
-        scale = rotation_safe_scale(w, h, rotate_deg)
-
-        if scale < 1.0:
-            img = img.resize(
-                (round(w * scale), round(h * scale)),
-                resample=Image.BICUBIC,
-            )
-
         img = img.rotate(
             rotate_deg,
             resample=Image.BICUBIC,
-            expand=False,
+            expand=True,
             fillcolor=color,
         )
-
-        canvas = Image.new("RGB", (w, h), color)
-        canvas.paste(img, ((w - img.width) // 2, (h - img.height) // 2))
-        img = canvas
+        img = img.resize((w, h), resample=Image.BICUBIC)
     return img
 
 
 def render_game_step_rand(state: np.ndarray, non_rand: bool = False) -> Image.Image:
     if non_rand:
         return render_game_step(state=state)
-    palette = _generate_distinct_colors(22)
+    palette = _generate_distinct_colors()
     board_color = random.choice(palette)
     line_color = _contrasting_line_color(board_color)
 
@@ -151,7 +130,13 @@ def render_game_step_rand(state: np.ndarray, non_rand: bool = False) -> Image.Im
 
     return render_game_step(
         state=state,
-        lcolor=board_color,
-        color=line_color,
+        lcolor=line_color,
+        color=board_color,
         rotate_deg=rotate_deg,
     )
+
+
+if __name__ == "__main__":
+    game = simulate_game(generate_next_move_greedy)
+    for step, game_state in enumerate(game):
+        render_game_step_rand(game_state).save(f"game_step_{step}.png")
