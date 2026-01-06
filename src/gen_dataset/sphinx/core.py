@@ -3,6 +3,8 @@ import shutil
 import tomllib
 import warnings
 from enum import Enum
+from typing import Dict
+
 import numpy as np
 from pathlib import Path
 import json
@@ -14,10 +16,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_SPHINX_CONFIG_PATH = PROJECT_ROOT / "sphinx_config.toml"
 DEFAULT_SPHINX_QUESTION_PATH = PROJECT_ROOT / "sphinx_questions.toml"
 DEFAULT_SPHINX_OUT_ROOT_PATH = PROJECT_ROOT / "out"
-
-# how the dataset is structured *inside* the OUT_ROOT path
-# <output_root> / sphinx / dataset / dataset_000 / ...
-DATASET_PATH_SUFFIX = Path("sphinx") / "dataset"
 
 # dynamic, will be set via init_sphinx_environment() in runner.py
 SPHINX_CONFIG: dict | None = None
@@ -97,7 +95,12 @@ def _get_sim_game_state_dir(sim_id: int) -> Path:
     return sim_dir
 
 
-def persist_turn_image(board: np.ndarray, turn_index: int, sim_id: int) -> tuple[Path, bytes]:
+def persist_turn_image(
+        board: np.ndarray,
+        turn_index: int,
+        sim_id: int,
+        *,
+        non_rand_img: bool) -> tuple[Path, bytes]:
     """
     Renders the provided board as a .png image and then saves it.
 
@@ -105,6 +108,7 @@ def persist_turn_image(board: np.ndarray, turn_index: int, sim_id: int) -> tuple
         board: (np.ndarray): The 2D-board of the turn.
         turn_index (int): Zero-based turn index used to correctly name the file.
         sim_id (int): Zero-based sim id index (episode) to correctly locate the folder.
+        non_rand_img: (bool) Whether to exclude image alterations, like rotation or discoloration from the image rendering process.
 
     Returns:
         tuple[Path, bytes]: A tuple containing:
@@ -113,7 +117,8 @@ def persist_turn_image(board: np.ndarray, turn_index: int, sim_id: int) -> tuple
     """
     filename = f"turn_{turn_index:03d}.png"
     img_path = _get_sim_image_dir(sim_id) / filename
-    img = sim_game.render_game_step(board)
+    # img = sim_game.render_game_step(board)
+    img = sim_game.render_game_step_rand(board, non_rand=non_rand_img)
     img.save(img_path)
 
     # read image bytes (PNG-encoded)
@@ -141,7 +146,7 @@ def persist_turn_game_state(board: np.ndarray, turn_index: int, sim_id: int) -> 
     return out_path
 
 
-def _init_output_dirs() -> None:
+def _init_output_dirs(gen_subfolder: bool = True) -> None:
     """
     Create dataset_<NNN>/images, game_states, parquet under SPHINX_BASE_OUT_PATH
     and write the paths into SPHINX_IMG_OUT_PATH, SPHINX_PARQUET_OUT_PATH, etc.
@@ -154,15 +159,18 @@ def _init_output_dirs() -> None:
     base = SPHINX_OUT_ROOT_PATH
     base.mkdir(parents=True, exist_ok=True)
 
-    # find first free index of existing dataset_XXX dirs
-    next_idx = 0
-    while True:
+    if gen_subfolder:
+        # find first free index of existing dataset_XXX dirs
+        next_idx = 0
+        while True:
+            dataset_root = base / f"dataset_{next_idx:03d}"
+            if not dataset_root.exists():
+                break
+            next_idx += 1
         dataset_root = base / f"dataset_{next_idx:03d}"
-        if not dataset_root.exists():
-            break
-        next_idx += 1
+    else:
+        dataset_root = base
 
-    dataset_root = base / f"dataset_{next_idx:03d}"
     img_dir = dataset_root / "images"
     game_states_dir = dataset_root / "game_states"
     parquet_dir = dataset_root / "parquet"
@@ -182,6 +190,7 @@ def init_sphinx_environment(
     config_path: Path | str = DEFAULT_SPHINX_CONFIG_PATH,
     questions_path: Path | str = DEFAULT_SPHINX_QUESTION_PATH,
     output_path: Path | str = DEFAULT_SPHINX_OUT_ROOT_PATH,
+    gen_subfolder: bool = True,
 ) -> None:
     """
     Load the sphinx_config TOML, initialize all SPHINX_* paths,
@@ -209,9 +218,9 @@ def init_sphinx_environment(
 
     SPHINX_CONFIG_PATH = config_path
     SPHINX_QUESTIONS_PATH = questions_path
-    SPHINX_OUT_ROOT_PATH = output_path / DATASET_PATH_SUFFIX
+    SPHINX_OUT_ROOT_PATH = output_path
 
-    _init_output_dirs()
+    _init_output_dirs(gen_subfolder)
 
 
 def is_question_configured(q_id: str) -> bool:
@@ -259,3 +268,50 @@ def get_question_text(q_id: str) -> str:
         result = base_text
 
     return result
+
+def num_required_samples(q_id: str) -> int:
+    """
+    Return required sample count for a specific q_id.
+    Uses [questions.<q_id>].num_samples if set, otherwise [general].num_samples_per_question.
+    """
+    if SPHINX_QUESTIONS is None:
+        raise RuntimeError("SPHINX_QUESTIONS is not loaded. Call init_sphinx_environment() first.")
+
+    qcfg = SPHINX_QUESTIONS
+
+    general = qcfg.get("general", {}) or {}
+    raw_default = general.get("num_samples_per_question")
+    if raw_default is None:
+        raise ValueError('Missing [general].num_samples_per_question in sphinx_questions.toml')
+
+    try:
+        default_n = int(raw_default)
+    except (TypeError, ValueError):
+        raise ValueError(f"num_samples_per_question must be an int >= 0, got {raw_default!r}")
+    if default_n < 0:
+        raise ValueError(f"num_samples_per_question must be >= 0, got {default_n}")
+
+    questions = qcfg.get("questions", {}) or {}
+    qc = questions.get(q_id) or {}
+
+    raw_n = qc.get("num_samples")
+    if raw_n is None:
+        return default_n
+
+    try:
+        n = int(raw_n)
+    except (TypeError, ValueError):
+        raise ValueError(f"num_samples for {q_id} must be an int >= 0, got {raw_n!r}")
+    if n < 0:
+        raise ValueError(f"num_samples for {q_id} must be >= 0, got {n}")
+    return n
+
+def should_generate_question(qid: str, generated_questions_count: Dict[str, int]) -> bool:
+    """
+    Returns for a specific q_id if the question should be generated based on the config.toml file.
+    """
+    generated_questions_count.setdefault(qid, 0)
+    if is_question_configured(qid) and generated_questions_count[qid] < num_required_samples(qid):
+        return True
+    else:
+        return False

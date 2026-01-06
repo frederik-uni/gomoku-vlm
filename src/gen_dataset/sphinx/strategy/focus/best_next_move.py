@@ -13,7 +13,8 @@ def _focus_best_next_move(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
-    min_turns: int = 0,
+    non_rand_img: bool,
+    min_turns: int = 2,
     max_turns: int = 999
 ) -> tuple[str, DatasetRow]:
     """
@@ -32,7 +33,7 @@ def _focus_best_next_move(
     if num_turns < 2:
         # Impossible to compare two states, if less than two turns have been performed
         raise ValueError(f"Need at least 2 turns for 'focus: best_next_move', got num_turns={num_turns}. "
-                         f"Miss configured sphinx_config file, make sure the min_turns is at least 2.")
+                         f"Miss configured focus, make sure the min_turns is at least 2.")
 
     # Random 0-based index of the "before" board.
     turn_index = get_random_turn_index(game, min_turns, max_turns)
@@ -54,12 +55,12 @@ def _focus_best_next_move(
     # get board before performing the turn
     board = game[turn_index]
     # Persist the image and get img_bytes
-    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id)
+    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id, non_rand_img=non_rand_img)
 
     # also get the next board (to determine the actually performed move by the bot)
     board_after = game[next_turn]
     # persist the image for debugging only, not for the dataset
-    persist_turn_image(board_after, turn_index, sim_id)
+    persist_turn_image(board_after, next_turn, sim_id, non_rand_img=True)
 
     # compare boards to get target (row, col)
     mask = board != board_after  # shape (15, 15)
@@ -100,14 +101,16 @@ def _focus_best_next_move(
     )
 
 
-def gen_question_q10100_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1201_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10100 sample:
+    Generate a single Q1201 sample:
     focus: "best_next_move"
     """
-    q_id = "Q10100"
+    q_id = "Q1201"
+    min_turn = 0
+    max_turn = 30
 
-    color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game)
+    color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
     template = get_question_text(q_id)
     dataset_row.question = template.format(color=color)
@@ -115,14 +118,16 @@ def gen_question_q10100_sample(sim_id: int, simulated_game: np.ndarray) -> Datas
     return dataset_row
 
 
-def gen_question_q10101_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1202_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10101 sample:
+    Generate a single Q1202 sample:
     focus: "best_next_move"
     """
-    q_id = "Q10101"
+    q_id = "Q1202"
+    min_turn = 31
+    max_turn = 75
 
-    color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game)
+    color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
     template = get_question_text(q_id)
     dataset_row.question = template.format(color=color)
@@ -130,14 +135,16 @@ def gen_question_q10101_sample(sim_id: int, simulated_game: np.ndarray) -> Datas
     return dataset_row
 
 
-def gen_question_q10102_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1203_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10102 sample:
+    Generate a single Q1203 sample:
     focus: "best_next_move"
     """
-    q_id = "Q10102"
+    q_id = "Q1203"
+    min_turn = 76
+    max_turn = 150
 
-    color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game)
+    color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
     template = get_question_text(q_id)
     dataset_row.question = template.format(color=color)
@@ -145,14 +152,16 @@ def gen_question_q10102_sample(sim_id: int, simulated_game: np.ndarray) -> Datas
     return dataset_row
 
 
-def gen_question_q10103_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1204_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10103 sample:
+    Generate a single Q1204 sample:
     focus: "best_next_move"
     """
-    q_id = "Q10103"
+    q_id = "Q1204"
+    min_turn = 151
+    max_turn = 224
 
-    color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game)
+    color, dataset_row = _focus_best_next_move(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
     template = get_question_text(q_id)
     dataset_row.question = template.format(color=color)

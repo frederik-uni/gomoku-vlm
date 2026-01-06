@@ -3,7 +3,7 @@ import math
 from collections import defaultdict
 from dataclasses import asdict
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 import numpy as np
 import pandas as pd
@@ -80,7 +80,9 @@ def simulate_game_preferring_winner(
     bots,
     size: int,
     to_win: int,
-    max_attempts: int
+    *,
+    max_attempts: int,
+    min_final_idx: int = 0,
 ):
     """
     Simulate games, preferring ones that end with a clear winner.
@@ -98,12 +100,15 @@ def simulate_game_preferring_winner(
         game = sim_game.simulate_game(bots, size, to_win)
 
         final_board = game[-1]
+        final_idx = len(game) - 1
         winner = get_winner(final_board, to_win)
         last_game = game
 
         if winner in (1, 2):
-            print(f"Player {winner} wins! After {attempt + 1} / {max_attempts} attempts.")
-            return game
+            print(f"Player {winner} wins! After {attempt + 1} / {max_attempts} attempts."
+                  f"final_idx / min_final_idx: {final_idx} / {min_final_idx}.")
+            if final_idx >= min_final_idx:
+                return game
 
     # Return last game anyway, after max_attempts.
     print(f"Game ended in a draw. After {max_attempts} / {max_attempts} attempts.")
@@ -136,29 +141,37 @@ def _get_max_simulation_attempts() -> int:
     return value
 
 
-def generate_question_dataset() -> List[DatasetRow]:
+def generate_question_dataset(non_rand_img: bool) -> List[DatasetRow]:
     """
     Simulates multiple episodes of the entire game
     and generates one of each question per episode,
     slowly creating the entire dataset
     """
     num_required_episodes = _determine_num_of_required_episodes()
+    generated_questions_count: Dict[str, int] = {}
     rows: List[DatasetRow] = []
     for sim_id in range(num_required_episodes):
         print(f"Simulating {sim_id} / {num_required_episodes}")
 
         max_simulation_attempts = _get_max_simulation_attempts()
         simulated_game = simulate_game_preferring_winner(
-        (generate_next_move_probabilistic, generate_next_move_probabilistic), 15, 5, max_simulation_attempts
+        (generate_next_move_probabilistic, generate_next_move_probabilistic),
+            15, 5, max_attempts=max_simulation_attempts, min_final_idx=151
         )
 
         perception_rows: List[DatasetRow] = generate_perception_questions_for_episode(
-            sim_id, simulated_game
+            sim_id,
+            simulated_game,
+            generated_questions_count,
+            non_rand_img
         )
         rows.extend(perception_rows)
 
         strategy_rows: List[DatasetRow] = generate_strategy_questions_for_episode(
-            sim_id, simulated_game
+            sim_id,
+            simulated_game,
+            generated_questions_count,
+            non_rand_img
         )
         rows.extend(strategy_rows)
 
@@ -171,6 +184,9 @@ def assemble_parquet_file(rows: List[DatasetRow]) -> None:
 
     # build DataFrame
     df = pd.DataFrame(data)
+
+    # shuffle DataFrame
+    df = df.sample(frac=1.0).reset_index(drop=True)
 
     # get output path for Q1
     out_path = (
@@ -270,6 +286,21 @@ def parse_args():
         type=str,
         help="Path where parquet file will be stored",
     )
+    parser.add_argument(
+        "--no_gen_subfolder",
+        dest="gen_subfolder",
+        action="store_false",
+        help="Do not generate dataset_NNNN subfolder under output folder.",
+    )
+    parser.set_defaults(gen_subfolder=True)
+    parser.add_argument(
+        "--no_rand_img",
+        dest="non_rand_img",
+        action="store_true",
+        help="Do not add randomness to the images (e.g. discoloration, rotation, etc.).",
+    )
+    parser.set_defaults(non_rand_img=False)
+
     return parser.parse_args()
 
 
@@ -284,8 +315,11 @@ if __name__ == "__main__":
         config_path=config_path,
         questions_path=questions_path,
         output_path=output_path,
+        gen_subfolder=args.gen_subfolder,
     )
+    non_rand_img = args.non_rand_img
+    print("DEBUG args.non_rand_img =", args.non_rand_img)
 
-    rows = generate_question_dataset()
+    rows = generate_question_dataset(non_rand_img)
     assign_splits(rows)
     assemble_parquet_file(rows)

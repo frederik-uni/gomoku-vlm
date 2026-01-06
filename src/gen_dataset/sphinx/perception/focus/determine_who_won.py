@@ -15,6 +15,7 @@ def _focus_determine_who_won(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
+    non_rand_img: bool,
     min_turns: int = 0,
     max_turns: int = 999
 ) -> DatasetRow:
@@ -29,7 +30,7 @@ def _focus_determine_who_won(
     last_turn = game.shape[0] - 1
     board = game[last_turn]
     # Persist the image and get img_bytes
-    img_path, img_bytes = persist_turn_image(board, last_turn, sim_id)
+    img_path, img_bytes = persist_turn_image(board, last_turn, sim_id, non_rand_img=non_rand_img)
 
     # Determine winner for ground truth answer
     winner = game_logic.get_winner(board, 5)
@@ -62,45 +63,46 @@ def _focus_determine_who_won(
         split=None
     )
 
-def gen_question_q600_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
-    """
-    Generate a single Q600 sample:
-    focus: "determine_who_won"
-    """
-    q_id = "Q600"
-    row = _focus_determine_who_won(q_id, sim_id, simulated_game)
-    row.question = get_question_text(q_id)
-    return row
 
-
-def gen_question_q601_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q601_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
     Generate a single Q601 sample:
     focus: "determine_who_won"
     """
     q_id = "Q601"
-    row = _focus_determine_who_won(q_id, sim_id, simulated_game)
+    row = _focus_determine_who_won(q_id, sim_id, simulated_game, non_rand_img)
     row.question = get_question_text(q_id)
     return row
 
 
-def gen_question_q602_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q602_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
     Generate a single Q602 sample:
     focus: "determine_who_won"
     """
     q_id = "Q602"
-    row = _focus_determine_who_won(q_id, sim_id, simulated_game)
+    row = _focus_determine_who_won(q_id, sim_id, simulated_game, non_rand_img)
     row.question = get_question_text(q_id)
     return row
 
 
-def gen_question_q603_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q603_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
     Generate a single Q603 sample:
     focus: "determine_who_won"
     """
     q_id = "Q603"
-    row = _focus_determine_who_won(q_id, sim_id, simulated_game)
+    row = _focus_determine_who_won(q_id, sim_id, simulated_game, non_rand_img)
+    row.question = get_question_text(q_id)
+    return row
+
+
+def gen_question_q604_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q604 sample:
+    focus: "determine_who_won"
+    """
+    q_id = "Q604"
+    row = _focus_determine_who_won(q_id, sim_id, simulated_game, non_rand_img)
     row.question = get_question_text(q_id)
     return row

@@ -15,6 +15,7 @@ def _focus_color_at_position(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
+    non_rand_img: bool,
     min_turns: int = 0,
     max_turns: int = 999
 ) -> tuple[DatasetRow, int, int]:
@@ -35,7 +36,7 @@ def _focus_color_at_position(
     turn_index = get_random_turn_index(game, min_turns, max_turns)
     board = game[turn_index]
     # Persist the image and get img_bytes
-    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id)
+    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id, non_rand_img=non_rand_img)
     # Persist game state for easier debugging
     persist_turn_game_state(board, turn_index, sim_id)
 
@@ -81,17 +82,17 @@ def _focus_color_at_position(
     return row, row_idx, col_idx
 
 
-def gen_question_q400_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q1_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q400 sample:
+    Generate a single Q1 sample:
     focus: "color_at_position"
     """
-    q_id = "Q400"
+    q_id = "Q1"
     min_turns = 0
-    max_turns = 999
+    max_turns = 30
 
     dataset_row, row_idx, col_idx = _focus_color_at_position(
-        q_id, sim_id, simulated_game, min_turns, max_turns
+        q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns
     )
 
     template = get_question_text(q_id)
@@ -100,17 +101,17 @@ def gen_question_q400_sample(sim_id: int, simulated_game: np.ndarray) -> Dataset
     return dataset_row
 
 
-def gen_question_q401_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q2_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q401 sample:
+    Generate a single Q2 sample:
     focus: "color_at_position"
     """
-    q_id = "Q401"
-    min_turns = 25
-    max_turns = 999
+    q_id = "Q2"
+    min_turns = 31
+    max_turns = 75
 
     dataset_row, row_idx, col_idx = _focus_color_at_position(
-        q_id, sim_id, simulated_game, min_turns, max_turns
+        q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns
     )
 
     template = get_question_text(q_id)
@@ -119,17 +120,17 @@ def gen_question_q401_sample(sim_id: int, simulated_game: np.ndarray) -> Dataset
     return dataset_row
 
 
-def gen_question_q402_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q3_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q402 sample:
+    Generate a single Q3 sample:
     focus: "color_at_position"
     """
-    q_id = "Q402"
-    min_turns = 50
-    max_turns = 999
+    q_id = "Q3"
+    min_turns = 76
+    max_turns = 150
 
     dataset_row, row_idx, col_idx = _focus_color_at_position(
-        q_id, sim_id, simulated_game, min_turns, max_turns
+        q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns
     )
 
     template = get_question_text(q_id)
@@ -138,17 +139,17 @@ def gen_question_q402_sample(sim_id: int, simulated_game: np.ndarray) -> Dataset
     return dataset_row
 
 
-def gen_question_q403_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q4_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q403 sample:
+    Generate a single Q4 sample:
     focus: "color_at_position"
     """
-    q_id = "Q403"
-    min_turns = 75
-    max_turns = 999
+    q_id = "Q4"
+    min_turns = 151
+    max_turns = 224
 
     dataset_row, row_idx, col_idx = _focus_color_at_position(
-        q_id, sim_id, simulated_game, min_turns, max_turns
+        q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns
     )
 
     template = get_question_text(q_id)

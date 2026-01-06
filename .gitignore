@@ -218,4 +218,4 @@ move_*.png
 src/tmp/
 
 # generated datasets
-out/sphinx/dataset/
+out/

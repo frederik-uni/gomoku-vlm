@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 from PIL import Image
 
-from gen_dataset.sphinx.core import DEFAULT_SPHINX_OUT_ROOT_PATH, DATASET_PATH_SUFFIX
+from gen_dataset.sphinx.core import DEFAULT_SPHINX_OUT_ROOT_PATH
 
 
 def _find_latest_dataset_idx(dataset_base_dir: Path) -> Optional[int]:
@@ -51,7 +51,7 @@ def parse_args():
     )
     parser.add_argument(
         "--dataset_root",
-        default=str(DEFAULT_SPHINX_OUT_ROOT_PATH / DATASET_PATH_SUFFIX),
+        default=str(DEFAULT_SPHINX_OUT_ROOT_PATH),
         type=str,
         help="root dir where the dataset files are stored. If none is provided the DEFAULT_SPHINX_OUT_ROOT_PATH will be used.",
     )
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     dataset_root = Path(args.dataset_root).resolve()
     if not args.dataset_idx:
         args.dataset_idx = _find_latest_dataset_idx(dataset_root)
-    parquet_path = dataset_root / f"dataset_{args.dataset_idx:03d}" / f"parquet/dataset.parquet"
+    parquet_path = dataset_root / f"dataset_{int(args.dataset_idx):03d}" / f"parquet/dataset.parquet"
 
     # Print the Metadata
     print(f"\nEvaluating dataset:")

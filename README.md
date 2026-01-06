@@ -24,13 +24,13 @@ options:
   --bot {random,ai,none}
 ```
 
-### Dataset Generator
-```bash
-usage: python -m gen_dataset.runner [-h] [--config CONFIG] [--questions QUESTIONS]
-                 [--output OUTPUT]
+## Dataset Generation
 
-Simulate multiple Gomoku games, generate all configured perception and strategy questions, assign train/eval/test splits, and write a single dataset.parquet
-file plus images.
+### Single questions.toml file
+```bash
+usage: runner.py [-h] [--config CONFIG] [--questions QUESTIONS] [--output OUTPUT] [--no_gen_subfolder] [--no_rand_img]
+
+Simulate multiple Gomoku games, generate all configured perception and strategy questions, assign train/eval/test splits, and write a single dataset.parquet file plus images.
 
 options:
   -h, --help            show this help message and exit
@@ -38,6 +38,24 @@ options:
   --questions QUESTIONS
                         Path where the question text for the questions is stored.
   --output OUTPUT       Path where parquet file will be stored
+  --no_gen_subfolder    Do not generate dataset_NNNN subfolder under output folder.
+  --no_rand_img         Do not add randomness to the images (e.g. discoloration, rotation, etc.).
+```
+
+### Batch question generation for folder containing *.toml files
+```bash
+usage: batch_runner.py [-h] [--config CONFIG] --questions_dir QUESTIONS_DIR --output OUTPUT [--no_gen_subfolder] [--no_rand_img]
+
+Runs the dataset runner for all question.toml files in a folder.
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to the sphinx config file.
+  --questions_dir QUESTIONS_DIR
+                        Folder with question files (e.g. *.toml)
+  --output OUTPUT       Path to the base output folder.
+  --no_gen_subfolder    Do not generate dataset_NNNN subfolder under output folder.
+  --no_rand_img         Do not add randomness to the images (e.g. discoloration, rotation, etc.).
 ```
 
 ### Evaluation

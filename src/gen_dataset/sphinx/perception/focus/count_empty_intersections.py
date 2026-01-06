@@ -14,6 +14,7 @@ def _focus_count_empty_intersections(
     q_id: str,
     sim_id: int,
     game: np.ndarray,
+    non_rand_img: bool,
     min_turns: int = 0,
     max_turns: int = 999
 ) -> DatasetRow:
@@ -28,7 +29,7 @@ def _focus_count_empty_intersections(
     turn_index = get_random_turn_index(game, min_turns, max_turns)
     board = game[turn_index]
     # Persist the image and get img_bytes
-    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id)
+    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id, non_rand_img=non_rand_img)
     # Persist game state for easier debugging
     persist_turn_game_state(board, turn_index, sim_id)
 
@@ -54,49 +55,57 @@ def _focus_count_empty_intersections(
     )
 
 
-def gen_question_q300_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
-    """
-    Generate a single Q300 sample:
-    focus: "count_empty_intersections"
-    """
-    q_id = "Q300"
-
-    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game)
-    row.question = get_question_text(q_id)
-    return row
-
-
-def gen_question_q301_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q301_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
     Generate a single Q301 sample:
     focus: "count_empty_intersections"
     """
     q_id = "Q301"
+    min_turns = 0
+    max_turns = 30
 
-    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game)
+    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     row.question = get_question_text(q_id)
     return row
 
 
-def gen_question_q302_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q302_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
     Generate a single Q302 sample:
     focus: "count_empty_intersections"
     """
     q_id = "Q302"
+    min_turns = 31
+    max_turns = 75
 
-    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game)
+    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     row.question = get_question_text(q_id)
     return row
 
 
-def gen_question_q303_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q303_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
     Generate a single Q303 sample:
     focus: "count_empty_intersections"
     """
     q_id = "Q303"
+    min_turns = 76
+    max_turns = 150
 
-    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game)
+    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
+    row.question = get_question_text(q_id)
+    return row
+
+
+def gen_question_q304_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q304 sample:
+    focus: "count_empty_intersections"
+    """
+    q_id = "Q304"
+    min_turns = 151
+    max_turns = 224
+
+    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     row.question = get_question_text(q_id)
     return row

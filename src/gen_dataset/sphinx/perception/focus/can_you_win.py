@@ -1,126 +1,185 @@
-# import random
-#
-# import numpy as np
-#
-# from gen_dataset.dataset_schema import DatasetRow
-# from gen_dataset.sphinx.core import (
-#     QuestionFamily,
-#     build_basic_dataset_row,
-#     get_question_meta,
-# )
-#
-#
-# def _focus_can_you_win(
-#     q_id: str, sim_id: int, simulated_game: np.ndarray
-# ) -> tuple[int, DatasetRow]:
-#     """
-#     Helper function for any question that has the
-#     focus: "can_you_win"
-#     """
-#     family, focus = get_question_meta(QuestionFamily.PERCEPTION, q_id)
-#
-#     win = random.random() < 0.5
-#     if win:
-#         board = simulated_game[-1]
-#         player = 1 if (board != 0).sum() % 2 == 0 else 2
-#     else:
-#         N = simulated_game.shape[0]
-#         idx = np.random.randint(0, N - 1)
-#         board = simulated_game[idx]
-#         player = 1 if random.random() < 0.5 else 2
-#
-#     # count black stones (=1) as ground truth
-#     num_black = int(np.count_nonzero(board == 1))
-#     answer_text = str(num_black)
-#
-#     return player, build_basic_dataset_row(
-#         img_path=None,
-#         img_bytes=img_bytes,
-#         family=family,
-#         q_id=q_id,
-#         focus=focus,
-#         answer=answer_text,
-#     )
-#
-#
-# def gen_question_q100_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
-#     """
-#     Generate a single Q1 sample:
-#     focus: "count_black_stones"
-#     """
-#     q_id = "Q1"
-#     player, dataset_row = _focus_can_you_win(q_id, sim_id, simulated_game)
-#     player = "Player 1" if player == 1 else "Player 2"
-#     question_text = (
-#         "“Analyze the position in this Gomoku game."
-#         "Player 1 is black; Player 2 is white."
-#         f"Determine whether a victory for {player} remains achievable under optimal play."
-#         "Answer strictly with ‘yes’ or ‘no’.”"
-#     )
-#
-#     dataset_row.question = question_text
-#
-#     # Optionally, add additional valid answers here
-#
-#     return dataset_row
-#
-#
-# def gen_question_q101_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
-#     """
-#     Generate a single Q2 sample:
-#     focus: "count_black_stones"
-#     """
-#     q_id = "Q2"
-#
-#     player, dataset_row = _focus_can_you_win(q_id, sim_id, simulated_game)
-#     player = "Player 1" if player == 1 else "Player 2"
-#     question_text = (
-#         "“You are analyzing the current Gomoku game state."
-#         "Player 1 uses black stones and Player 2 uses white stones."
-#         f"Evaluate the position and determine whether ${player} has a forced win from this position, assuming optimal play by both sides."
-#         "Answer with either ‘yes’ or ‘no’.”"
-#     )
-#     dataset_row.question = question_text
-#
-#     return dataset_row
-#
-#
-# def gen_question_q102_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
-#     """
-#     Generate a single Q3 sample:
-#     focus: "count_black_stones"
-#     """
-#     q_id = "Q3"
-#
-#     player, dataset_row = _focus_can_you_win(q_id, sim_id, simulated_game)
-#     player = "Player 1" if player == 1 else "Player 2"
-#     question_text = (
-#         "“Consider the following Gomoku position."
-#         "Black represents Player 1 and white represents Player 2."
-#         f"Your task is to assess the position and state whether {player} can still win the game from here."
-#         "Respond with a single word: ‘yes’ or ‘no’.”"
-#     )
-#
-#     dataset_row.question = question_text
-#
-#     return dataset_row
-#
-#
-# def gen_question_q103_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
-#     """
-#     Generate a single Q4 sample:
-#     focus: "count_black_stones"
-#     """
-#     q_id = "Q4"
-#
-#     player, dataset_row = _focus_can_you_win(q_id, sim_id, simulated_game)
-#     player = "Player 1" if player == 1 else "Player 2"
-#     question_text = (
-#         "“You are reviewing a Gomoku board position."
-#         "Player 1 (black stones) and Player 2 (white stones) have already played several moves."
-#         f"Based solely on the current configuration, determine if a winning sequence for {player} is still possible."
-#         "Provide a one-word answer: ‘yes’ or ‘no’.”"
-#     )
-#     dataset_row.question = question_text
-#
-#     return dataset_row
+import random
+
+import numpy as np
+
+import game_logic
+from gen_dataset.dataset_schema import DatasetRow
+from gen_dataset.sphinx.core import (
+    QuestionFamily, persist_turn_image, get_question_text, get_random_turn_index
+)
+
+
+def _focus_can_you_win(
+    q_id: str,
+    sim_id: int,
+    game: np.ndarray,
+    non_rand_img: bool,
+    *,
+    can_win_bias = 0.01,
+    max_resamples: int = 2000,
+) -> tuple[int, str, bool, DatasetRow]:
+    """
+    Helper function for any question that has the
+    focus: "can_you_win".
+
+    Label definition:
+        "can_win" is True iff the current player (the one to move next)
+        has an immediate winning move available on this turn
+        (i.e., there exists at least one 4+1 completion for this player).
+
+    Sampling strategy:
+        - ~0.5 (+ optional bias) to sample a "yes" label.
+        The small bias exists because matches that ended with a draw are automatically labeled with a "no" by default
+        (It is assumed that no winning position occurred for the bots under optimal play in the case of a draw).
+
+    Returns:
+        tuple[int, str, bool, DatasetRow]: A tuple containing:
+            - int: The player to move as int (1 if black, 2 if white).
+            - str: The color of that player ("black" or "white").
+            - bool: Whether the player can win immediately with one move.
+            - DatasetRow: The pre-constructed dataset row for the dataset (question still None).
+    """
+    FOCUS = "can_you_win"
+    FAMILY = QuestionFamily.PERCEPTION
+
+    # Sanity Check
+    num_turns = game.shape[0]
+    if num_turns < 3:
+        raise ValueError(f"Need at least 3 turns for {FOCUS}, got num_turns={num_turns} instead.")
+
+    last_turn = game.shape[0] - 1
+    end_board = game[last_turn]
+
+    winner = game_logic.get_winner(end_board, 5)
+
+    if winner == -1 or winner == 0:
+        can_win = False # Game ended in a draw, or is somehow still in progress, assume no winning opportunity occurred
+    else:
+        # ~50/50 + user defined bias, to offset the fact that matches can end in a draw
+        p_yes = min(1.0, max(0.0, 0.5 + float(can_win_bias)))
+        can_win = random.random() < p_yes
+
+    if can_win:
+        # Under optimal play the only time when a potential winning position occurs is on the last turn
+        after_idx = last_turn
+        before_idx = after_idx - 1  # turn that has to be played
+        after_board = game[after_idx]
+        before_board = game[before_idx]
+        player = 1 if (after_idx % 2 == 0) else 2
+    else:
+        found = False
+        for i in range (max_resamples):
+            # Just sample a random turn otherwise, assume no winning position did occur for that player,
+            # otherwise the bot would have taken advantage of it
+            after_idx = get_random_turn_index(game, 1, last_turn - 1) # exclude last turn
+            before_idx = after_idx - 1
+            after_board = game[after_idx]
+            before_board = game[before_idx]
+            player = 1 if (after_idx % 2 == 0) else 2
+            # Break out of the for-loop if no winning position is possible
+            # (i.e. guaranteed that no miss play by the bots occurred)
+            if game_logic.count(before_board, 5, player, almost=True) <= 0:
+                found = True
+                break
+
+        if not found:
+            # Fallback, at least assign the correct label
+            can_win = game_logic.count(before_board, 5, player, almost=True) > 0
+
+    # Raise runtime error if labels are incorrect
+    if (not can_win and game_logic.count(before_board, 5, player, almost=True)
+    or can_win and not game_logic.count(before_board, 5, player, almost=True)):
+        raise RuntimeError(f"Invalid lables in focus {FOCUS}."
+                           f"Answer to the question \"can_you_win\" is: {game_logic.count(before_board, 5, player, almost=True)},"
+                           f"but has been classified as {can_win} for turn {before_idx} -> {after_idx}.")
+
+    # Persist the image and get img_bytes
+    img_path, img_bytes = persist_turn_image(before_board, before_idx, sim_id, non_rand_img=non_rand_img)
+    # Persist after board for debugging only
+    _, _ = persist_turn_image(after_board, after_idx, sim_id, non_rand_img=True)
+    color = "black" if player == 1 else "white"
+    answer = "yes" if can_win else "no"
+
+    return player, color, can_win, DatasetRow(
+        img_path=str(img_path),
+        img_bytes=img_bytes,
+        family=FAMILY,
+        q_id=q_id,
+        focus=FOCUS,
+        answer=answer,
+        valid_answers=[answer],
+        question=None,
+        split=None,
+    )
+
+
+def gen_question_q701_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q701 sample:
+    focus: "can_you_win"
+    """
+    q_id = "Q701"
+
+    player, color, can_win, row = _focus_can_you_win(q_id, sim_id, simulated_game, non_rand_img)
+
+    template = get_question_text(q_id)
+    row.question = template.format(
+        player=f"Player {player}",
+        color=color,
+    )
+
+    return row
+
+
+def gen_question_q702_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q702 sample:
+    focus: "can_you_win"
+    """
+    q_id = "Q702"
+
+    player, color, can_win, row = _focus_can_you_win(q_id, sim_id, simulated_game, non_rand_img)
+
+    template = get_question_text(q_id)
+    row.question = template.format(
+        player=f"Player {player}",
+        color=color,
+    )
+
+    return row
+
+
+def gen_question_q703_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q703 sample:
+    focus: "can_you_win"
+    """
+    q_id = "Q703"
+
+    player, color, can_win, row = _focus_can_you_win(q_id, sim_id, simulated_game, non_rand_img)
+
+    template = get_question_text(q_id)
+    row.question = template.format(
+        player=f"Player {player}",
+        color=color,
+    )
+
+    return row
+
+
+def gen_question_q704_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
+    """
+    Generate a single Q704 sample:
+    focus: "can_you_win"
+    """
+    q_id = "Q704"
+
+    player, color, can_win, row = _focus_can_you_win(q_id, sim_id, simulated_game, non_rand_img)
+
+    template = get_question_text(q_id)
+    row.question = template.format(
+        player=f"Player {player}",
+        color=color,
+    )
+
+    return row

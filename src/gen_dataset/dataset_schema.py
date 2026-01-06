@@ -14,7 +14,7 @@ class DatasetRow:
 
     family: str  # "perception" | "strategy"
     q_id: str  # "Q1", "Q2", ...
-    focus: str  # "count_black_stones", ...
+    focus: str  # "count_black_stones", ...z
 
     answer: str  # canonical answer used for training
     valid_answers: List[str] # all acceptable answers (incl. canonical)
