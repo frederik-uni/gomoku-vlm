@@ -59,8 +59,10 @@ def gen_question_q101_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "count_black_stones"
     """
     q_id = "Q101"
+    min_turns = 0
+    max_turns = 55
 
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img)
+    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     dataset_row.question = get_question_text(q_id)
 
     return dataset_row
@@ -71,8 +73,10 @@ def gen_question_q102_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "count_black_stones"
     """
     q_id = "Q102"
+    min_turns = 55
+    max_turns = 110
 
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img)
+    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     dataset_row.question = get_question_text(q_id)
 
     return dataset_row
@@ -83,8 +87,10 @@ def gen_question_q103_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "count_black_stones"
     """
     q_id = "Q103"
+    min_turns = 110
+    max_turns = 165
 
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img)
+    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     dataset_row.question = get_question_text(q_id)
 
     return dataset_row
@@ -95,8 +101,10 @@ def gen_question_q104_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "count_black_stones"
     """
     q_id = "Q104"
+    min_turns = 165
+    max_turns = 225
 
-    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img)
+    dataset_row = _focus_count_black_stones(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     dataset_row.question = get_question_text(q_id)
 
     return dataset_row

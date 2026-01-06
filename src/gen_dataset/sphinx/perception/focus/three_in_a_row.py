@@ -72,8 +72,11 @@ def _focus_three_in_a_row(
 
 def gen_question_q401_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     q_id = "Q401"
+    min_turn = 0
+    max_turn = 55
+
     player, color, _count, row = _focus_three_in_a_row(
-        q_id, sim_id, simulated_game, non_rand_img
+        q_id, sim_id, simulated_game, non_rand_img, min_turn=min_turn, max_turn=max_turn
     )
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)
@@ -82,8 +85,11 @@ def gen_question_q401_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
 
 def gen_question_q402_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     q_id = "Q402"
+    min_turn = 55
+    max_turn = 110
+
     player, color, _count, row = _focus_three_in_a_row(
-        q_id, sim_id, simulated_game, non_rand_img
+        q_id, sim_id, simulated_game, non_rand_img, min_turn=min_turn, max_turn=max_turn
     )
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)
@@ -92,8 +98,11 @@ def gen_question_q402_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
 
 def gen_question_q403_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     q_id = "Q403"
+    min_turn = 110
+    max_turn = 165
+
     player, color, _count, row = _focus_three_in_a_row(
-        q_id, sim_id, simulated_game, non_rand_img
+        q_id, sim_id, simulated_game, non_rand_img, min_turn=min_turn, max_turn=max_turn
     )
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)
@@ -102,8 +111,11 @@ def gen_question_q403_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
 
 def gen_question_q404_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     q_id = "Q404"
+    min_turn = 165
+    max_turn = 225
+
     player, color, _count, row = _focus_three_in_a_row(
-        q_id, sim_id, simulated_game, non_rand_img
+        q_id, sim_id, simulated_game, non_rand_img, min_turn=min_turn, max_turn=max_turn
     )
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)

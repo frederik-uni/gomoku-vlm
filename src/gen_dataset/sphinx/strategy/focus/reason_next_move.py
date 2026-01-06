@@ -145,8 +145,11 @@ def gen_question_q1301_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     focus: "reason_next_move"
     """
     q_id = "Q1301"
+    min_turn = 0
+    max_turn = 55
 
-    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game, non_rand_img)
+    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(
+        q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)
@@ -159,8 +162,11 @@ def gen_question_q1302_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     focus: "reason_next_move"
     """
     q_id = "Q1302"
+    min_turn = 55
+    max_turn = 110
 
-    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game, non_rand_img)
+    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(
+        q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)
@@ -173,8 +179,11 @@ def gen_question_q1303_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     focus: "reason_next_move"
     """
     q_id = "Q1303"
+    min_turn = 110
+    max_turn = 165
 
-    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game, non_rand_img)
+    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(
+        q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)
@@ -187,8 +196,11 @@ def gen_question_q1304_sample(sim_id: int, simulated_game: np.ndarray, non_rand_
     focus: "reason_next_move"
     """
     q_id = "Q1304"
+    min_turn = 165
+    max_turn = 225
 
-    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(q_id, sim_id, simulated_game, non_rand_img)
+    player, color, can_win, can_lose, next_move, row = _focus_reason_next_move(
+        q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
 
     template = get_question_text(q_id)
     row.question = template.format(player=player, color=color)

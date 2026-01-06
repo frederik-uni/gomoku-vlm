@@ -80,7 +80,9 @@ def simulate_game_preferring_winner(
     bots,
     size: int,
     to_win: int,
-    max_attempts: int
+    *,
+    max_attempts: int,
+    min_final_idx: int = 0,
 ):
     """
     Simulate games, preferring ones that end with a clear winner.
@@ -98,12 +100,15 @@ def simulate_game_preferring_winner(
         game = sim_game.simulate_game(bots, size, to_win)
 
         final_board = game[-1]
+        final_idx = len(game) - 1
         winner = get_winner(final_board, to_win)
         last_game = game
 
         if winner in (1, 2):
-            print(f"Player {winner} wins! After {attempt + 1} / {max_attempts} attempts.")
-            return game
+            print(f"Player {winner} wins! After {attempt + 1} / {max_attempts} attempts."
+                  f"final_idx / min_final_idx: {final_idx} / {min_final_idx}.")
+            if final_idx >= min_final_idx:
+                return game
 
     # Return last game anyway, after max_attempts.
     print(f"Game ended in a draw. After {max_attempts} / {max_attempts} attempts.")
@@ -150,7 +155,8 @@ def generate_question_dataset(non_rand_img: bool) -> List[DatasetRow]:
 
         max_simulation_attempts = _get_max_simulation_attempts()
         simulated_game = simulate_game_preferring_winner(
-        (generate_next_move_probabilistic, generate_next_move_probabilistic), 15, 5, max_simulation_attempts
+        (generate_next_move_probabilistic, generate_next_move_probabilistic),
+            15, 5, max_attempts=max_simulation_attempts
         )
 
         perception_rows: List[DatasetRow] = generate_perception_questions_for_episode(

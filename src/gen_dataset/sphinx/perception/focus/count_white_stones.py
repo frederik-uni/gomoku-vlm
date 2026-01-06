@@ -61,8 +61,10 @@ def gen_question_q201_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "count_white_stones"
     """
     q_id = "Q201"
+    min_turns = 0
+    max_turns = 55
 
-    dataset_row = _focus_count_white_stones(q_id, sim_id, simulated_game, non_rand_img)
+    dataset_row = _focus_count_white_stones(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     dataset_row.question = get_question_text(q_id)
 
     return dataset_row
@@ -74,8 +76,10 @@ def gen_question_q202_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "count_white_stones"
     """
     q_id = "Q202"
+    min_turns = 55
+    max_turns = 110
 
-    dataset_row = _focus_count_white_stones(q_id, sim_id, simulated_game, non_rand_img)
+    dataset_row = _focus_count_white_stones(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     dataset_row.question = get_question_text(q_id)
 
     return dataset_row
@@ -87,8 +91,10 @@ def gen_question_q203_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "count_white_stones"
     """
     q_id = "Q203"
+    min_turns = 110
+    max_turns = 165
 
-    dataset_row = _focus_count_white_stones(q_id, sim_id, simulated_game, non_rand_img)
+    dataset_row = _focus_count_white_stones(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     dataset_row.question = get_question_text(q_id)
 
     return dataset_row
@@ -100,8 +106,10 @@ def gen_question_q204_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "count_white_stones"
     """
     q_id = "Q204"
+    min_turns = 165
+    max_turns = 225
 
-    dataset_row = _focus_count_white_stones(q_id, sim_id, simulated_game, non_rand_img)
+    dataset_row = _focus_count_white_stones(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
     dataset_row.question = get_question_text(q_id)
 
     return dataset_row

@@ -86,7 +86,10 @@ def gen_question_q901_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "print_board_matrix"
     """
     q_id = "Q901"
-    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img)
+    min_turn = 0
+    max_turn = 55
+
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
     dataset_row.question = get_question_text(q_id)
     return dataset_row
 
@@ -97,7 +100,10 @@ def gen_question_q902_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "print_board_matrix"
     """
     q_id = "Q902"
-    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img)
+    min_turn = 55
+    max_turn = 110
+
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
     dataset_row.question = get_question_text(q_id)
     return dataset_row
 
@@ -108,7 +114,10 @@ def gen_question_q903_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "print_board_matrix"
     """
     q_id = "Q903"
-    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img)
+    min_turn = 110
+    max_turn = 165
+
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
     dataset_row.question = get_question_text(q_id)
     return dataset_row
 
@@ -119,6 +128,9 @@ def gen_question_q904_sample(sim_id: int, simulated_game: np.ndarray, non_rand_i
     focus: "print_board_matrix"
     """
     q_id = "Q904"
-    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img)
+    min_turn = 165
+    max_turn = 225
+
+    dataset_row = _focus_print_board_matrix(q_id, sim_id, simulated_game, non_rand_img, min_turn, max_turn)
     dataset_row.question = get_question_text(q_id)
     return dataset_row
