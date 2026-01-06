@@ -50,6 +50,43 @@ def count_wins(board: npt.NDArray[np.int8], n: int, player: int):
     return np.count_nonzero(conv == n)
 
 
+def count_almost_wins2(board: npt.NDArray[np.int8], n: int, player: int) -> int:
+    count = 0
+    length = len(board)
+
+    for i in range(length - n + 1):
+        window = board[i : i + n]
+
+        if (
+            np.count_nonzero(window == player) == n - 1
+            and np.count_nonzero(window == 0) == 1
+        ):
+            left_ok = (i == 0) or (board[i - 1] != player)
+            right_ok = (i + n == length) or (board[i + n] != player)
+
+            if left_ok and right_ok:
+                count += 1
+
+    return count
+
+
+def count_wins2(board: npt.NDArray[np.int8], n: int, player: int) -> int:
+    wins = 0
+    length = len(board)
+
+    for i in range(length - n + 1):
+        window = board[i : i + n]
+
+        if np.all(window == player):
+            left_ok = (i == 0) or (board[i - 1] != player)
+            right_ok = (i + n == length) or (board[i + n] != player)
+
+            if left_ok and right_ok:
+                wins += 1
+
+    return wins
+
+
 def _has_player_won_helper(board: npt.NDArray[np.int8], n: int, player: int):
     mask = (board == player).astype(int)
     kernel = np.ones(n, dtype=int)  # dim of win condition
@@ -58,11 +95,20 @@ def _has_player_won_helper(board: npt.NDArray[np.int8], n: int, player: int):
     return np.any(conv == n)
 
 
-def count(board: npt.NDArray[np.int8], n: int, player: int, almost: bool) -> int:
+def count(
+    board: npt.NDArray[np.int8],
+    n: int,
+    player: int,
+    almost: bool,
+    longer_allowed: bool = True,
+) -> int:
     """
     returns true if the win condition is satisfied by the given player (n in a row), otherwise false
     """
-    func = count_almost_wins if almost else count_wins
+    if longer_allowed:
+        func = count_almost_wins if almost else count_wins
+    else:
+        func = count_almost_wins2 if almost else count_wins2
     counter = 0
     size = board.shape[0]
     for i in range(0, size):

@@ -1,4 +1,3 @@
-import colorsys
 import math
 import random
 from typing import Callable
@@ -62,15 +61,31 @@ def rotation_safe_scale(w: int, h: int, deg: float) -> float:
     return min(w / w_rot, h / h_rot)
 
 
-def _generate_distinct_colors(n: int = 22):
-    colors = []
-    for i in range(n):
-        h = i / n
-        s = random.uniform(0.35, 0.55)
-        v = random.uniform(0.70, 0.88)
-        r, g, b = colorsys.hsv_to_rgb(h, s, v)
-        colors.append((int(r * 255), int(g * 255), int(b * 255)))
-    return colors
+def _generate_distinct_colors():
+    return [
+        (230, 72, 72),
+        (230, 132, 72),
+        (230, 192, 72),
+        (192, 230, 72),
+        (132, 230, 72),
+        (72, 230, 92),
+        (72, 230, 152),
+        (72, 230, 212),
+        (72, 192, 230),
+        (72, 132, 230),
+        (92, 72, 230),
+        (152, 72, 230),
+        (212, 72, 230),
+        (230, 72, 192),
+        (230, 72, 132),
+        (200, 90, 90),
+        (90, 200, 130),
+        (130, 90, 200),
+        (200, 160, 90),
+        (90, 160, 200),
+        (160, 200, 90),
+        (200, 90, 160),
+    ]
 
 
 def _contrasting_line_color(board_color: tuple[int, int, int]):
@@ -81,8 +96,8 @@ def _contrasting_line_color(board_color: tuple[int, int, int]):
 
 def render_game_step(
     state: np.ndarray,
-    lcolor: tuple[int, int, int] = (238, 178, 73),
-    color: tuple[int, int, int] = (0, 0, 0),
+    lcolor: tuple[int, int, int] = (0, 0, 0),
+    color: tuple[int, int, int] = (238, 178, 73),
     rotate_deg: int | None = None,
 ) -> Image.Image:
     size = 68
@@ -107,7 +122,10 @@ def render_game_step(
         scale = rotation_safe_scale(w, h, rotate_deg)
 
         if scale < 1.0:
-            img = img.resize((int(w * scale), int(h * scale)), resample=Image.BICUBIC)
+            img = img.resize(
+                (round(w * scale), round(h * scale)),
+                resample=Image.BICUBIC,
+            )
 
         img = img.rotate(
             rotate_deg,
