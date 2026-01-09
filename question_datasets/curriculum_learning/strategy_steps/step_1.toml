@@ -1,0 +1,140 @@
+[general]
+# Strategy Step 1 (bootstrap): 80/20 with reduced baseline
+#
+# Non-curr overall target: 250 per non-curr question across 4 steps.
+# Per-step plan: [63, 63, 62, 62]
+# -> Step 1 uses 63 for each non-curr question variant (Q1101–Q1104).
+#
+# Step 1 totals:
+# - Non-curr: 4 * 63 = 252  (20%)
+# - Curriculum: 1008        (80%)
+# - Total: 1260
+#
+# Curriculum Step 1 gating: Variant 1 only for curriculum-capable families:
+# Q1001, Q1201, Q1301
+#
+# Questions not listed here are not generated.
+num_samples_per_question = 0
+
+context = """
+You are a vision-language model analyzing Gomoku game positions.
+
+Game rules (for this dataset):
+- The board is a 15×15 grid. Player 1 = black stones (value 1). Player 2 = white stones (value 2).
+- A legal move is placing exactly one stone on an empty intersection (value 0).
+- A player wins immediately if they can place one stone that creates 5 stones in a row (horizontal, vertical, or diagonal).
+
+Important:
+- Always follow the per-question instructions and output format exactly.
+- Do not add explanations or any extra text beyond what the question requests.
+"""
+
+# ============================================================
+# CURRICULUM (80% = 1008): Variant 1 only (3 questions)
+# 1008 / 3 = 336 exactly
+# ============================================================
+
+[questions.Q1001]
+num_samples = 336
+text = """
+It is {color}'s turn to move.
+
+Task:
+List all valid moves (all empty intersections).
+Output the moves in row-major order (increasing row, then increasing column).
+
+Answer format:
+A comma-separated list of 0-based coordinates: "row col, row col, ...".
+Do not output anything else.
+"""
+
+[questions.Q1201]
+num_samples = 336
+text = """
+It is {color}'s turn.
+
+Task:
+What is the best move to play now for {color}?
+
+Answer format: "row col" (0-based). Output nothing else.
+"""
+
+[questions.Q1301]
+num_samples = 336
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Tasks (in order):
+1) Output the board as a 15×15 integer matrix using:
+   0 = empty, 1 = black, 2 = white.
+   Output exactly 15 lines, each line with 15 integers separated by single spaces.
+2) Determine if you can win immediately on this move (one-move win).
+3) Determine if your opponent can win immediately on their next move (one-move win).
+4) Provide the best next move as "row col" (0-based).
+
+Answer format:
+- First: the 15-line matrix (15 lines).
+- Then exactly these three lines:
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+BEST_NEXT_MOVE: row col
+"""
+
+# ============================================================
+# NON-CURRICULUM (Step 1 uses 63 each): Q1101–Q1104
+# ============================================================
+
+[questions.Q1101]
+num_samples = 63
+text = """
+This image shows the Gomoku position immediately before the final move of a completed game.
+Final outcome of the completed game: {outcome_phrase}.
+You are playing {color}, and it is your turn in this position.
+
+Task:
+Play the best final move with the goal of winning immediately if a one-move win exists.
+Otherwise, play the best final move available in this position.
+
+Answer format: exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1102]
+num_samples = 63
+text = """
+You are given the board state one move before the game ended.
+Final outcome: {outcome_phrase}.
+It is {color}'s turn.
+
+Task:
+Choose the final move. Prefer an immediate win if possible; otherwise choose the best move available.
+
+Answer format: "row col" (0-based) and nothing else.
+"""
+
+[questions.Q1103]
+num_samples = 63
+text = """
+This is the position directly before the last move of the game.
+Final outcome: {outcome_phrase}.
+Current player: {color}.
+
+Task:
+Output the final move, aiming to win immediately if possible.
+If an immediate win is not available, output the best available move.
+
+Answer format: exactly "row col" using 0-based indexing.
+"""
+
+[questions.Q1104]
+num_samples = 63
+text = """
+Board state: one move before the end of the game.
+Final outcome: {outcome_phrase}.
+You are {color} and it is your turn.
+
+Task:
+Select the final move. If you can win immediately with one move, play that winning move.
+Otherwise, play the best available move.
+
+Answer format: two 0-based integers: "row col".
+"""

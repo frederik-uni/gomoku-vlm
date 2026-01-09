@@ -1,0 +1,257 @@
+[general]
+# Strategy Step 4: 60/20/20 with reduced baseline
+#
+# Non-curr: 4 * 62 = 248 (20%) -> Total = 1240
+# Curriculum (60%) = 744  (Variant 4)
+# Old (20%)        = 248  (Replay Variants 1–3)
+# Non-curr (20%)   = 248  (Fixed)
+num_samples_per_question = 0
+
+context = """
+You are a vision-language model analyzing Gomoku game positions.
+
+Game rules (for this dataset):
+- The board is a 15×15 grid. Player 1 = black stones (value 1). Player 2 = white stones (value 2).
+- A legal move is placing exactly one stone on an empty intersection (value 0).
+- A player wins immediately if they can place one stone that creates 5 stones in a row (horizontal, vertical, or diagonal).
+
+Important:
+- Always follow the per-question instructions and output format exactly.
+- Do not add explanations or any extra text beyond what the question requests.
+"""
+
+# ============================================================
+# CURRICULUM (60% = 744): Variant 4 only (3 questions)
+# 744 / 3 = 248 exactly
+# ============================================================
+
+[questions.Q1004]
+num_samples = 248
+text = """
+Player to move: {color}.
+
+Task:
+List every empty intersection as a valid move.
+Provide moves in row-major order (row then column).
+
+Answer format: "row col, row col, ..." and nothing else.
+"""
+
+[questions.Q1204]
+num_samples = 248
+text = """
+It is {color}'s move.
+
+Task:
+Select the best move for {color} to play next.
+
+Answer format: exactly "row col" (0-based).
+"""
+
+[questions.Q1304]
+num_samples = 248
+text = """
+It is your move. You are Player {player} playing {color}.
+
+Required output:
+1) The 15×15 board matrix with encoding 0/1/2 (15 lines total).
+2) CAN_WIN_NEXT_TURN: yes or no.
+3) CAN_LOSE_NEXT_TURN: yes or no.
+4) BEST_NEXT_MOVE: row col (0-based).
+
+Answer format:
+Matrix first (15 lines), then the three labeled lines exactly.
+"""
+
+# ============================================================
+# OLD (20% = 248): replay Variants 1–3 (9 questions)
+# 248 / 9 = 27 r5 -> 5x28, 4x27
+# Deterministic: first 5 listed get 28; remaining 4 get 27
+# ============================================================
+
+[questions.Q1001]
+num_samples = 28
+text = """
+It is {color}'s turn to move.
+
+Task:
+List all valid moves (all empty intersections).
+Output the moves in row-major order (increasing row, then increasing column).
+
+Answer format:
+A comma-separated list of 0-based coordinates: "row col, row col, ...".
+Do not output anything else.
+"""
+
+[questions.Q1201]
+num_samples = 28
+text = """
+It is {color}'s turn.
+
+Task:
+What is the best move to play now for {color}?
+
+Answer format: "row col" (0-based). Output nothing else.
+"""
+
+[questions.Q1301]
+num_samples = 28
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Tasks (in order):
+1) Output the board as a 15×15 integer matrix using:
+   0 = empty, 1 = black, 2 = white.
+   Output exactly 15 lines, each line with 15 integers separated by single spaces.
+2) Determine if you can win immediately on this move (one-move win).
+3) Determine if your opponent can win immediately on their next move (one-move win).
+4) Provide the best next move as "row col" (0-based).
+
+Answer format:
+- First: the 15-line matrix (15 lines).
+- Then exactly these three lines:
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+BEST_NEXT_MOVE: row col
+"""
+
+[questions.Q1002]
+num_samples = 28
+text = """
+Current player: {color}.
+
+Task:
+Enumerate every legal placement (every empty intersection).
+Sort the moves by row ascending, then column ascending.
+
+Answer format: "row col, row col, ..." (comma + single space between moves).
+"""
+
+[questions.Q1202]
+num_samples = 28
+text = """
+Current turn: {color} to move.
+
+Task:
+Choose the single best next move for {color} in this position.
+
+Answer format: exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1302]
+num_samples = 27
+text = """
+You are {color} (Player {player}). It is your turn.
+
+Do the following:
+1) Print the 15×15 board matrix (0 empty, 1 black, 2 white), exactly 15 lines.
+2) CAN_WIN_NEXT_TURN: do you have a one-move win now?
+3) CAN_LOSE_NEXT_TURN: does the opponent have a one-move win next?
+4) BEST_NEXT_MOVE: output the best move "row col" (0-based).
+
+Answer format:
+15 matrix lines, then:
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+BEST_NEXT_MOVE: row col
+"""
+
+[questions.Q1003]
+num_samples = 27
+text = """
+It is {color}'s move.
+
+Task:
+Output all legal moves (every empty coordinate).
+Use 0-based indexing and order moves in row-major order.
+
+Answer format: comma-separated "row col" pairs only.
+"""
+
+[questions.Q1203]
+num_samples = 27
+text = """
+{color} to move.
+
+Task:
+Determine the best next action for {color}.
+
+Answer format: "row col" using 0-based indexing, and nothing else.
+"""
+
+[questions.Q1303]
+num_samples = 27
+text = """
+Player {player} ({color}) to move.
+
+Tasks:
+1) Output the board as a 15×15 matrix (0 empty, 1 black, 2 white), 15 lines exactly.
+2) State whether you can win immediately (one move).
+3) State whether the opponent can win immediately on their next move.
+4) Give BEST_NEXT_MOVE as "row col" (0-based).
+
+Answer format must be exactly:
+[15 lines of matrix]
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+BEST_NEXT_MOVE: row col
+"""
+
+# ============================================================
+# NON-CURRICULUM (fixed for Step 4): 62 each (4 questions)
+# ============================================================
+
+[questions.Q1101]
+num_samples = 62
+text = """
+This image shows the Gomoku position immediately before the final move of a completed game.
+Final outcome of the completed game: {outcome_phrase}.
+You are playing {color}, and it is your turn in this position.
+
+Task:
+Play the best final move with the goal of winning immediately if a one-move win exists.
+Otherwise, play the best final move available in this position.
+
+Answer format: exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1102]
+num_samples = 62
+text = """
+You are given the board state one move before the game ended.
+Final outcome: {outcome_phrase}.
+It is {color}'s turn.
+
+Task:
+Choose the final move. Prefer an immediate win if possible; otherwise choose the best move available.
+
+Answer format: "row col" (0-based) and nothing else.
+"""
+
+[questions.Q1103]
+num_samples = 62
+text = """
+This is the position directly before the last move of the game.
+Final outcome: {outcome_phrase}.
+Current player: {color}.
+
+Task:
+Output the final move, aiming to win immediately if possible.
+If an immediate win is not available, output the best available move.
+
+Answer format: exactly "row col" using 0-based indexing.
+"""
+
+[questions.Q1104]
+num_samples = 62
+text = """
+Board state: one move before the end of the game.
+Final outcome: {outcome_phrase}.
+You are {color} and it is your turn.
+
+Task:
+Select the final move. If you can win immediately with one move, play that winning move.
+Otherwise, play the best available move.
+
+Answer format: two 0-based integers: "row col".
+"""
