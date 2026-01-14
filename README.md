@@ -28,7 +28,7 @@ options:
 
 ### Single questions.toml file
 ```bash
-usage: runner.py [-h] [--config CONFIG] [--questions QUESTIONS] [--output OUTPUT] [--no_gen_subfolder] [--no_rand_img]
+usage: python -m gen_dataset.runner [-h] [--config CONFIG] [--questions QUESTIONS] [--output OUTPUT] [--no_gen_subfolder] [--no_rand_img]
 
 Simulate multiple Gomoku games, generate all configured perception and strategy questions, assign train/eval/test splits, and write a single dataset.parquet file plus images.
 
@@ -44,7 +44,7 @@ options:
 
 ### Batch question generation for folder containing *.toml files
 ```bash
-usage: batch_runner.py [-h] [--config CONFIG] --questions_dir QUESTIONS_DIR --output OUTPUT [--no_gen_subfolder] [--no_rand_img]
+usage: python -m gen_dataset.runner [-h] [--config CONFIG] --questions_dir QUESTIONS_DIR --output OUTPUT [--no_gen_subfolder] [--no_rand_img]
 
 Runs the dataset runner for all question.toml files in a folder.
 
