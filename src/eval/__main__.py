@@ -21,7 +21,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--match-mode",
         default="exact",
-        choices=["exact", "fuzzy"],
+        choices=["exact", "fuzzy", "lisa"],
         help="Answer-matching mode. Default: exact.",
     )
     parser.add_argument(
