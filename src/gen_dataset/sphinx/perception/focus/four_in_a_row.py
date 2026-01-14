@@ -51,7 +51,7 @@ def _focus_four_in_a_row(
 
     idx = get_random_turn_index(game, min_turn, max_turn)
     board = game[idx]
-    num_four_in_a_row = game_logic.count(board, 4, player, almost=False)
+    num_four_in_a_row = game_logic.count(board, 4, player, almost=False, longer_allowed=False)
     answer = str(num_four_in_a_row)
 
     # Persist the image and get img_bytes
