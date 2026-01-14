@@ -7,7 +7,7 @@ name = "gomoku_vlm"
 version = "0.1.0"
 description = "..."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
     "numpy",
     "Pillow",
@@ -16,7 +16,10 @@ dependencies = [
     "pandas",
     "pyarrow",
     "transformers",
-    "torchvision","tqdm"
+    "tqdm",
+    "torchvision",
+    "trl",
+    "peft"
 ]
 
 [tool.setuptools]

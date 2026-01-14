@@ -2,30 +2,38 @@ import numpy as np
 
 from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.core import (
-    get_question_meta,
     QuestionFamily,
-    select_fixed_turn_and_store_image,
-    build_basic_dataset_row
+    get_random_turn_index,
+    persist_turn_image,
+    persist_turn_game_state,
+    get_question_text
 )
-from src.game_logic import get_winner
+from src import game_logic
 
 
-def _determine_who_won(q_id: str, sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def _focus_determine_who_won(
+    q_id: str,
+    sim_id: int,
+    game: np.ndarray,
+    non_rand_img: bool,
+    min_turns: int = 0,
+    max_turns: int = 999
+) -> DatasetRow:
     """
     Helper function for any question that has the
     focus: "determine_who_won"
     """
-    family, focus = get_question_meta(QuestionFamily.PERCEPTION, q_id)
+    FOCUS = "determine_who_won"
+    FAMILY = QuestionFamily.PERCEPTION
 
-    last_turn = simulated_game.shape[0] - 1
-    # choose last turn, get board, store image
-    board, img_path, img_bytes = select_fixed_turn_and_store_image(
-        sim_id=sim_id,
-        simulated_game=simulated_game,
-        turn_index=last_turn,
-    )
+    # choose last turn, get board
+    last_turn = game.shape[0] - 1
+    board = game[last_turn]
+    # Persist the image and get img_bytes
+    img_path, img_bytes = persist_turn_image(board, last_turn, sim_id, non_rand_img=non_rand_img)
 
-    winner = get_winner(board, 5)
+    # Determine winner for ground truth answer
+    winner = game_logic.get_winner(board, 5)
     match winner:
         case 1:
             answer = "black"
@@ -39,95 +47,62 @@ def _determine_who_won(q_id: str, sim_id: int, simulated_game: np.ndarray) -> Da
         case _:
             raise ValueError(f"Unexpected winner, game may still be in progress.")
 
-    return build_basic_dataset_row(
-        img_path=img_path,
+    return DatasetRow(
+        img_path=str(img_path),
         img_bytes=img_bytes,
-        family=family,
+
+        family=FAMILY,
         q_id=q_id,
-        focus=focus,
+        focus=FOCUS,
+
         answer=answer,
         valid_answers=valid_answers,
+
+        # Will be assigned later in the creation process
+        question=None,
+        split=None
     )
 
 
-def gen_question_q21_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q601_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q21 sample:
+    Generate a single Q601 sample:
     focus: "determine_who_won"
     """
-    q_id = "Q21"
-
-    dataset_row = _determine_who_won(q_id, sim_id, simulated_game)
-
-    question_text = (
-        "You are looking at the final position of a completed Gomoku game. "
-        "Player 1 uses black stones and Player 2 uses white stones. "
-        "Based on this final board, determine the result of the game. "
-        "Answer with exactly one word: 'black' if Player 1 won, "
-        "'white' if Player 2 won, or 'draw' if neither player won."
-    )
-
-    dataset_row.question = question_text
-    return dataset_row
+    q_id = "Q601"
+    row = _focus_determine_who_won(q_id, sim_id, simulated_game, non_rand_img)
+    row.question = get_question_text(q_id)
+    return row
 
 
-def gen_question_q22_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q602_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q22 sample:
+    Generate a single Q602 sample:
     focus: "determine_who_won"
     """
-    q_id = "Q22"
-
-    dataset_row = _determine_who_won(q_id, sim_id, simulated_game)
-
-    question_text = (
-        "This image shows the board at the end of a Gomoku game. "
-        "Black stones belong to Player 1 and white stones belong to Player 2. "
-        "The game is finished and no more moves will be played. "
-        "Who won the game, or was it a draw? "
-        "Respond with exactly one word: 'black', 'white', or 'draw'."
-    )
-
-    dataset_row.question = question_text
-    return dataset_row
+    q_id = "Q602"
+    row = _focus_determine_who_won(q_id, sim_id, simulated_game, non_rand_img)
+    row.question = get_question_text(q_id)
+    return row
 
 
-def gen_question_q23_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q603_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q23 sample:
+    Generate a single Q603 sample:
     focus: "determine_who_won"
     """
-    q_id = "Q23"
-
-    dataset_row = _determine_who_won(q_id, sim_id, simulated_game)
-
-    question_text = (
-        "You see a finished Gomoku game. "
-        "One player has placed black stones, the other player has placed white stones. "
-        "Using only the final arrangement of black and white stones on the board, "
-        "determine the outcome of the game. "
-        "Answer with exactly one word: 'black', 'white', or 'draw'."
-    )
-
-    dataset_row.question = question_text
-    return dataset_row
+    q_id = "Q603"
+    row = _focus_determine_who_won(q_id, sim_id, simulated_game, non_rand_img)
+    row.question = get_question_text(q_id)
+    return row
 
 
-def gen_question_q24_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q604_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q24 sample:
+    Generate a single Q604 sample:
     focus: "determine_who_won"
     """
-    q_id = "Q24"
-
-    dataset_row = _determine_who_won(q_id, sim_id, simulated_game)
-
-    question_text = (
-        "This board position represents the final state of a Gomoku game. "
-        "Black stones and white stones have already been placed; the game is over. "
-        "From the pattern of stones, decide who has won the game, or if it is a draw. "
-        "Reply with exactly one word: 'black', 'white', or 'draw'."
-    )
-
-    dataset_row.question = question_text
-    return dataset_row
+    q_id = "Q604"
+    row = _focus_determine_who_won(q_id, sim_id, simulated_game, non_rand_img)
+    row.question = get_question_text(q_id)
+    return row

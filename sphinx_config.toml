@@ -1,0 +1,7 @@
+[general]
+max_simulation_attempts = 10000  # how many times to re-simulate to avoid draws
+
+[general.split_ratios]
+train = 0.8
+eval = 0.1
+test = 0.1

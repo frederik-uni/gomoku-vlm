@@ -3,116 +3,109 @@ import numpy as np
 from gen_dataset.dataset_schema import DatasetRow
 from gen_dataset.sphinx.core import (
     QuestionFamily,
-    build_basic_dataset_row,
-    select_random_turn_and_store_image,
-    get_question_meta,
+    get_random_turn_index,
+    persist_turn_image,
+    persist_turn_game_state,
+    get_question_text
 )
 
 
-def _focus_count_empty_intersections(q_id: str,sim_id: int,simulated_game: np.ndarray) -> DatasetRow:
+def _focus_count_empty_intersections(
+    q_id: str,
+    sim_id: int,
+    game: np.ndarray,
+    non_rand_img: bool,
+    min_turns: int = 0,
+    max_turns: int = 999
+) -> DatasetRow:
     """
     Helper for any question with the
     focus: "count_empty_intersections".
     """
-    family, focus = get_question_meta(QuestionFamily.PERCEPTION, q_id)
+    FOCUS = "count_empty_intersections"
+    FAMILY = QuestionFamily.PERCEPTION
 
-    # choose turn, get board, store image
-    turn_index, board, img_path, img_bytes = select_random_turn_and_store_image(
-        family=family,
-        q_id=q_id,
-        sim_id=sim_id,
-        simulated_game=simulated_game,
-    )
+    # Sample random turn
+    turn_index = get_random_turn_index(game, min_turns, max_turns)
+    board = game[turn_index]
+    # Persist the image and get img_bytes
+    img_path, img_bytes = persist_turn_image(board, turn_index, sim_id, non_rand_img=non_rand_img)
+    # Persist game state for easier debugging
+    persist_turn_game_state(board, turn_index, sim_id)
 
     # empty cells are encoded as 0
     num_empty = int(np.count_nonzero(board == 0))
-    answer_text = str(num_empty)
+    answer = str(num_empty)
+    valid_answers = [answer]
 
-    return build_basic_dataset_row(
-        img_path=img_path,
+    return DatasetRow(
+        img_path=str(img_path),
         img_bytes=img_bytes,
-        family=family,
+
+        family=FAMILY,
         q_id=q_id,
-        focus=focus,
-        answer=answer_text,
+        focus=FOCUS,
+
+        answer=answer,
+        valid_answers=valid_answers,
+
+        # Will be assigned later in the creation process
+        question=None,
+        split=None
     )
 
 
-def gen_question_q9_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q301_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q9 sample:
+    Generate a single Q301 sample:
     focus: "count_empty_intersections"
     """
-    q_id = "Q9"
-    question_text = (
-        "You are looking at a Gomoku game position. "
-        "Black stones belong to player 1 and white stones belong to player 2. "
-        "Some intersections already contain stones, others are still empty. "
-        "Count ONLY the empty intersections where no stone has been placed yet. "
-        "How many empty intersections are there in total? "
-        "Answer with a single integer."
-    )
+    q_id = "Q301"
+    min_turns = 0
+    max_turns = 30
 
-    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game)
-    row.question = question_text
+    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
+    row.question = get_question_text(q_id)
     return row
 
 
-def gen_question_q10_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q302_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q10 sample:
+    Generate a single Q302 sample:
     focus: "count_empty_intersections"
     """
-    q_id = "Q10"
-    question_text = (
-        "Consider this snapshot of a Gomoku board. "
-        "Player 1 uses black stones, player 2 uses white stones. "
-        "Ignore all intersections that already contain a stone. "
-        "Count how many intersections are still completely empty and "
-        "available for future moves. "
-        "Return the number of empty intersections as a single integer."
-    )
+    q_id = "Q302"
+    min_turns = 31
+    max_turns = 75
 
-    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game)
-    row.question = question_text
+    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
+    row.question = get_question_text(q_id)
     return row
 
 
-def gen_question_q11_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q303_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q11 sample:
+    Generate a single Q303 sample:
     focus: "count_empty_intersections"
     """
-    q_id = "Q11"
-    question_text = (
-        "This image shows a Gomoku game in progress. "
-        "Some grid intersections are occupied by black or white stones, "
-        "while others remain empty. "
-        "Your task is to determine how many intersections are still empty. "
-        "Do NOT count any intersection that contains a stone. "
-        "Provide only the total number of empty intersections as a single integer."
-    )
+    q_id = "Q303"
+    min_turns = 76
+    max_turns = 150
 
-    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game)
-    row.question = question_text
+    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
+    row.question = get_question_text(q_id)
     return row
 
 
-def gen_question_q12_sample(sim_id: int, simulated_game: np.ndarray) -> DatasetRow:
+def gen_question_q304_sample(sim_id: int, simulated_game: np.ndarray, non_rand_img: bool) -> DatasetRow:
     """
-    Generate a single Q12 sample:
+    Generate a single Q304 sample:
     focus: "count_empty_intersections"
     """
-    q_id = "Q12"
-    question_text = (
-        "You are inspecting a partially filled Gomoku board. "
-        "Black stones (player 1) and white stones (player 2) occupy some intersections, "
-        "but many intersections are still empty. "
-        "Focus ONLY on the intersections that contain no stone at all. "
-        "How many empty intersections are on the board at this moment? "
-        "Answer with a single integer and no additional text."
-    )
+    q_id = "Q304"
+    min_turns = 151
+    max_turns = 224
 
-    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game)
-    row.question = question_text
+    row = _focus_count_empty_intersections(q_id, sim_id, simulated_game, non_rand_img, min_turns, max_turns)
+    row.question = get_question_text(q_id)
     return row
