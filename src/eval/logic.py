@@ -40,7 +40,7 @@ def ask_lisa(question1: str, question2: str) -> bool:
             "messages": [
             {
               "role": "user",
-              "content": "You are a llm judge. You are supposted evalutate the performance of another llm model. Does the second answer contains the ground truth(answer1). Dont explain your answer & only anyswer with yes or no \n\n"+question1+"\n\n"+question2
+              "content": "You are a llm judge. You are supposed to evaluate the performance of another llm model. Does the second answer correspond to the ground truth(answer1) which is a list of valid answers. Dont explain your answer & only answer with yes or no \n\n"+question1+"\n\n"+question2
             }
           ]
         }
@@ -70,10 +70,11 @@ def match_answer(
     regex: Optional[str],
     mode: Literal["exact", "fuzzy", "regex", "lisa"] = "exact",
 ):
+    return ask_lisa(str(valid_answers), pred)
     if regex is None:
         mode = "exact"
     if mode == "lisa":
-        return ask_lisa(str(valid_answers), pred)
+
     if mode == "exact":
         return pred in valid_answers
     if mode == "fuzzy":
