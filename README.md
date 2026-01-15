@@ -48,7 +48,7 @@ source ~/.bashrc
 ```
 ### Download Dataset
 ```
-hf download eganscha/gomoku_vlm_ds --repo-type=dataset
+hf download eganscha/gomoku_vlm_ds --repo-type=dataset --local-dir ./gomoku_vlm_ds
 ```
 
 ## Dataset Generation
