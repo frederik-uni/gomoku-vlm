@@ -10,6 +10,19 @@ or
 ```bash
 pip install "git+https://github.com/frederik-uni/gomoku-vlm.git"
 ```
+```
+or 
+```bash
+pip install "git+https://github.com/frederik-uni/gomoku-vlm.git"
+```
+
+## Setup
+```bash
+git clone https://github.com/frederik-uni/gomoku-vlm.git
+cd gomoku-vlm
+python3 -m venv venv && source venv/bin/activate
+pip install -e .
+```
 
 ## Usage
 ### Game
@@ -45,6 +58,7 @@ options:
 ### Batch question generation for folder containing *.toml files
 ```bash
 usage: python -m gen_dataset.runner [-h] [--config CONFIG] --questions_dir QUESTIONS_DIR --output OUTPUT [--no_gen_subfolder] [--no_rand_img]
+example: python -m gen_dataset.batch_runner --config sphinx_config.toml --questions_dir question_datasets/basic_visual_strategy_split/ --output parquets/ --no_gen_subfolder --no_rand_img
 
 Runs the dataset runner for all question.toml files in a folder.
 
@@ -56,6 +70,35 @@ options:
   --output OUTPUT       Path to the base output folder.
   --no_gen_subfolder    Do not generate dataset_NNNN subfolder under output folder.
   --no_rand_img         Do not add randomness to the images (e.g. discoloration, rotation, etc.).
+```
+
+### Rewrite the entire split column of an existing parquet dataset
+```bash
+python -m gen_dataset.parquet_split_rewriter -h
+usage: parquet_split_rewriter.py [-h] --in IN_PATH --out OUT_PATH --split SPLIT
+example: python -m gen_dataset.parquet_split_rewriter --in out/batch/run_1/strategy_questions/parquet/dataset.parquet --out out/batch/run_1b/strategy.parquet --split train
+
+Rewrite the entire "split" column of an existing parquet dataset.
+
+options:
+  -h, --help      show this help message and exit
+  --in IN_PATH    Path to input parquet file
+  --out OUT_PATH  Path to output parquet file
+  --split SPLIT   Split value to write into every row (train|eval|test)
+```
+
+### Combine Parquets inside a folder into one .parquet file
+```bash
+python -m gen_dataset.combine_parquets -h
+usage: combine_parquets.py [-h] --in_dir IN_DIR --out OUT
+example: python -m gen_dataset.combine_parquets --in_dir out/batch/run_1b/ --out out/batch/run_1c/combined.parquet
+
+Combine all .parquet files in a folder into one parquet file.
+
+options:
+  -h, --help       show this help message and exit
+  --in_dir IN_DIR  Folder containing parquet files (searched recursively).
+  --out OUT        Output parquet file path.
 ```
 
 ### Evaluation

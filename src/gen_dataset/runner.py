@@ -244,13 +244,6 @@ def assign_splits(rows: List[DatasetRow]) -> None:
         n_train = int(round(num_samples_for_this_question * train_r))
         n_eval = int(round(num_samples_for_this_question * eval_r))
         n_test = num_samples_for_this_question - n_train - n_eval  # rest goes to test
-        # Fail if any of the resulting splits is < 0 (probably sample size too small for that question)
-        if n_train < 0 or n_eval < 0 or n_test < 0:
-            raise ValueError(
-                f"Bad split for q_id={q_id}: "
-                f"num_samples_for_this_question={num_samples_for_this_question}, n_train={n_train}, n_eval={n_eval}, n_test={n_test}. "
-                'Check your "num_samples" for that questions and "split_ratios" in the provided config files.'
-            )
 
         # Assign splits for this question
         for local_idx, row_idx in enumerate(idxs):
