@@ -37,7 +37,16 @@ options:
   --bot {random,ai,none}
 ```
 
-### Downloading the Dataset
+## Downloading the Dataset
+### Make sure the hf CLI is installed
+```bash
+curl -LsSf https://hf.co/cli/install.sh | bash
+```
+### Source bashrc
+```
+source ~/.bashrc
+```
+### Download Dataset
 ```
 hf download eganscha/gomoku_vlm_ds --repo-type=dataset
 ```
