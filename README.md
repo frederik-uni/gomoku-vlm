@@ -37,6 +37,11 @@ options:
   --bot {random,ai,none}
 ```
 
+### Downloading the Dataset
+```
+hf download eganscha/gomoku_vlm_ds --repo-type=dataset
+```
+
 ## Dataset Generation
 
 ### Single questions.toml file
