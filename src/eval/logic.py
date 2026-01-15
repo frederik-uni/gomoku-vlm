@@ -11,6 +11,7 @@ from PIL import Image
 import numpy as np
 from utils.ai_utils import get_device
 import requests
+import os
 
 
 def normalize(s: str):
@@ -25,12 +26,12 @@ def is_yes(data):
     return s.startswith("yes")
 
 def ask_lisa(question1: str, question2: str) -> bool:
+    api_token = os.getenv("API_TOKEN")
+
+    if not api_token:
+        raise RuntimeError("API_TOKEN is not set")
     try:
         url = "https://chat-1.ki-awz.iisys.de/api/chat/completions"
-        api_token = os.getenv("API_TOKEN")
-
-        if not api_token:
-            raise RuntimeError("API_TOKEN is not set")
 
         model: str = "lisa-v40-rc1-qwen3235b-a22b-instruct"
         headers = {'Authorization': f'Bearer {api_token}',
@@ -70,11 +71,10 @@ def match_answer(
     regex: Optional[str],
     mode: Literal["exact", "fuzzy", "regex", "lisa"] = "exact",
 ):
-    return ask_lisa(str(valid_answers), pred)
-    if regex is None:
+    if regex is None and mode == "regex":
         mode = "exact"
     if mode == "lisa":
-
+        return ask_lisa(str(valid_answers), pred)
     if mode == "exact":
         return pred in valid_answers
     if mode == "fuzzy":
