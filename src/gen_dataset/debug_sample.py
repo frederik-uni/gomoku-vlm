@@ -6,16 +6,13 @@ from pathlib import Path
 import pandas as pd
 from PIL import Image
 
-from gen_dataset.sphinx.core import DEFAULT_SPHINX_OUT_ROOT_PATH
-
-
 def parse_args():
     """cli"""
     parser = argparse.ArgumentParser(
         description="Evaluate a single question sample for a parquet file"
     )
     parser.add_argument(
-        "--in",
+        "--in", dest="input",
         required=True,
         type=str,
         help="path to the parquet file",
@@ -38,7 +35,7 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     # Turn strings into absolute Paths
-    path = Path(args.dataset_root).resolve()
+    path = Path(args.input).resolve()
 
     # Print the Metadata
     print(f"\nEvaluating dataset:")
@@ -62,13 +59,13 @@ if __name__ == "__main__":
         print(f"No Questions found for q_id={args.qid}")
         exit(1)
 
-    if args.sample_idx < 0 or args.sample_idx >= len(subset):
-        print(f"sample_idx {args.sample_idx} out of range for q_id={args.qid}, "
+    if args.idx < 0 or args.idx >= len(subset):
+        print(f"idx {args.idx} out of range for q_id={args.qid}, "
               f"we only have {len(subset)} samples for this question.")
         exit(1)
 
     # Pick the row we want
-    row = subset.iloc[args.sample_idx]
+    row = subset.iloc[args.idx]
 
     # Decode and show image from img_bytes
     img_bytes = row["img_bytes"]
@@ -77,7 +74,7 @@ if __name__ == "__main__":
         exit(1)
 
     img = Image.open(io.BytesIO(img_bytes))
-    img.show(title=f"q_id={args.qid}, sample={args.sample_idx}")
+    img.show(title=f"qid={args.qid}, sample={args.idx}")
 
     # Print parquet row contents (but only size for img_bytes)
     for key, value in row.items():
