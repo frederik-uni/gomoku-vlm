@@ -1,17 +1,18 @@
 import difflib
 import io
 import json
+import os
+from collections import defaultdict
 from typing import Literal, Optional, cast
 
+import numpy as np
 import pandas as pd
 import regex as re
-import torch
-from collections import defaultdict
-from PIL import Image
-import numpy as np
-from utils.ai_utils import get_device
 import requests
-import os
+import torch
+from PIL import Image
+
+from utils.ai_utils import get_device
 
 
 def normalize(s: str):
@@ -21,9 +22,19 @@ def normalize(s: str):
 def is_yes(data):
     s = str(data)
     s = s.lower().strip()
-    s = re.sub(r'[^a-z]+', ' ', s)
+    s = re.sub(r"[^a-z]+", " ", s)
     s = s.strip()
     return s.startswith("yes")
+
+
+def last_line(s: str):
+    lines = [line.strip().lower() for line in s.splitlines() if line.strip()]
+
+    if not lines:
+        raise ValueError("Empty output")
+
+    return lines[-1]
+
 
 def ask_lisa(question1: str, question2: str) -> bool:
     api_token = os.getenv("API_TOKEN")
@@ -34,27 +45,62 @@ def ask_lisa(question1: str, question2: str) -> bool:
         url = "https://chat-1.ki-awz.iisys.de/api/chat/completions"
 
         model: str = "lisa-v40-rc1-qwen3235b-a22b-instruct"
-        headers = {'Authorization': f'Bearer {api_token}',
-                    "Content-Type": "application/json"}
+        headers = {
+            "Authorization": f"Bearer {api_token}",
+            "Content-Type": "application/json",
+        }
         data = {
             "model": model,
             "messages": [
-            {
-              "role": "user",
-              "content": "You are a llm judge. You are supposed to evaluate the performance of another llm model. Does the second answer correspond to the ground truth(answer1) which is a list of valid answers. Dont explain your answer & only answer with yes or no \n\n"+question1+"\n\n"+question2
-            }
-          ]
+                {
+                    "role": "user",
+                    "content": """You are an LLM judge. You are supposed to evaluate the performance of another LLM model.
+                    Your task is to decide whether answer2 matches ANY valid ground-truth answer in answer1.
+
+                    You will be given:
+                    - answer1: a list of valid ground-truth answers (strings). If answer2 matches ANY one item, the result is yes.
+                    - answer2: the candidate model answer (string)
+                    First, evaluate carefully, step by step, whether answer2 corresponds to any valid answer in answer1. Use this reasoning to reach your decision.
+
+                    In the final line, output ONLY ONE word: 'yes' if answer2 corresponds to any of the answers in the ground truth, or 'no' otherwise. Do not include anything else in the final line.
+
+                    Matching policy (be strict to avoid false positives):
+                    1) Exact match always counts.
+                    2) Do NOT count as a match if answer2:
+                       - is merely related, plausible, but not equivalent;
+                       - mixes multiple answers where any part conflicts with the matched ground-truth item;
+
+
+                    Decision rule:
+                    - If there exists at least one ground-truth item that answer2 matches under the policy above, output "yes".
+                    - If you are not highly confident that answer2 matches at least one ground-truth item, output "no".
+
+                    Process:
+                    - Compare answer2 against each item in answer1.
+
+                    Output format:
+                    On the final line output ONLY one word:
+                    yes
+                    or
+                    no
+
+              """
+                    + question1
+                    + "\n\n"
+                    + question2,
+                }
+            ],
         }
         response = requests.post(url, json=data, headers=headers)
         print(response.json())
 
-
         data = response.json()["choices"][0]["message"]["content"]
 
-        return is_yes(str(data))
+        return is_yes(last_line(str(data)))
     except:
         print("error")
         return ask_lisa(question1, question2)
+
 
 def fuzzy_match(pred: str, valid_answers: list[str], threshold: float = 0.75) -> bool:
     pred_norm = normalize(pred)
@@ -130,7 +176,7 @@ def eval_vlm_on_parquet(
     from tqdm import tqdm
 
     for _, row in tqdm(df.iterrows(), desc="Processing", unit="item"):
-        question = "<start_of_image>\n"+row["question"]
+        question = "<start_of_image>\n" + row["question"]
         valid_answers = cast(list[str], row["valid_answers"])
         img_bytes = cast(bytes, row["img_bytes"])
         family = cast(str, row["family"])
