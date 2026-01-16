@@ -115,6 +115,19 @@ options:
   --out OUT        Output parquet file path.
 ```
 
+### Debugging a .parquet-file
+```bash
+usage: debug_sample.py [-h] --in IN --qid QID [--idx IDX]
+
+Evaluate a single question sample for a parquet file
+
+options:
+  -h, --help  show this help message and exit
+  --in IN     path to the parquet file
+  --qid QID   qid of the question to be evaluated
+  --idx IDX   idx of the sample to be evaluated for the provided qid. If none is provided the first sample (idx = 0) will be used.
+```
+
 ### Evaluation
 ```bash
 python -m eval --model-id "Qwen/Qwen2.5-VL-7B-Instruct" --parquet-path ./datasets/initial_eval.parquet
