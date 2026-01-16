@@ -118,6 +118,7 @@ options:
 ### Debugging a .parquet-file
 ```bash
 usage: debug_sample.py [-h] --in IN --qid QID [--idx IDX]
+example: python -m gen_dataset.debug_sample --in path_to.parquet --qid Q101 --idx 0
 
 Evaluate a single question sample for a parquet file
 
