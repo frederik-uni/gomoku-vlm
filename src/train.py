@@ -2,21 +2,21 @@ import os
 from pathlib import Path
 
 import pandas as pd
-from datasets import Dataset
 from peft import LoraConfig, PeftModel
 from PIL import Image
-from transformers import AutoModelForCausalLM
+from transformers import AutoModelForImageTextToText
 from trl import SFTConfig, SFTTrainer
 from typing_extensions import Literal
 
+from datasets import Dataset
+
 
 def init_model(model_id):
-    return AutoModelForCausalLM.from_pretrained(
+    return AutoModelForImageTextToText.from_pretrained(
         model_id,
         trust_remote_code=True,
         device_map="auto",
         torch_dtype="auto",
-        attn_implementation="eager",
     )
 
 
