@@ -55,16 +55,7 @@ def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
             "messages": [
                 {
                     "role": "user",
-                    "content": """You are an LLM judge. You are supposed to evaluate the performance of another LLM model.
-                                  You are given a ground truth (answer1), which is a list of valid answers, and a second answer (answer2).
-
-                                  First, carefully reason step by step whether answer2 corresponds to any valid answer in answer1.
-                                  Use this reasoning only to reach your decision.
-
-                                  In the final line, output ONLY one word: 'yes' if answer2 corresponds to the ground truth, or 'no' otherwise.
-                                  Do not include anything else in the final line.
-
-                                  """
+                    "content": "You are a llm judge. You are supposed to evaluate the performance of another llm model. Does the second answer correspond to the ground truth(answer1) which is a list of valid answers. Dont explain your answer & only answer with yes or no \n\n"
                     + question1
                     + "\n\n"
                     + question2,
