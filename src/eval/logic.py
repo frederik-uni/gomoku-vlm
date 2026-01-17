@@ -54,37 +54,26 @@ def ask_lisa(question1: str, question2: str) -> bool:
             "messages": [
                 {
                     "role": "user",
-                    "content": """You are an LLM judge. You are supposed to evaluate the performance of another LLM model.
-                    Your task is to decide whether answer2 matches ANY valid ground-truth answer in answer1.
-
+                    "content": """
+                    You are an LLM judge. You are supposed to evaluate the performance of another LLM model.
+                    Your task is to decide whether answer2 matches any valid ground-truth answer in answer1.
+                    
                     You will be given:
                     - answer1: a list of valid ground-truth answers (strings). If answer2 matches ANY one item, the result is yes.
                     - answer2: the candidate model answer (string)
+                    
                     First, evaluate carefully, step by step, whether answer2 corresponds to any valid answer in answer1. Use this reasoning to reach your decision.
-
                     In the final line, output ONLY ONE word: 'yes' if answer2 corresponds to any of the answers in the ground truth, or 'no' otherwise. Do not include anything else in the final line.
-
-                    Matching policy (be strict to avoid false positives):
+                    
+                    Matching policy (be strict, avoid false positives):
                     1) Exact match always counts.
-                    2) Do NOT count as a match if answer2:
-                       - is merely related, plausible, but not equivalent;
-                       - mixes multiple answers where any part conflicts with the matched ground-truth item;
-
-
-                    Decision rule:
-                    - If there exists at least one ground-truth item that answer2 matches under the policy above, output "yes".
-                    - If you are not highly confident that answer2 matches at least one ground-truth item, output "no".
-
-                    Process:
-                    - Compare answer2 against each item in answer1.
-
+                    2) Do NOT count as a match if answer2 mixes multiple answers where any part conflicts with the matched ground-truth item;
+                    
                     Output format:
-                    On the final line output ONLY one word:
-                    yes
-                    or
-                    no
-
-              """
+                    [Your Reasoning Process]
+                    [\n====================================\n]
+                    [On the final line output ONLY one word ‘yes’ or ‘no’]
+                    """
                     + question1
                     + "\n\n"
                     + question2,
