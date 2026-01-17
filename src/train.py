@@ -146,7 +146,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a LoRA SFT model.")
 
     parser.add_argument("--model_id", type=str, required=True, help="Model ID to load")
-    parser.add_argument("--peft", type=Path, required=True, help="Path to PEFT model")
+    parser.add_argument("--peft", type=Path, default=None, help="Path to PEFT model")
 
     parser.add_argument(
         "--output_dir",
