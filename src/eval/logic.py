@@ -37,7 +37,7 @@ def last_line(s: str):
     return lines[-1]
 
 
-def ask_lisa(question1: str, question2: str) -> bool:
+def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
     api_token = os.getenv("API_TOKEN")
 
     if not api_token:
@@ -85,7 +85,7 @@ def ask_lisa(question1: str, question2: str) -> bool:
 
         data = response.json()["choices"][0]["message"]["content"]
 
-        return is_yes(last_line(str(data)))
+        return is_yes(last_line(str(data))), str(data)
     except:
         print("error")
         return ask_lisa(question1, question2)
@@ -106,12 +106,12 @@ def match_answer(
     regex: Optional[str],
     mode: Literal["exact", "fuzzy", "regex", "lisa"] = "exact",
 ):
-    with open("log.txt", "a", encoding="utf-8") as f:
-        f.write(f"=====\n{valid_answers}\n{pred}\n\n")
     if regex is None and mode == "regex":
         mode = "exact"
     if mode == "lisa":
-        return ask_lisa(str(valid_answers), pred)
+        v, t = ask_lisa(str(valid_answers), pred)
+        with open("log.txt", "a", encoding="utf-8") as f:
+            f.write(f"=====\n{valid_answers}\n{pred}\n{v}\n{t}\n\n")
     if mode == "exact":
         return pred in valid_answers
     if mode == "fuzzy":
