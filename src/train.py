@@ -27,7 +27,6 @@ def init_lora(r, target_modules, modules_to_save):
         bias="none",
         target_modules=target_modules,
         modules_to_save=modules_to_save,
-        task_type="IMAGE_TEXT_TO_TEXT",
     )
 
 
@@ -78,25 +77,36 @@ def latest_valid_checkpoint(root: str):
 
 def load_our_dataset(parquet_path: str) -> Dataset:
     df = pd.read_parquet(parquet_path)
-
     df = df[["question", "img_bytes", "answer"]]
 
-    def preprocess_row(row):
-        prompt_content = f"{row['question']}"
+    def load_image_from_bytes(img_bytes):
+        return Image.open(BytesIO(img_bytes)).convert("RGB")
 
-        def load_image_from_bytes(img_bytes):
-            return Image.open(BytesIO(img_bytes)).convert("RGB")
+    def preprocess_row(row):
+        image = load_image_from_bytes(row["img_bytes"])
 
         return {
-            "images": [load_image_from_bytes(row["img_bytes"])],
-            "prompt": [{"role": "user", "content": prompt_content}],
-            "completion": [{"role": "assistant", "content": row["answer"]}],
+            "messages": [
+                [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image", "image": image},
+                            {"type": "text", "text": row["question"]},
+                        ],
+                    },
+                    {
+                        "role": "assistant",
+                        "content": [
+                            {"type": "text", "text": row["answer"]},
+                        ],
+                    },
+                ]
+            ]
         }
 
     processed_data = df.apply(preprocess_row, axis=1)
-
-    sft_dataset = Dataset.from_list(processed_data.tolist())
-    return sft_dataset
+    return Dataset.from_list(processed_data.tolist())
 
 
 Mode = Literal["visual", "logic"]
