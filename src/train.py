@@ -15,7 +15,6 @@ def init_model(model_id):
     return AutoModelForImageTextToText.from_pretrained(
         model_id,
         trust_remote_code=True,
-        device_map="auto",
         torch_dtype="auto",
     )
 
@@ -28,7 +27,7 @@ def init_lora(r, target_modules, modules_to_save):
         bias="none",
         target_modules=target_modules,
         modules_to_save=modules_to_save,
-        task_type="CAUSAL_LM",
+        task_type="IMAGE_TEXT_TO_TEXT",
     )
 
 
@@ -137,6 +136,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a LoRA SFT model.")
 
     parser.add_argument("--model_id", type=str, required=True, help="Model ID to load")
+    parser.add_argument("--peft", type=Path, required=True, help="Path to PEFT model")
+
     parser.add_argument(
         "--output_dir",
         type=str,
@@ -167,12 +168,15 @@ if __name__ == "__main__":
     resume_path = latest_valid_checkpoint(args.output_dir)
 
     model = init_model(args.model_id)
+    if args.peft:
+        model.load_adapter(args.peft, adapter_name="visual", is_trainable=False)
+        model.set_adapter("visual")
 
     final_dir = os.path.join(args.output_dir, "final-adapter")
-    if os.path.isdir(final_dir) and resume_path:
-        model = PeftModel.from_pretrained(
-            model, resume_path, is_trainable=True, ignore_mismatched_sizes=True
-        )
+    ##if os.path.isdir(final_dir) and resume_path:
+    #    model = PeftModel.from_pretrained(
+    #        model, resume_path, is_trainable=True, ignore_mismatched_sizes=True
+    #    )
 
     trainer = SFTTrainer(
         model=model,
@@ -180,8 +184,9 @@ if __name__ == "__main__":
         args=init_train(args.output_dir, args.num_epochs, args.batch_size),
         peft_config=init_lora(args.lora_r, target(args.mode), modules(args.mode)),
     )
+    print(resume_path)
 
-    trainer.train()  # resume_from_checkpoint=resume_path)
+    trainer.train(resume_from_checkpoint=resume_path)
 
     Path(final_dir).mkdir(parents=True, exist_ok=True)
     trainer.model.save_pretrained(final_dir)
