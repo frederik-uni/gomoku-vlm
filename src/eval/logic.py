@@ -135,7 +135,7 @@ def eval_vlm_on_parquet(
 
     model.eval()
 
-    ds = load_dataset("egansha/gomoku_vlm_ds", "eval")
+    ds = load_dataset("eganscha/gomoku_vlm_ds", "eval")
     df = concatenate_datasets(list(ds.values())).to_pandas()
     df = cast(pd.DataFrame, df)
     # df = pd.read_parquet(parquet_path)

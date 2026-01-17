@@ -1,6 +1,5 @@
 import argparse
 
-from datasets import load_dataset
 from eval.logic import eval_vlm_on_parquet
 
 
