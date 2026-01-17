@@ -55,26 +55,16 @@ def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
             "messages": [
                 {
                     "role": "user",
-                    "content": """
-                    You are an LLM judge. You are supposed to evaluate the performance of another LLM model.
-                    Your task is to decide whether answer2 matches any valid ground-truth answer in answer1.
+                    "content": """You are an LLM judge. You are supposed to evaluate the performance of another LLM model.
+                                  You are given a ground truth (answer1), which is a list of valid answers, and a second answer (answer2).
 
-                    You will be given:
-                    - answer1: a list of valid ground-truth answers (strings). If answer2 matches ANY one item, the result is yes.
-                    - answer2: the candidate model answer (string)
+                                  First, carefully reason step by step whether answer2 corresponds to any valid answer in answer1.
+                                  Use this reasoning only to reach your decision.
 
-                    First, evaluate carefully, step by step, whether answer2 corresponds to any valid answer in answer1. Use this reasoning to reach your decision.
-                    In the final line, output ONLY ONE word: 'yes' if answer2 corresponds to any of the answers in the ground truth, or 'no' otherwise. Do not include anything else in the final line.
+                                  In the final line, output ONLY one word: 'yes' if answer2 corresponds to the ground truth, or 'no' otherwise.
+                                  Do not include anything else in the final line.
 
-                    Matching policy (be strict, avoid false positives):
-                    1) Exact match always counts.
-                    2) Do NOT count as a match if answer2 mixes multiple answers where any part conflicts with the matched ground-truth item;
-
-                    Output format:
-                    [Your Reasoning Process]
-                    [\n====================================\n]
-                    [On the final line output ONLY one word ‘yes’ or ‘no’]
-                    """
+                                  """
                     + question1
                     + "\n\n"
                     + question2,
@@ -112,7 +102,7 @@ def match_answer(
         v, t = ask_lisa(str(valid_answers), pred)
         with open("log.txt", "a", encoding="utf-8") as f:
             f.write(
-                f"=====\nGround Trhough:{valid_answers}\n Resp:{pred}\n:Result:{v}\nLisa:{t}\n\n"
+                f"=====\nGround truth :{valid_answers}\n Resp:{pred}\n:Result:{v}\nLisa:{t}\n\n"
             )
         return v
     if mode == "exact":
