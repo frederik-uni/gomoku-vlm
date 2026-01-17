@@ -57,18 +57,18 @@ def ask_lisa(question1: str, question2: str) -> bool:
                     "content": """
                     You are an LLM judge. You are supposed to evaluate the performance of another LLM model.
                     Your task is to decide whether answer2 matches any valid ground-truth answer in answer1.
-                    
+
                     You will be given:
                     - answer1: a list of valid ground-truth answers (strings). If answer2 matches ANY one item, the result is yes.
                     - answer2: the candidate model answer (string)
-                    
+
                     First, evaluate carefully, step by step, whether answer2 corresponds to any valid answer in answer1. Use this reasoning to reach your decision.
                     In the final line, output ONLY ONE word: 'yes' if answer2 corresponds to any of the answers in the ground truth, or 'no' otherwise. Do not include anything else in the final line.
-                    
+
                     Matching policy (be strict, avoid false positives):
                     1) Exact match always counts.
                     2) Do NOT count as a match if answer2 mixes multiple answers where any part conflicts with the matched ground-truth item;
-                    
+
                     Output format:
                     [Your Reasoning Process]
                     [\n====================================\n]
@@ -81,7 +81,6 @@ def ask_lisa(question1: str, question2: str) -> bool:
             ],
         }
         response = requests.post(url, json=data, headers=headers)
-        print(response.json())
 
         data = response.json()["choices"][0]["message"]["content"]
 
@@ -106,6 +105,8 @@ def match_answer(
     regex: Optional[str],
     mode: Literal["exact", "fuzzy", "regex", "lisa"] = "exact",
 ):
+    with open("log.txt", "a", encoding="utf-8") as f:
+        f.write(f"=====\n{valid_answers}\n{pred}\n\n")
     if regex is None and mode == "regex":
         mode = "exact"
     if mode == "lisa":
