@@ -12,6 +12,7 @@ import requests
 import torch
 from PIL import Image
 
+from datasets import concatenate_datasets, load_dataset
 from utils.ai_utils import get_device
 
 
@@ -125,7 +126,6 @@ def match_answer(
 def eval_vlm_on_parquet(
     processor,
     model,
-    parquet_path: str,
     match_mode: Literal["exact", "fuzzy", "regex"] = "exact",
     max_new_tokens=64,
     device: Literal["cpu", "cuda", "auto"] = "auto",
@@ -135,7 +135,10 @@ def eval_vlm_on_parquet(
 
     model.eval()
 
-    df = pd.read_parquet(parquet_path)
+    ds = load_dataset("egansha/gomoku_vlm_ds", "eval")
+    df = concatenate_datasets(list(ds.values())).to_pandas()
+    df = cast(pd.DataFrame, df)
+    # df = pd.read_parquet(parquet_path)
 
     def ensure_list(x):
         if isinstance(x, np.ndarray):
