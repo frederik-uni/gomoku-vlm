@@ -1,5 +1,7 @@
 import argparse
 
+from peft import PeftModel
+
 from eval.logic import eval_vlm_on_parquet
 
 
@@ -18,6 +20,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default="exact",
         choices=["exact", "fuzzy", "lisa"],
         help="Answer-matching mode. Default: exact.",
+    )
+    parser.add_argument(
+        "--peft",
+        default=None,
+        type=str,
+        help="Path to the PEFT model.",
     )
     parser.add_argument(
         "--max-new-tokens",
@@ -39,7 +47,8 @@ def main():
     processor = AutoProcessor.from_pretrained(args.model_id)
     model = AutoModelForImageTextToText.from_pretrained(args.model_id)
 
-    # todo: download parquet_path
+    if args.peft:
+        model = PeftModel.from_pretrained(model, args.peft)
 
     result = eval_vlm_on_parquet(
         processor=processor,
