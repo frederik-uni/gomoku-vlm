@@ -111,7 +111,10 @@ def match_answer(
     if mode == "lisa":
         v, t = ask_lisa(str(valid_answers), pred)
         with open("log.txt", "a", encoding="utf-8") as f:
-            f.write(f"=====\n{valid_answers}\n{pred}\n{v}\n{t}\n\n")
+            f.write(
+                f"=====\nGround Trhough:{valid_answers}\n Resp:{pred}\n:Result:{v}\nLisa:{t}\n\n"
+            )
+        return v
     if mode == "exact":
         return pred in valid_answers
     if mode == "fuzzy":
