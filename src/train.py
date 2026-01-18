@@ -1,10 +1,10 @@
 import os
+from io import BytesIO
 from pathlib import Path
 
-import pandas as pd
-from peft import LoraConfig, PeftModel
+from peft import LoraConfig
 from PIL import Image
-from transformers import AutoModelForImageTextToText
+from transformers import AutoModelForImageTextToText, AutoProcessor
 from trl import SFTConfig, SFTTrainer
 from typing_extensions import Literal
 
@@ -27,6 +27,7 @@ def init_lora(r, target_modules, modules_to_save):
         bias="none",
         target_modules=target_modules,
         modules_to_save=modules_to_save,
+        task_type="CAUSAL_LM",
     )
 
 
@@ -55,9 +56,6 @@ def init_train(out, epochs: int, batch_size: int):
     )
 
 
-from io import BytesIO
-
-
 def latest_valid_checkpoint(root: str):
     p = Path(root)
     if not p.exists():
@@ -75,46 +73,88 @@ def latest_valid_checkpoint(root: str):
     return str(ckpts[-1])
 
 
-def load_our_dataset(
-    repo_id: str,
-    file_path: str,
-) -> Dataset:
+processor = AutoProcessor.from_pretrained(
+    "google/gemma-3-4b-it",
+    padding_side="right",
+)
+processor.tokenizer.pad_token = processor.tokenizer.eos_token
+processor.tokenizer.padding_side = "right"
+
+
+def load_our_dataset(file_path: str) -> Dataset:
     ds = load_dataset(
-        "parquet",
-        data_files=repo_id + "/" + file_path,
+        "eganscha/gomoku_vlm_ds",
+        data_files=file_path,
     )["train"]
 
     ds = ds.select_columns(["question", "img_bytes", "answer"])
 
     def preprocess_batch(batch):
-        images = [Image.open(BytesIO(b)).convert("RGB") for b in batch["img_bytes"]]
+        formatted_messages = []
 
-        return {
-            "messages": [
+        for i in range(len(batch["question"])):
+            images = []
+            try:
+                img_entries = batch["img_bytes"][i]
+                if isinstance(img_entries, list):
+                    for b in img_entries:
+                        images.append(
+                            {
+                                "type": "image",
+                                "image": Image.open(BytesIO(b)).convert("RGB"),
+                            }
+                        )
+                else:
+                    images.append(
+                        {
+                            "type": "image",
+                            "image": Image.open(BytesIO(img_entries)).convert("RGB"),
+                        }
+                    )
+            except Exception as e:
+                print(f"Error decoding images at row {i}: {e}")
+
+            formatted_messages.append(
                 [
                     {
-                        "role": "user",
+                        "role": "system",
                         "content": [
-                            {"type": "image", "image": img},
-                            {"type": "text", "text": q},
+                            {
+                                "type": "text",
+                                "text": "You are a vision-language model analyzing Gomoku game positions.",
+                            }
+                        ],
+                    },
+                    {
+                        "role": "user",
+                        "content": images
+                        + [
+                            {
+                                "type": "text",
+                                "text": batch["question"][i]
+                                .replace(
+                                    "You are a vision-language model analyzing Gomoku game positions.",
+                                    "",
+                                )
+                                .strip(),
+                            }
                         ],
                     },
                     {
                         "role": "assistant",
-                        "content": [
-                            {"type": "text", "text": a},
-                        ],
+                        "content": [{"type": "text", "text": batch["answer"][i]}],
                     },
                 ]
-                for img, q, a in zip(images, batch["question"], batch["answer"])
-            ]
-        }
+            )
+        return {"messages": formatted_messages}
 
     ds = ds.map(
         preprocess_batch,
         batched=True,
+        batch_size=8,
+        num_proc=4,
         remove_columns=["question", "img_bytes", "answer"],
-        desc="Preprocessing dataset",
+        desc="Formatting dataset with messages",
     )
 
     return ds
@@ -204,6 +244,7 @@ if __name__ == "__main__":
         train_dataset=load_our_dataset(args.data_file),
         args=init_train(args.output_dir, args.num_epochs, args.batch_size),
         peft_config=init_lora(args.lora_r, target(args.mode), modules(args.mode)),
+        processing_class=processor.tokenizer,
     )
     print(resume_path)
 
