@@ -98,6 +98,22 @@ def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
         return ask_lisa(question1, question2)
 
 
+def contains_match(pred: str, valid_answers: list[str]) -> bool:
+    pred_norm = normalize(pred)
+
+    for ans in valid_answers:
+        ans_norm = normalize(ans)
+        if not ans_norm:
+            continue
+
+        # Token-boundary containment (reduces "4 0" matching inside "14 0")
+        pattern = re.compile(rf"(?<!\S){re.escape(ans_norm)}(?!\S)")
+        if pattern.search(pred_norm):
+            return True
+
+    return False
+
+
 def fuzzy_match(pred: str, valid_answers: list[str], threshold: float = 0.75) -> bool:
     pred_norm = normalize(pred)
     for ans in valid_answers:
@@ -124,6 +140,8 @@ def match_answer(
         return v
     if mode == "exact":
         return pred in valid_answers
+    if mode == "contains":
+        return contains_match(pred, valid_answers)
     if mode == "fuzzy":
         return fuzzy_match(pred, valid_answers)
     if mode == "regex" and regex is not None:
