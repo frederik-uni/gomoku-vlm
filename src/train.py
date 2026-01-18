@@ -2,7 +2,8 @@ import os
 from io import BytesIO
 from pathlib import Path
 
-from peft import LoraConfig
+import torch
+from peft import LoraConfig, PeftModel
 from PIL import Image
 from transformers import AutoModelForImageTextToText, AutoProcessor
 from trl import SFTConfig, SFTTrainer
@@ -244,17 +245,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
     resume_path = latest_valid_checkpoint(args.output_dir)
 
-    model = init_model(resume_path or args.model_id)
+    model = init_model(args.model_id)
 
+    final_dir = os.path.join(args.output_dir, "final-adapter")
+    if os.path.isdir(final_dir) and resume_path:
+        model = PeftModel.from_pretrained(model, final_dir)
+    #    model = PeftModel.from_pretrained(    #        model, resume_path, is_trainable=True, ignore_mismatched_sizes=True
+    #    )
+    #
     if args.peft:
         model.load_adapter(args.peft, adapter_name="visual", is_trainable=False)
         model.set_adapter("visual")
-
-    final_dir = os.path.join(args.output_dir, "final-adapter")
-    ##if os.path.isdir(final_dir) and resume_path:
-    #    model = PeftModel.from_pretrained(
-    #        model, resume_path, is_trainable=True, ignore_mismatched_sizes=True
-    #    )
 
     trainer = SFTTrainer(
         model=model,
@@ -266,11 +267,7 @@ if __name__ == "__main__":
             args.gradient_accumulation_steps,
             args.learning_rate,
         ),
-        peft_config=(
-            None
-            if resume_path is not None
-            else init_lora(args.lora_r, target(args.mode), modules(args.mode))
-        ),
+        peft_config=init_lora(args.lora_r, target(args.mode), modules(args.mode)),
         processing_class=processor.tokenizer,
     )
     print(resume_path)
