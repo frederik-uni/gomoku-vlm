@@ -196,7 +196,7 @@ def eval_vlm_on_parquet(
     from tqdm import tqdm
 
     for _, row in tqdm(df.iterrows(), desc="Processing", unit="item"):
-        question = cast(str, "<start_of_image>\n" + row["question"])
+        question = cast(str, row["question"])
         valid_answers = cast(list[str], row["valid_answers"])
         img_bytes = cast(bytes, row["img_bytes"])
         family = cast(str, row["family"])
