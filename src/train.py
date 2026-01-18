@@ -218,7 +218,7 @@ if __name__ == "__main__":
         help="Path to dataset file",
     )
     parser.add_argument(
-        "--num_epochs", type=int, default=6, help="Number of training epochs"
+        "--num_epochs", type=int, default=3, help="Number of training epochs"
     )
     parser.add_argument(
         "--batch_size", type=int, default=4, help="Batch size for training"
