@@ -259,18 +259,18 @@ if __name__ == "__main__":
     trainer = SFTTrainer(
         model=model,
         train_dataset=load_our_dataset(args.data_file),
-        args=(
+        args=init_train(
+            args.output_dir,
+            args.num_epochs,
+            args.batch_size,
+            args.gradient_accumulation_steps,
+            args.learning_rate,
+        ),
+        peft_config=(
             None
             if resume_path is not None
-            else init_train(
-                args.output_dir,
-                args.num_epochs,
-                args.batch_size,
-                args.gradient_accumulation_steps,
-                args.learning_rate,
-            )
+            else init_lora(args.lora_r, target(args.mode), modules(args.mode))
         ),
-        peft_config=init_lora(args.lora_r, target(args.mode), modules(args.mode)),
         processing_class=processor.tokenizer,
     )
     print(resume_path)
