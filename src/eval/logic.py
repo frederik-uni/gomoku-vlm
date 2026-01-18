@@ -235,7 +235,11 @@ def eval_vlm_on_parquet(
                     ],
                 },
             ],
-            tokenize=True,
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+        inputs = processor(
+            inputs,
             return_tensors="pt",
         )
 
