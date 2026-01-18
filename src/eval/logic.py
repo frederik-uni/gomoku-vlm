@@ -128,7 +128,7 @@ def match_answer(
         return fuzzy_match(pred, valid_answers)
     if mode == "regex" and regex is not None:
         pattern = re.compile(regex)
-        return pattern.fullmatch(pred.strip()) is not None and pred in valid_answers
+        return any(pattern.fullmatch(ans) for ans in valid_answers)
 
     raise ValueError("Unknown match mode")
 
