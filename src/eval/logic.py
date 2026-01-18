@@ -136,16 +136,17 @@ def match_answer(
 def eval_vlm_on_parquet(
     processor,
     model,
-    match_mode: Literal["exact", "fuzzy", "regex"] = "exact",
+    match_mode: Literal["exact", "fuzzy", "regex", "lisa"] = "exact",
     max_new_tokens=64,
     device: Literal["cpu", "cuda", "auto"] = "auto",
+    dataset: str = "eval",
 ) -> dict[str, float]:
     device = get_device(device)
     model = model.to(device)
 
     model.eval()
 
-    ds = load_dataset("eganscha/gomoku_vlm_ds", "eval")
+    ds = load_dataset("eganscha/gomoku_vlm_ds", dataset)
     df = concatenate_datasets(list(ds.values())).to_pandas()
     df = cast(pd.DataFrame, df)
     # df = pd.read_parquet(parquet_path)

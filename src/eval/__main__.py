@@ -12,13 +12,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--model-id",
-        required=True,
-        help="HuggingFace model identifier (e.g., 'google/paligemma-3b').",
+        default="google/gemma-3-4b-it",
+        help="HuggingFace model identifier (e.g., 'google/gemma-3-4b-it').",
     )
     parser.add_argument(
         "--match-mode",
         default="exact",
-        choices=["exact", "fuzzy", "lisa"],
+        choices=["exact", "fuzzy", "lisa", "regex"],
         help="Answer-matching mode. Default: exact.",
     )
     parser.add_argument(
@@ -32,6 +32,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
         type=int,
         default=64,
         help="Max new tokens to generate.",
+    )
+    parser.add_argument(
+        "--ds",
+        default="eval",
+        choices=["eval", "eval_reduced", "test"],
+        help="Dataset config in eganscha/gomoku_vlm_ds to evaluate. Default: eval.",
     )
     return parser
 
@@ -56,6 +62,7 @@ def main():
         match_mode=args.match_mode,
         max_new_tokens=args.max_new_tokens,
         device="auto",
+        dataset=args.ds,
     )
 
     print(result)
