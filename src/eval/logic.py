@@ -237,13 +237,8 @@ def eval_vlm_on_parquet(
             ],
             tokenize=True,
             return_tensors="pt",
-        )
+        ).to(model.device)
         # inputs = processor(images=[img], text=question, return_tensors="pt").to(device)
-
-        inputs = {
-            k: v.to(model.device) if isinstance(v, torch.Tensor) else v
-            for k, v in inputs.items()
-        }
 
         with torch.no_grad():
             output_ids = model.generate(
