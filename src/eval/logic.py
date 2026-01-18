@@ -74,12 +74,13 @@ def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
                     3) Do NOT count as a match if answer2 contains only parts of a ground-truth string (prefix, suffix, substring);
                     4) Do NOT accept “close” values (e.g., swapped coordinates, nearby numbers).
                     5) Do NOT accept answers that contain additional conflicting content beyond the matched string.
-                    6) If ANSWER2 is empty or only whitespace, the result is FALSE.
-                    7) If you are not 100% certain, output FALSE.
+                    6) Do NOT accept answers where the output format is different than expected (e.g., the answer is embedded in a .json string, but the question did not ask for it)
+                    7) If ANSWER2 is empty or only whitespace, the result is FALSE.
+                    8) If you are not 100% certain, output FALSE.
 
                     Output format:
                     [Your Reasoning Process]
-                    [\n====================================\n]
+                    [----------------------]
                     [On the final line output ONLY one word ‘yes’ or ‘no’]
                     """
                     + question1
@@ -133,7 +134,7 @@ def match_answer(
         v, t = ask_lisa(str(valid_answers), pred)
         with open("log.txt", "a", encoding="utf-8") as f:
             f.write(
-                f"=====\nGround truth :{valid_answers}\n Resp:{pred}\n:Result:{v}\nLisa:{t}\n\n"
+                f"=======================\nGround truth:\n{valid_answers}\n\nResp:\n{pred}\n\nResult:\n{v}\n\nLisa:\n{t}\n\n"
             )
         return v
     if mode == "exact":
