@@ -55,10 +55,36 @@ def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
             "messages": [
                 {
                     "role": "user",
-                    "content": "You are a llm judge. You are supposed to evaluate the performance of another llm model. Does the second answer correspond to the ground truth(answer1) which is a list of valid answers. Dont explain your answer & only answer with yes or no \n\n"
-                    + question1
-                    + "\n\n"
-                    + question2,
+                    "content": """
+                    You are a strict evaluator. You are supposed to evaluate the performance of another LLM model.
+                    
+                    Task:
+                    Decide whether ANSWER2 is an exact match to ANY string in ANSWER1.
+                    
+                    Definitions:
+                    - ANSWER1 is a JSON array of strings. Each element is a complete valid answer.
+                    - ANSWER2 is a raw text string produced by a model.
+
+                    First, evaluate carefully, step by step, whether answer2 equals to any valid answer in answer1. Use this reasoning to reach your decision.
+                    In the final line, output ONLY ONE word: 'yes' if answer2 equals to any of the answers in the ground truth, or 'no' otherwise. Do not include anything else in the final line.
+
+                    Matching policy (be strict, avoid false positives):
+                    1) Exact match always counts;
+                    2) Do NOT count as a match if answer2 mixes multiple answers where any part conflicts with the matched ground-truth item;
+                    3) Do NOT count as a match if answer2 contains only parts of a ground-truth string (prefix, suffix, substring);
+                    4) Do NOT accept “close” values (e.g., swapped coordinates, nearby numbers).
+                    5) Do NOT accept answers that contain additional conflicting content beyond the matched string.
+                    6) If ANSWER2 is empty or only whitespace, the result is FALSE.
+                    7) If you are not 100% certain, output FALSE.
+
+                    Output format:
+                    [Your Reasoning Process]
+                    [\n====================================\n]
+                    [On the final line output ONLY one word ‘yes’ or ‘no’]
+                    """
+                               + question1
+                               + "\n\n"
+                               + question2,
                 }
             ],
         }
