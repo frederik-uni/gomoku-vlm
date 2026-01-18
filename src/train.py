@@ -8,7 +8,7 @@ from transformers import AutoModelForImageTextToText
 from trl import SFTConfig, SFTTrainer
 from typing_extensions import Literal
 
-from datasets import Dataset
+from datasets import Dataset, load_dataset
 
 
 def init_model(model_id):
@@ -75,15 +75,19 @@ def latest_valid_checkpoint(root: str):
     return str(ckpts[-1])
 
 
-def load_our_dataset(parquet_path: str) -> Dataset:
-    df = pd.read_parquet(parquet_path)
-    df = df[["question", "img_bytes", "answer"]]
+def load_our_dataset(
+    repo_id: str,
+    file_path: str,
+) -> Dataset:
+    ds = load_dataset(
+        "parquet",
+        data_files=repo_id + "/" + file_path,
+    )["train"]
 
-    def load_image_from_bytes(img_bytes):
-        return Image.open(BytesIO(img_bytes)).convert("RGB")
+    ds = ds.select_columns(["question", "img_bytes", "answer"])
 
-    def preprocess_row(row):
-        image = load_image_from_bytes(row["img_bytes"])
+    def preprocess_batch(batch):
+        images = [Image.open(BytesIO(b)).convert("RGB") for b in batch["img_bytes"]]
 
         return {
             "messages": [
@@ -91,22 +95,29 @@ def load_our_dataset(parquet_path: str) -> Dataset:
                     {
                         "role": "user",
                         "content": [
-                            {"type": "image", "image": image},
-                            {"type": "text", "text": row["question"]},
+                            {"type": "image", "image": img},
+                            {"type": "text", "text": q},
                         ],
                     },
                     {
                         "role": "assistant",
                         "content": [
-                            {"type": "text", "text": row["answer"]},
+                            {"type": "text", "text": a},
                         ],
                     },
                 ]
+                for img, q, a in zip(images, batch["question"], batch["answer"])
             ]
         }
 
-    processed_data = df.apply(preprocess_row, axis=1)
-    return Dataset.from_list(processed_data.tolist())
+    ds = ds.map(
+        preprocess_batch,
+        batched=True,
+        remove_columns=["question", "img_bytes", "answer"],
+        desc="Preprocessing dataset",
+    )
+
+    return ds
 
 
 Mode = Literal["visual", "logic"]
