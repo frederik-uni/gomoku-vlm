@@ -36,12 +36,18 @@ def init_save(out):
     os.environ["WANDB_DISABLED"] = "true"
 
 
-def init_train(out, epochs: int, batch_size: int):
+def init_train(
+    out,
+    epochs: int,
+    batch_size: int,
+    gradient_accumulation_steps: int,
+    learning_rate: float,
+):
     return SFTConfig(
         output_dir=out,
         per_device_train_batch_size=batch_size,
-        gradient_accumulation_steps=8,
-        learning_rate=2e-5,
+        gradient_accumulation_steps=gradient_accumulation_steps,
+        learning_rate=learning_rate,
         num_train_epochs=epochs,
         save_strategy="steps",
         save_steps=200,
@@ -225,10 +231,21 @@ if __name__ == "__main__":
         help="Target modules for LoRA",
     )
 
+    parser.add_argument(
+        "--learning_rate", type=float, default=2e-5, help="Learning rate for training"
+    )
+    parser.add_argument(
+        "--gradient_accumulation_steps",
+        type=int,
+        default=8,
+        help="Gradient accumulation steps",
+    )
+
     args = parser.parse_args()
     resume_path = latest_valid_checkpoint(args.output_dir)
 
-    model = init_model(args.model_id)
+    model = init_model(resume_path or args.model_id)
+
     if args.peft:
         model.load_adapter(args.peft, adapter_name="visual", is_trainable=False)
         model.set_adapter("visual")
@@ -242,13 +259,23 @@ if __name__ == "__main__":
     trainer = SFTTrainer(
         model=model,
         train_dataset=load_our_dataset(args.data_file),
-        args=init_train(args.output_dir, args.num_epochs, args.batch_size),
+        args=(
+            None
+            if resume_path is not None
+            else init_train(
+                args.output_dir,
+                args.num_epochs,
+                args.batch_size,
+                args.gradient_accumulation_steps,
+                args.learning_rate,
+            )
+        ),
         peft_config=init_lora(args.lora_r, target(args.mode), modules(args.mode)),
         processing_class=processor.tokenizer,
     )
     print(resume_path)
 
-    trainer.train(resume_from_checkpoint=resume_path)
+    trainer.train()
 
     Path(final_dir).mkdir(parents=True, exist_ok=True)
     trainer.model.save_pretrained(final_dir)
