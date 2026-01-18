@@ -235,22 +235,29 @@ def eval_vlm_on_parquet(
                     ],
                 },
             ],
-            tokenize=False,
-            add_generation_prompt=True,
-        )
-        inputs = processor(
-            inputs,
+            tokenize=True,
             return_tensors="pt",
         )
-
         # inputs = processor(images=[img], text=question, return_tensors="pt").to(device)
 
-        with torch.no_grad():
-            output_ids = model.generate(**inputs, max_new_tokens=max_new_tokens)
-            prompt_len = inputs["input_ids"].shape[1]
+        inputs = {k: v.to(model.device) for k, v in inputs.items()}
 
-            generated_only = output_ids[:, prompt_len:]
-            pred = processor.batch_decode(generated_only, skip_special_tokens=True)[0]
+        with torch.no_grad():
+            output_ids = model.generate(
+                **inputs,
+                max_new_tokens=max_new_tokens,
+                pad_token_id=processor.tokenizer.eos_token_id,
+            )
+
+        # Decode full output
+        decoded = processor.batch_decode(output_ids, skip_special_tokens=True)[0]
+
+        # Remove prompt text safely
+        prompt_text = processor.batch_decode(
+            inputs["input_ids"], skip_special_tokens=True
+        )[0]
+
+        pred = decoded[len(prompt_text) :].strip()
 
         total[focus] += 1
         total[q_id] += 1
