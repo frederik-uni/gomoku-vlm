@@ -36,7 +36,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--ds",
         default="eval",
-        choices=["eval", "eval_reduced", "test"],
+        choices=["eval", "eval_reduced", "eval_mini", "test"],
         help="Dataset config in eganscha/gomoku_vlm_ds to evaluate. Default: eval.",
     )
     return parser
