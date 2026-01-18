@@ -258,7 +258,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Find all previously trained adapters and apply them sequentially
     adapter_paths = get_sorted_adapter_paths(args.output_dir)
     model = init_model(args.model_id)
 

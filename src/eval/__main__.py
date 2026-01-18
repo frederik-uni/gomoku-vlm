@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 from peft import PeftModel
 
@@ -42,6 +43,26 @@ def build_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def get_sorted_adapter_paths(root: str) -> list[str]:
+    p = Path(root)
+    if not p.exists():
+        return []
+
+    lora_dirs = [d for d in p.iterdir() if d.is_dir() and d.name.startswith("lora_")]
+    if not lora_dirs:
+        return []
+
+    # Sort lora_dirs numerically by the index X in "lora_X"
+    sorted_lora_dirs = sorted(lora_dirs, key=lambda d: int(d.name.split("_")[-1]))
+
+    adapter_paths = []
+    for lora_dir in sorted_lora_dirs:
+        adapter_path = lora_dir / "final-adapter"
+        if adapter_path.exists() and adapter_path.is_dir():
+            adapter_paths.append(str(adapter_path))
+    return adapter_paths
+
+
 def main():
     parser = build_arg_parser()
     args = parser.parse_args()
@@ -52,9 +73,16 @@ def main():
 
     processor = AutoProcessor.from_pretrained(args.model_id)
     model = AutoModelForImageTextToText.from_pretrained(args.model_id)
+    adapter_paths = get_sorted_adapter_paths("./train_output")
 
-    if args.peft:
-        model = PeftModel.from_pretrained(model, args.peft)
+    if adapter_paths:
+        print(f"Found {len(adapter_paths)} adapters to apply sequentially.")
+        for adapter_path in adapter_paths:
+            print(f"  -> Applying adapter from: {adapter_path}")
+            model = PeftModel.from_pretrained(model, adapter_path)
+            model = model.merge_and_unload()
+    else:
+        print("No previous adapters found. Starting from base model.")
 
     result = eval_vlm_on_parquet(
         processor=processor,
