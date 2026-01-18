@@ -1,8 +1,10 @@
 import argparse
 import os
-import zipfile
 import tempfile
-from huggingface_hub import HfApi, HfFolder, upload_file, hf_hub_download
+import zipfile
+
+from huggingface_hub import HfApi, HfFolder, hf_hub_download, upload_file
+
 
 def zip_folder(folder_path, zip_path):
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -13,13 +15,17 @@ def zip_folder(folder_path, zip_path):
                 zipf.write(full_path, arcname)
     return zip_path
 
+
 def unzip_file(zip_path, extract_dir):
     with zipfile.ZipFile(zip_path, "r") as zipf:
         zipf.extractall(extract_dir)
 
+
 def upload(file_path, repo_id, token):
     if os.path.isdir(file_path):
-        tmp_zip = os.path.join(tempfile.gettempdir(), os.path.basename(file_path) + ".zip")
+        tmp_zip = os.path.join(
+            tempfile.gettempdir(), os.path.basename(file_path) + ".zip"
+        )
         zip_folder(file_path, tmp_zip)
         file_path = tmp_zip
 
@@ -29,9 +35,10 @@ def upload(file_path, repo_id, token):
         path_in_repo=os.path.basename(file_path),
         repo_id=repo_id,
         token=token,
-        repo_type="dataset"
+        repo_type="model",
     )
     print("complete")
+
 
 def download(file_name, repo_id, token, out_dir="."):
     print(f"Downloading {file_name} from {repo_id}")
@@ -47,6 +54,7 @@ def download(file_name, repo_id, token, out_dir="."):
         out_path = os.path.join(out_dir, os.path.basename(local_path))
         os.replace(local_path, out_path)
         print(f"Downloaded to {out_path}")
+
 
 def main():
     parser = argparse.ArgumentParser(description="hf CLI uploader/downloader")
@@ -69,6 +77,7 @@ def main():
         upload(args.path, args.repo_id, args.token)
     elif args.command == "download":
         download(args.file_name, args.repo_id, args.token, args.out_dir)
+
 
 if __name__ == "__main__":
     main()
