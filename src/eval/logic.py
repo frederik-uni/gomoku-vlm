@@ -57,10 +57,10 @@ def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
                     "role": "user",
                     "content": """
                     You are a strict evaluator. You are supposed to evaluate the performance of another LLM model.
-                    
+
                     Task:
                     Decide whether ANSWER2 is an exact match to ANY string in ANSWER1.
-                    
+
                     Definitions:
                     - ANSWER1 is a JSON array of strings. Each element is a complete valid answer.
                     - ANSWER2 is a raw text string produced by a model.
@@ -82,9 +82,9 @@ def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
                     [\n====================================\n]
                     [On the final line output ONLY one word ‘yes’ or ‘no’]
                     """
-                               + question1
-                               + "\n\n"
-                               + question2,
+                    + question1
+                    + "\n\n"
+                    + question2,
                 }
             ],
         }
@@ -196,7 +196,7 @@ def eval_vlm_on_parquet(
     from tqdm import tqdm
 
     for _, row in tqdm(df.iterrows(), desc="Processing", unit="item"):
-        question = "<start_of_image>\n" + row["question"]
+        question = cast(str, row["question"])
         valid_answers = cast(list[str], row["valid_answers"])
         img_bytes = cast(bytes, row["img_bytes"])
         family = cast(str, row["family"])
@@ -207,22 +207,73 @@ def eval_vlm_on_parquet(
         regex = cast(Optional[str], row.get("regex"))
 
         img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
-
-        inputs = processor(images=[img], text=question, return_tensors="pt").to(device)
+        inputs = processor.apply_chat_template(
+            [
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "You are a vision-language model analyzing Gomoku game positions.",
+                        }
+                    ],
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "image": img,
+                        },
+                        {
+                            "type": "text",
+                            "text": question.replace(
+                                "You are a vision-language model analyzing Gomoku game positions.",
+                                "",
+                            ).strip(),
+                        },
+                    ],
+                },
+            ],
+            add_generation_prompt=True,
+            tokenize=False,
+        )
+        inputs = processor(
+            text=inputs,
+            images=[img],
+            return_tensors="pt",
+        ).to(model.device)
+        # inputs = processor(images=[img], text=question, return_tensors="pt").to(device)
 
         with torch.no_grad():
-            output_ids = model.generate(**inputs, max_new_tokens=max_new_tokens)
-            prompt_len = inputs["input_ids"].shape[1]
+            output_ids = model.generate(
+                **inputs,
+                max_new_tokens=max_new_tokens,
+                pad_token_id=processor.tokenizer.eos_token_id,
+            )
 
-            generated_only = output_ids[:, prompt_len:]
-            pred = processor.batch_decode(generated_only, skip_special_tokens=True)[0]
+        # Decode full output
+        decoded = processor.batch_decode(output_ids, skip_special_tokens=True)[0]
+
+        # Remove prompt text safely
+        prompt_text = processor.batch_decode(
+            inputs["input_ids"], skip_special_tokens=True
+        )[0]
+
+        pred = decoded[len(prompt_text) :].strip()
 
         total[focus] += 1
         total[q_id] += 1
         total[family] += 1
         total["all"] += 1
 
-        if match_answer(pred, valid_answers, regex, mode=match_mode):
+        pred_v = match_answer(pred, valid_answers, regex, mode=match_mode)
+
+        with open("logfile.txt", "a", encoding="utf-8") as f:
+            f.write(
+                f"=====\nGround truth :{valid_answers}\n Resp:{pred}\n:Result:{pred_v}\n\n"
+            )
+        if pred_v:
             correct[focus] += 1
             correct[q_id] += 1
             correct[family] += 1
