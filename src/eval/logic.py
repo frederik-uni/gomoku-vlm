@@ -235,7 +235,12 @@ def eval_vlm_on_parquet(
                     ],
                 },
             ],
-            tokenize=True,
+            add_generation_prompt=True,
+            tokenize=False,
+        )
+        inputs = processor(
+            text=inputs,
+            images=[img],
             return_tensors="pt",
         ).to(model.device)
         # inputs = processor(images=[img], text=question, return_tensors="pt").to(device)
