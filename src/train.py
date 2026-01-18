@@ -244,7 +244,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     resume_path = latest_valid_checkpoint(args.output_dir)
 
-    model = init_model(resume_path)
+    model = init_model(resume_path or args.model_id)
+
     if args.peft:
         model.load_adapter(args.peft, adapter_name="visual", is_trainable=False)
         model.set_adapter("visual")
@@ -258,12 +259,16 @@ if __name__ == "__main__":
     trainer = SFTTrainer(
         model=model,
         train_dataset=load_our_dataset(args.data_file),
-        args=init_train(
-            args.output_dir,
-            args.num_epochs,
-            args.batch_size,
-            args.gradient_accumulation_steps,
-            args.learning_rate,
+        args=(
+            None
+            if resume_path is not None
+            else init_train(
+                args.output_dir,
+                args.num_epochs,
+                args.batch_size,
+                args.gradient_accumulation_steps,
+                args.learning_rate,
+            )
         ),
         peft_config=init_lora(args.lora_r, target(args.mode), modules(args.mode)),
         processing_class=processor.tokenizer,
