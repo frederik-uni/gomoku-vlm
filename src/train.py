@@ -2,7 +2,6 @@ import os
 from io import BytesIO
 from pathlib import Path
 
-import torch
 from peft import LoraConfig, PeftModel
 from PIL import Image
 from transformers import AutoModelForImageTextToText, AutoProcessor
@@ -33,8 +32,21 @@ def init_lora(r, target_modules, modules_to_save):
 
 
 def init_save(out):
-    Path(out).mkdir(parents=True, exist_ok=True)
+    base_path = Path(out)
+    base_path.mkdir(parents=True, exist_ok=True)
+    existing_runs = [
+        d for d in base_path.iterdir() if d.is_dir() and d.name.startswith("lora_")
+    ]
+    next_run_num = 0
+    if existing_runs:
+        max_run_num = max(
+            [int(d.name.split("_")[-1]) for d in existing_runs if "_" in d.name]
+        )
+        next_run_num = max_run_num + 1
+    new_run_dir = base_path / f"lora_{next_run_num}"
+    new_run_dir.mkdir(parents=True, exist_ok=True)
     os.environ["WANDB_DISABLED"] = "true"
+    return str(new_run_dir)
 
 
 def init_train(
@@ -63,21 +75,24 @@ def init_train(
     )
 
 
-def latest_valid_checkpoint(root: str):
+def get_sorted_adapter_paths(root: str) -> list[str]:
     p = Path(root)
     if not p.exists():
-        return None
-    ckpts = [
-        d
-        for d in p.iterdir()
-        if d.is_dir()
-        and d.name.startswith("checkpoint-")
-        and (d / "trainer_state.json").exists()
-    ]
-    if not ckpts:
-        return None
-    ckpts = sorted(ckpts, key=lambda d: int(d.name.split("-")[-1]))
-    return str(ckpts[-1])
+        return []
+
+    lora_dirs = [d for d in p.iterdir() if d.is_dir() and d.name.startswith("lora_")]
+    if not lora_dirs:
+        return []
+
+    # Sort lora_dirs numerically by the index X in "lora_X"
+    sorted_lora_dirs = sorted(lora_dirs, key=lambda d: int(d.name.split("_")[-1]))
+
+    adapter_paths = []
+    for lora_dir in sorted_lora_dirs:
+        adapter_path = lora_dir / "final-adapter"
+        if adapter_path.exists() and adapter_path.is_dir():
+            adapter_paths.append(str(adapter_path))
+    return adapter_paths
 
 
 processor = AutoProcessor.from_pretrained(
@@ -204,7 +219,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a LoRA SFT model.")
 
     parser.add_argument("--model_id", type=str, required=True, help="Model ID to load")
-    parser.add_argument("--peft", type=Path, default=None, help="Path to PEFT model")
 
     parser.add_argument(
         "--output_dir",
@@ -243,25 +257,30 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    resume_path = latest_valid_checkpoint(args.output_dir)
 
+    # Find all previously trained adapters and apply them sequentially
+    adapter_paths = get_sorted_adapter_paths(args.output_dir)
     model = init_model(args.model_id)
 
-    final_dir = os.path.join(args.output_dir, "final-adapter")
-    if os.path.isdir(final_dir) and resume_path:
-        model = PeftModel.from_pretrained(model, final_dir)
-    #    model = PeftModel.from_pretrained(    #        model, resume_path, is_trainable=True, ignore_mismatched_sizes=True
-    #    )
-    #
-    if args.peft:
-        model.load_adapter(args.peft, adapter_name="visual", is_trainable=False)
-        model.set_adapter("visual")
+    if adapter_paths:
+        print(f"Found {len(adapter_paths)} adapters to apply sequentially.")
+        for adapter_path in adapter_paths:
+            print(f"  -> Applying adapter from: {adapter_path}")
+            model = PeftModel.from_pretrained(model, adapter_path)
+            model = model.merge_and_unload()
+    else:
+        print("No previous adapters found. Starting from base model.")
+
+    new_output_dir = init_save(args.output_dir)
+    print(f"New adapter will be saved to: {new_output_dir}")
+
+    final_dir = os.path.join(new_output_dir, "final-adapter")
 
     trainer = SFTTrainer(
         model=model,
         train_dataset=load_our_dataset(args.data_file),
         args=init_train(
-            args.output_dir,
+            new_output_dir,
             args.num_epochs,
             args.batch_size,
             args.gradient_accumulation_steps,
@@ -270,7 +289,6 @@ if __name__ == "__main__":
         peft_config=init_lora(args.lora_r, target(args.mode), modules(args.mode)),
         processing_class=processor.tokenizer,
     )
-    print(resume_path)
 
     trainer.train()
 
