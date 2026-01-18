@@ -228,7 +228,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     resume_path = latest_valid_checkpoint(args.output_dir)
 
-    model = init_model(args.model_id)
+    model = init_model(resume_path)
     if args.peft:
         model.load_adapter(args.peft, adapter_name="visual", is_trainable=False)
         model.set_adapter("visual")
@@ -248,7 +248,7 @@ if __name__ == "__main__":
     )
     print(resume_path)
 
-    trainer.train(resume_from_checkpoint=resume_path)
+    trainer.train()
 
     Path(final_dir).mkdir(parents=True, exist_ok=True)
     trainer.model.save_pretrained(final_dir)
