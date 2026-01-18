@@ -106,9 +106,7 @@ def contains_match(pred: str, valid_answers: list[str]) -> bool:
         if not ans_norm:
             continue
 
-        # Token-boundary containment (reduces "4 0" matching inside "14 0")
-        pattern = re.compile(rf"(?<!\S){re.escape(ans_norm)}(?!\S)")
-        if pattern.search(pred_norm):
+        if ans_norm in pred_norm:
             return True
 
     return False
@@ -127,7 +125,7 @@ def match_answer(
     pred: str,
     valid_answers: list[str],
     regex: Optional[str],
-    mode: Literal["exact", "fuzzy", "regex", "lisa"] = "exact",
+    mode: Literal["exact", "contains", "fuzzy", "regex", "lisa"] = "exact",
 ):
     if regex is None and mode == "regex":
         mode = "exact"
@@ -154,7 +152,7 @@ def match_answer(
 def eval_vlm_on_parquet(
     processor,
     model,
-    match_mode: Literal["exact", "fuzzy", "regex", "lisa"] = "exact",
+    match_mode: Literal["exact", "contains", "fuzzy", "regex", "lisa"] = "exact",
     max_new_tokens=64,
     device: Literal["cpu", "cuda", "auto"] = "auto",
     dataset: str = "eval",
