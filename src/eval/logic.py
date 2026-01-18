@@ -98,6 +98,20 @@ def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
         return ask_lisa(question1, question2)
 
 
+def contains_match(pred: str, valid_answers: list[str]) -> bool:
+    pred_norm = normalize(pred)
+
+    for ans in valid_answers:
+        ans_norm = normalize(ans)
+        if not ans_norm:
+            continue
+
+        if ans_norm in pred_norm:
+            return True
+
+    return False
+
+
 def fuzzy_match(pred: str, valid_answers: list[str], threshold: float = 0.75) -> bool:
     pred_norm = normalize(pred)
     for ans in valid_answers:
@@ -111,7 +125,7 @@ def match_answer(
     pred: str,
     valid_answers: list[str],
     regex: Optional[str],
-    mode: Literal["exact", "fuzzy", "regex", "lisa"] = "exact",
+    mode: Literal["exact", "contains", "fuzzy", "regex", "lisa"] = "exact",
 ):
     if regex is None and mode == "regex":
         mode = "exact"
@@ -124,6 +138,8 @@ def match_answer(
         return v
     if mode == "exact":
         return pred in valid_answers
+    if mode == "contains":
+        return contains_match(pred, valid_answers)
     if mode == "fuzzy":
         return fuzzy_match(pred, valid_answers)
     if mode == "regex" and regex is not None:
@@ -136,7 +152,7 @@ def match_answer(
 def eval_vlm_on_parquet(
     processor,
     model,
-    match_mode: Literal["exact", "fuzzy", "regex", "lisa"] = "exact",
+    match_mode: Literal["exact", "contains", "fuzzy", "regex", "lisa"] = "exact",
     max_new_tokens=64,
     device: Literal["cpu", "cuda", "auto"] = "auto",
     dataset: str = "eval",
