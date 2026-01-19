@@ -35,7 +35,7 @@ def init_train(
         weight_decay=0.01,
         num_train_epochs=epochs,
         save_strategy="steps",
-        save_steps=50,
+        save_steps=40,
         eval_strategy="steps",
         save_total_limit=4,
         logging_dir=os.path.join(out, "logs"),
