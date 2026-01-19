@@ -55,37 +55,38 @@ def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
             "messages": [
                 {
                     "role": "user",
-                    "content": """
-                    You are a strict evaluator. You are supposed to evaluate the performance of another LLM model.
-
-                    Task:
-                    Decide whether ANSWER2 is an exact match to ANY string in ANSWER1.
-
-                    Definitions:
-                    - ANSWER1 is a JSON array of strings. Each element is a complete valid answer.
-                    - ANSWER2 is a raw text string produced by a model.
-
-                    First, evaluate carefully, step by step, whether answer2 equals to any valid answer in answer1. Use this reasoning to reach your decision.
-                    In the final line, output ONLY ONE word: 'yes' if answer2 equals to any of the answers in the ground truth, or 'no' otherwise. Do not include anything else in the final line.
-
-                    Matching policy (be strict, avoid false positives):
-                    1) Exact match always counts;
-                    2) Do NOT count as a match if answer2 mixes multiple answers where any part conflicts with the matched ground-truth item;
-                    3) Do NOT count as a match if answer2 contains only parts of a ground-truth string (prefix, suffix, substring);
-                    4) Do NOT accept “close” values (e.g., swapped coordinates, nearby numbers).
-                    5) Do NOT accept answers that contain additional conflicting content beyond the matched string.
-                    6) Do NOT accept answers where the output format is different than expected (e.g., the answer is embedded in a .json string, but the question did not ask for it)
-                    7) If ANSWER2 is empty or only whitespace, the result is FALSE.
-                    8) If you are not 100% certain, output FALSE.
-
-                    Output format:
+                    "content": f"""
+                    ROLE:
+                    You are a strict binary classifier.
+                    
+                    DEFINITIONS:
+                    - ANSWER1 is a JSON array of strings. Each string is a complete valid answer unit. ANSWER1 is the ground-truth.
+                    - ANSWER2 may contain one or more answer units.
+                    
+                    TASK:
+                    Decide if ANSWER2 is an EXACT match to ANY element in ANSWER1.
+                    
+                    INPUTS:
+                    <ANSWER1>
+                    {question1}
+                    </ANSWER1>
+                    
+                    <ANSWER2>
+                    {question2}
+                    </ANSWER2>
+                    
+                    RULES (strict):
+                    - If the answer content in ANSWER2 equals one or more complete elements from ANSWER1 exactly, character-for-character IT IS A MATCH.
+                    - Do NOT accept substrings, partial matches or “close” answers.
+                    - If ANSWER2 contains multiple answer contents, all of them must exactly match elements in ANSWER1 and they must not contradict each other; if any included answer content fails to exactly match ANSWER1, return no.
+                    - If ANSWER2 is empty or whitespace-only, return no.
+                    - If anything is unclear, return no.
+                    
+                    OUTPUT FORMAT:
                     [Your Reasoning Process]
                     [----------------------]
                     [On the final line output ONLY one word ‘yes’ or ‘no’]
                     """
-                    + question1
-                    + "\n\n"
-                    + question2,
                 }
             ],
         }
