@@ -5,12 +5,12 @@ from PIL import Image
 from datasets import Dataset, load_dataset
 
 
-def load_our_dataset(file_path: str) -> tuple[Dataset, Dataset]:
+def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
     ds = load_dataset(
         "eganscha/gomoku_vlm_ds",
         data_files={
             "train": file_path,
-            "eval": "eval/*.parquet",
+            "eval": eval_path,
         },
     )
     ds = ds.select_columns(["question", "img_bytes", "answer"])

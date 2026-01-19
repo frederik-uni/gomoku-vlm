@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     final_dir = os.path.join(new_output_dir, "final-adapter")
 
-    dst, dse = load_our_dataset(args.data_file)
+    dst, dse = load_our_dataset(args.data_file, args.eval_path)
     trainer = SFTTrainer(
         model=model,
         train_dataset=dst,
