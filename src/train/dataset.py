@@ -79,21 +79,29 @@ def load_our_dataset(file_path: str) -> tuple[Dataset, Dataset]:
             )
         return {"messages": formatted_messages, "images": imgs}
 
-    dst = ds["train"].map(
-        preprocess_batch,
-        batched=True,
-        batch_size=8,
-        num_proc=4,
-        remove_columns=["question", "img_bytes", "answer"],
-        desc="Formatting dataset with messages",
+    dst = (
+        ds["train"]
+        .shuffle(seed=42)
+        .map(
+            preprocess_batch,
+            batched=True,
+            batch_size=8,
+            num_proc=4,
+            remove_columns=["question", "img_bytes", "answer"],
+            desc="Formatting dataset with messages",
+        )
     )
-    dse = ds["eval"].map(
-        preprocess_batch,
-        batched=True,
-        batch_size=8,
-        num_proc=4,
-        remove_columns=["question", "img_bytes", "answer"],
-        desc="Formatting dataset with messages",
+    dse = (
+        ds["eval"]
+        .shuffle(seed=42)
+        .map(
+            preprocess_batch,
+            batched=True,
+            batch_size=8,
+            num_proc=4,
+            remove_columns=["question", "img_bytes", "answer"],
+            desc="Formatting dataset with messages",
+        )
     )
 
     return (dst, dse)
