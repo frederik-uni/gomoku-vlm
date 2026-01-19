@@ -43,6 +43,9 @@ def init_train(
         optim="adamw_torch",
         packing=False,
         report_to="none",
+        metric_for_best_model="eval_loss",
+        greater_is_better=False,
+        load_best_model_at_end=True,
     )
 
 
