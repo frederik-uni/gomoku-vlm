@@ -9,9 +9,9 @@ import numpy as np
 import pandas as pd
 import regex as re
 import requests
-import torch
 from PIL import Image
 
+from ask import ask
 from datasets import concatenate_datasets, load_dataset
 from utils.ai_utils import get_device
 
@@ -58,35 +58,35 @@ def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
                     "content": f"""
                     ROLE:
                     You are a strict binary classifier.
-                    
+
                     DEFINITIONS:
                     - ANSWER1 is a JSON array of strings. Each string is a complete valid answer unit. ANSWER1 is the ground-truth.
                     - ANSWER2 may contain one or more answer units.
-                    
+
                     TASK:
                     Decide if ANSWER2 is an EXACT match to ANY element in ANSWER1.
-                    
+
                     INPUTS:
                     <ANSWER1>
                     {question1}
                     </ANSWER1>
-                    
+
                     <ANSWER2>
                     {question2}
                     </ANSWER2>
-                    
+
                     RULES (strict):
                     - If the answer content in ANSWER2 equals one or more complete elements from ANSWER1 exactly, character-for-character IT IS A MATCH.
                     - Do NOT accept substrings, partial matches or “close” answers.
                     - If ANSWER2 contains multiple answer contents, all of them must exactly match elements in ANSWER1 and they must not contradict each other; if any included answer content fails to exactly match ANSWER1, return no.
                     - If ANSWER2 is empty or whitespace-only, return no.
                     - If anything is unclear, return no.
-                    
+
                     OUTPUT FORMAT:
                     [Your Reasoning Process]
                     [----------------------]
                     [On the final line output ONLY one word ‘yes’ or ‘no’]
-                    """
+                    """,
                 }
             ],
         }
@@ -207,62 +207,9 @@ def eval_vlm_on_parquet(
         img_bytes = cast(bytes, row["img_bytes"])
 
         regex = cast(Optional[str], row.get("regex"))
-
         img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
-        inputs = processor.apply_chat_template(
-            [
-                {
-                    "role": "system",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": "You are a vision-language model analyzing Gomoku game positions.",
-                        }
-                    ],
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "image": img,
-                        },
-                        {
-                            "type": "text",
-                            "text": question.replace(
-                                "You are a vision-language model analyzing Gomoku game positions.",
-                                "",
-                            ).strip(),
-                        },
-                    ],
-                },
-            ],
-            add_generation_prompt=True,
-            tokenize=False,
-        )
-        inputs = processor(
-            text=inputs,
-            images=[img],
-            return_tensors="pt",
-        ).to(model.device)
-        # inputs = processor(images=[img], text=question, return_tensors="pt").to(device)
 
-        with torch.no_grad():
-            output_ids = model.generate(
-                **inputs,
-                max_new_tokens=max_new_tokens,
-                pad_token_id=processor.tokenizer.eos_token_id,
-            )
-
-        # Decode full output
-        decoded = processor.batch_decode(output_ids, skip_special_tokens=True)[0]
-
-        # Remove prompt text safely
-        prompt_text = processor.batch_decode(
-            inputs["input_ids"], skip_special_tokens=True
-        )[0]
-
-        pred = decoded[len(prompt_text) :].strip()
+        pred = ask(model, processor, question, img, max_new_tokens)
 
         total[focus] += 1
         total[q_id] += 1
