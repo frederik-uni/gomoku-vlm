@@ -4,7 +4,10 @@ from pathlib import Path
 
 from peft import LoraConfig, PeftModel
 from PIL import Image
-from transformers import AutoModelForImageTextToText, AutoProcessor
+from transformers import (
+    AutoModelForImageTextToText,
+    EarlyStoppingCallback,
+)
 from trl import SFTConfig, SFTTrainer
 from typing_extensions import Literal
 
@@ -69,7 +72,6 @@ def init_train(
         logging_steps=20,
         bf16=True,
         optim="adamw_torch",
-        dataset_text_field="text",
         packing=False,
         report_to="none",
     )
@@ -95,42 +97,41 @@ def get_sorted_adapter_paths(root: str) -> list[str]:
     return adapter_paths
 
 
-processor = AutoProcessor.from_pretrained(
-    "google/gemma-3-4b-it",
-    padding_side="right",
-)
-processor.tokenizer.pad_token = processor.tokenizer.eos_token
-processor.tokenizer.padding_side = "right"
-
-
-def load_our_dataset(file_path: str) -> Dataset:
+def load_our_dataset(file_path: str) -> tuple[Dataset, Dataset]:
     ds = load_dataset(
         "eganscha/gomoku_vlm_ds",
-        data_files=file_path,
-    )["train"]
-
+        data_files={
+            "train": file_path,
+            "eval": "eganscha/gomoku_vlm_ds/eval/*.parquet",
+        },
+    )
     ds = ds.select_columns(["question", "img_bytes", "answer"])
 
     def preprocess_batch(batch):
         formatted_messages = []
-
+        imgs = []
         for i in range(len(batch["question"])):
             images = []
+
             try:
                 img_entries = batch["img_bytes"][i]
                 if isinstance(img_entries, list):
                     for b in img_entries:
+                        img = Image.open(BytesIO(b)).convert("RGB")
+                        imgs.append([img])
                         images.append(
                             {
                                 "type": "image",
-                                "image": Image.open(BytesIO(b)).convert("RGB"),
+                                "image": img,
                             }
                         )
                 else:
+                    img = Image.open(BytesIO(img_entries)).convert("RGB")
+                    imgs.append([img])
                     images.append(
                         {
                             "type": "image",
-                            "image": Image.open(BytesIO(img_entries)).convert("RGB"),
+                            "image": img,
                         }
                     )
             except Exception as e:
@@ -168,9 +169,17 @@ def load_our_dataset(file_path: str) -> Dataset:
                     },
                 ]
             )
-        return {"messages": formatted_messages}
+        return {"messages": formatted_messages, "images": imgs}
 
-    ds = ds.map(
+    dst = ds["train"].map(
+        preprocess_batch,
+        batched=True,
+        batch_size=8,
+        num_proc=4,
+        remove_columns=["question", "img_bytes", "answer"],
+        desc="Formatting dataset with messages",
+    )
+    dse = ds["eval"].map(
         preprocess_batch,
         batched=True,
         batch_size=8,
@@ -179,7 +188,7 @@ def load_our_dataset(file_path: str) -> Dataset:
         desc="Formatting dataset with messages",
     )
 
-    return ds
+    return (dst, dse)
 
 
 Mode = Literal["visual", "logic"]
@@ -204,13 +213,7 @@ def modules(mode: Mode):
     if mode == "visual":
         return ["multi_modal_projector"]
     else:
-        return ["lm_head"]
-
-
-def freeze_lora(model, modules: list[str]):
-    for name, param in model.named_parameters():
-        if "lora_" in name and any([module in name for module in modules]):
-            param.requires_grad = False
+        return ["vision_tower"]
 
 
 if __name__ == "__main__":
@@ -219,6 +222,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a LoRA SFT model.")
 
     parser.add_argument("--model_id", type=str, required=True, help="Model ID to load")
+    parser.add_argument(
+        "--peft", type=Path, required=False, default=None, help="Model ID to load"
+    )
 
     parser.add_argument(
         "--output_dir",
@@ -270,14 +276,19 @@ if __name__ == "__main__":
     else:
         print("No previous adapters found. Starting from base model.")
 
+    if args.peft:
+        model = PeftModel.from_pretrained(model, args.peft, is_trainable=False)
+
     new_output_dir = init_save(args.output_dir)
     print(f"New adapter will be saved to: {new_output_dir}")
 
     final_dir = os.path.join(new_output_dir, "final-adapter")
 
+    dst, dse = load_our_dataset(args.data_file)
     trainer = SFTTrainer(
         model=model,
-        train_dataset=load_our_dataset(args.data_file),
+        train_dataset=dst,
+        eval_dataset=dse,
         args=init_train(
             new_output_dir,
             args.num_epochs,
@@ -286,7 +297,7 @@ if __name__ == "__main__":
             args.learning_rate,
         ),
         peft_config=init_lora(args.lora_r, target(args.mode), modules(args.mode)),
-        processing_class=processor.tokenizer,
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
     )
 
     trainer.train()
