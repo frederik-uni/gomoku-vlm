@@ -106,7 +106,7 @@ def load_our_dataset(file_path: str) -> tuple[Dataset, Dataset]:
         "eganscha/gomoku_vlm_ds",
         data_files={
             "train": file_path,
-            "eval": "eganscha/gomoku_vlm_ds/eval/*.parquet",
+            "eval": "eval/*.parquet",
         },
     )
     ds = ds.select_columns(["question", "img_bytes", "answer"])
