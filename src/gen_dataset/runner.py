@@ -1,9 +1,12 @@
 import argparse
 import math
+import os
+import random
 from collections import defaultdict
+from concurrent.futures import ProcessPoolExecutor, wait, FIRST_COMPLETED
 from dataclasses import asdict
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -83,7 +86,7 @@ def simulate_game_preferring_winner(
     *,
     max_attempts: int,
     min_final_idx: int = 0,
-):
+) -> np.ndarray:
     """
     Simulate games, preferring ones that end with a clear winner.
     - Try up to max_attempts times.
@@ -115,6 +118,85 @@ def simulate_game_preferring_winner(
     return last_game
 
 
+def _simulate_one_attempt_worker(
+    bots,
+    size: int,
+    to_win: int,
+    min_final_idx: int,
+    seed: int,
+) -> Tuple[bool, int, int, np.ndarray]:
+    """
+    One attempt = one full game simulation.
+    Returns (ok, final_idx, winner, game)
+    """
+    random.seed(seed)
+    np.random.seed(seed & 0xFFFFFFFF)
+
+    game = sim_game.simulate_game(bots, size, to_win)
+
+    final_idx = len(game) - 1
+    winner = get_winner(game[-1], to_win)
+    ok = (winner in (1, 2)) and (final_idx >= min_final_idx)
+
+    return ok, final_idx, winner, game
+
+def simulate_game_preferring_winner_parallel(
+    bots,
+    size: int,
+    to_win: int,
+    *,
+    max_attempts: int,
+    workers: int,
+    min_final_idx: int = 0,
+    verbose: bool = True,
+) -> np.ndarray:
+    if max_attempts < 1:
+        raise ValueError(f"max_attempts must be >= 1, got {max_attempts}")
+
+    attempts_submitted = 0
+    in_flight = set()
+
+    best_game: Optional[np.ndarray] = None
+    best_final_idx = -1
+
+    first_ok_game: Optional[np.ndarray] = None  # acts as "found_ok" flag too
+
+    def submit_one(executor) -> bool:
+        nonlocal attempts_submitted, in_flight
+        if attempts_submitted >= max_attempts:
+            return False
+        attempts_submitted += 1
+        seed = (attempts_submitted * 1_000_000_007) ^ int.from_bytes(os.urandom(8), "little")
+        in_flight.add(executor.submit(_simulate_one_attempt_worker, bots, size, to_win, min_final_idx, seed))
+        return True
+
+    with ProcessPoolExecutor(max_workers=workers) as ex:
+        for _ in range(min(workers, max_attempts)):
+            submit_one(ex)
+
+        while in_flight:
+            done, in_flight = wait(in_flight, return_when=FIRST_COMPLETED)
+
+            for fut in done:
+                ok, final_idx, winner, game = fut.result()
+
+                if verbose:
+                    print(f"Attempt done: winner={winner}, final_idx={final_idx}, ok={ok}")
+
+                if final_idx > best_final_idx:
+                    best_final_idx = final_idx
+                    best_game = game
+
+                # Record first acceptable game (only once)
+                if ok and first_ok_game is None:
+                    first_ok_game = game
+
+                # Only refill while we haven't found an acceptable game yet
+                if first_ok_game is None:
+                    submit_one(ex)
+
+    return first_ok_game if first_ok_game is not None else best_game
+
 def _get_max_simulation_attempts() -> int:
     """
     Read the max_simulation_attempts setting from sphinx_config.toml.
@@ -140,6 +222,39 @@ def _get_max_simulation_attempts() -> int:
 
     return value
 
+def _get_num_workers() -> int:
+    """
+    Read the num_workers setting from sphinx_config.toml.
+
+    Ensures the value is explicitly set and an integer >= 1, or (cpu cores - 1)
+    """
+    if sphinx_core.SPHINX_CONFIG is None:
+        raise RuntimeError("SPHINX_CONFIG is not loaded. Call init_sphinx_environment() first.")
+
+    cpu = os.cpu_count() or 1
+    default_workers = max(1, cpu - 1)
+    print(f"Detected {cpu} CPU-Cores.")
+
+    general = sphinx_core.SPHINX_CONFIG.get("general") or {}
+    raw = general.get("num_workers")
+
+    if raw is None:
+        print(f"num_workers not set in sphinx_config.toml under [general]. Using {default_workers} workers.")
+        return default_workers
+
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        print(f"num_workers must be an integer >= 1 or -1, got {raw}. Using {default_workers} workers.")
+        return default_workers
+
+    if value < 1:
+        print(f"num_workers={value} -> using {default_workers} workers.")
+        return default_workers
+
+    print(f"Using {value} workers.")
+    return value
+
 
 def generate_question_dataset(non_rand_img: bool) -> List[DatasetRow]:
     """
@@ -150,13 +265,16 @@ def generate_question_dataset(non_rand_img: bool) -> List[DatasetRow]:
     num_required_episodes = _determine_num_of_required_episodes()
     generated_questions_count: Dict[str, int] = {}
     rows: List[DatasetRow] = []
+    max_simulation_attempts = _get_max_simulation_attempts()
+    num_workers = _get_num_workers()
+
     for sim_id in range(num_required_episodes):
         print(f"Simulating {sim_id} / {num_required_episodes}")
 
-        max_simulation_attempts = _get_max_simulation_attempts()
-        simulated_game = simulate_game_preferring_winner(
+        simulated_game = simulate_game_preferring_winner_parallel(
         (generate_next_move_probabilistic, generate_next_move_probabilistic),
-            15, 5, max_attempts=max_simulation_attempts, min_final_idx=151
+            15, 5, max_attempts=max_simulation_attempts, workers=num_workers, min_final_idx=151,
+            verbose=True
         )
 
         perception_rows: List[DatasetRow] = generate_perception_questions_for_episode(
