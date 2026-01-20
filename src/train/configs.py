@@ -47,6 +47,7 @@ def init_train(
         metric_for_best_model="eval_loss",
         greater_is_better=False,
         load_best_model_at_end=True,
+        #  dataset_text_field="messages",
     )
 
 
@@ -59,12 +60,17 @@ def target(mode: Mode):
             "q_proj",
             "k_proj",
             "v_proj",
+            "o_proj",
         ]
     else:
         return [
             "q_proj",
+            "k_proj",
             "v_proj",
+            "o_proj",
+            "gate_proj",
             "up_proj",
+            "down_proj",
         ]
 
 
@@ -72,4 +78,4 @@ def modules(mode: Mode):
     if mode == "visual":
         return ["multi_modal_projector"]
     else:
-        return ["vision_tower"]
+        return []

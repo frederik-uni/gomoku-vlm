@@ -3,6 +3,7 @@ from pathlib import Path
 
 from peft import PeftModel
 
+from ask import init
 from eval.logic import eval_vlm_on_parquet
 
 
@@ -13,7 +14,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--model-id",
-        default="google/gemma-3-4b-it",
+        default="Qwen/Qwen3-VL-2B-Instruct",
         help="HuggingFace model identifier (e.g., 'google/gemma-3-4b-it').",
     )
     parser.add_argument(
@@ -66,13 +67,8 @@ def get_sorted_adapter_paths(root: str) -> list[str]:
 def main():
     parser = build_arg_parser()
     args = parser.parse_args()
+    processor, model = init(args.model_id)
 
-    from transformers import AutoModelForImageTextToText, AutoProcessor
-
-    # todo: apply lora
-
-    processor = AutoProcessor.from_pretrained(args.model_id)
-    model = AutoModelForImageTextToText.from_pretrained(args.model_id)
     adapter_paths = get_sorted_adapter_paths("./train_output")
 
     if adapter_paths:

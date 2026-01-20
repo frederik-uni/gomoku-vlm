@@ -17,6 +17,12 @@ def parse_args():
         help="Directory to save checkpoints",
     )
     parser.add_argument(
+        "--eval_path",
+        type=str,
+        required=True,
+    )
+
+    parser.add_argument(
         "--data_file",
         type=str,
         required=True,
