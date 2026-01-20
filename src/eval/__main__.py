@@ -14,7 +14,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--model-id",
-        default="google/gemma-3-4b-it",
+        default="Qwen/Qwen3-VL-2B-Instruct",
         help="HuggingFace model identifier (e.g., 'google/gemma-3-4b-it').",
     )
     parser.add_argument(
