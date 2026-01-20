@@ -27,7 +27,8 @@ if __name__ == "__main__":
         print("No previous adapters found. Starting from base model.")
 
     if args.peft:
-        model = PeftModel.from_pretrained(model, args.peft, is_trainable=False)
+        model.load_adapter(args.peft, adapter_name="vision_adapter", is_trainable=False)
+        model.set_adapter("vision_adapter")
 
     new_output_dir = init_save(args.output_dir)
     print(f"New adapter will be saved to: {new_output_dir}")
