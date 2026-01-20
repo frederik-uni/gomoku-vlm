@@ -1,8 +1,7 @@
 from io import BytesIO
 
-from PIL import Image
-
 from datasets import Dataset, load_dataset
+from PIL import Image
 
 
 def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
@@ -20,28 +19,19 @@ def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
         imgs = []
         for i in range(len(batch["question"])):
             images = []
+            sample_imgs = []
 
             try:
                 img_entries = batch["img_bytes"][i]
                 if isinstance(img_entries, list):
                     for b in img_entries:
                         img = Image.open(BytesIO(b)).convert("RGB")
-                        imgs.append([img])
-                        images.append(
-                            {
-                                "type": "image",
-                                "image": img,
-                            }
-                        )
+                        sample_imgs.append(img)
+                        images.append({"type": "image", "image": img})
                 else:
                     img = Image.open(BytesIO(img_entries)).convert("RGB")
-                    imgs.append([img])
-                    images.append(
-                        {
-                            "type": "image",
-                            "image": img,
-                        }
-                    )
+                    sample_imgs.append(img)
+                    images.append({"type": "image", "image": img})
             except Exception as e:
                 print(f"Error decoding images at row {i}: {e}")
 
@@ -77,7 +67,8 @@ def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
                     },
                 ]
             )
-        return {"messages": formatted_messages, "images": imgs}
+
+            imgs.append(sample_imgs)
 
     dst = (
         ds["train"]
