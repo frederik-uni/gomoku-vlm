@@ -4,22 +4,6 @@
 ```bash
 git clone https://github.com/frederik-uni/gomoku-vlm.git
 cd gomoku-vlm
-pip install -e .
-```
-or 
-```bash
-pip install "git+https://github.com/frederik-uni/gomoku-vlm.git"
-```
-```
-or 
-```bash
-pip install "git+https://github.com/frederik-uni/gomoku-vlm.git"
-```
-
-## Setup
-```bash
-git clone https://github.com/frederik-uni/gomoku-vlm.git
-cd gomoku-vlm
 python3 -m venv venv && source venv/bin/activate
 pip install -e .
 ```
