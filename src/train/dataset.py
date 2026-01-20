@@ -76,7 +76,7 @@ def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
 
             imgs.append(sample_imgs)
 
-        return {"messages": formatted_messages, "imgs": imgs}
+        return {"conversations": formatted_messages, "imgs": imgs}
 
     dst = (
         ds["train"]
