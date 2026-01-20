@@ -15,14 +15,22 @@ def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
     ds = ds.select_columns(["question", "img_bytes", "answer"])
 
     def preprocess_batch(batch):
+        """
+        Preprocess a batch of examples for a vision-language model.
+        Expects batch to contain: 'question', 'img_bytes', 'answer'
+        Returns 'messages' column and optionally 'imgs' for debugging.
+        """
         formatted_messages = []
         imgs = []
-        for i in range(len(batch["question"])):
+
+        for question, img_entries, answer in zip(
+            batch["question"], batch["img_bytes"], batch["answer"]
+        ):
             images = []
             sample_imgs = []
 
+            # Handle multiple images or a single image
             try:
-                img_entries = batch["img_bytes"][i]
                 if isinstance(img_entries, list):
                     for b in img_entries:
                         img = Image.open(BytesIO(b)).convert("RGB")
@@ -33,7 +41,7 @@ def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
                     sample_imgs.append(img)
                     images.append({"type": "image", "image": img})
             except Exception as e:
-                print(f"Error decoding images at row {i}: {e}")
+                print(f"Error decoding images: {e}")
 
             formatted_messages.append(
                 [
@@ -52,23 +60,23 @@ def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
                         + [
                             {
                                 "type": "text",
-                                "text": batch["question"][i]
-                                .replace(
+                                "text": question.replace(
                                     "You are a vision-language model analyzing Gomoku game positions.",
                                     "",
-                                )
-                                .strip(),
+                                ).strip(),
                             }
                         ],
                     },
                     {
                         "role": "assistant",
-                        "content": [{"type": "text", "text": batch["answer"][i]}],
+                        "content": [{"type": "text", "text": answer}],
                     },
                 ]
             )
 
             imgs.append(sample_imgs)
+
+        return {"messages": formatted_messages, "imgs": imgs}
 
     dst = (
         ds["train"]
