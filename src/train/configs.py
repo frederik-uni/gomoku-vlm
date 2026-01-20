@@ -40,15 +40,15 @@ def init_train(
         save_total_limit=4,
         logging_dir=os.path.join(out, "logs"),
         logging_steps=20,
-        bf16=False,
-        fp16=True,
+        bf16=True,
+        fp16=False,
         optim="adamw_torch",
         packing=False,
         report_to="none",
         metric_for_best_model="eval_loss",
         greater_is_better=False,
         load_best_model_at_end=True,
-        max_length=1024 * 8,
+        max_length=2048,
     )
 
 
