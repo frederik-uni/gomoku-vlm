@@ -48,7 +48,7 @@ def init_train(
         metric_for_best_model="eval_loss",
         greater_is_better=False,
         load_best_model_at_end=True,
-        max_length=2048,
+        max_length=1024 * 4,
     )
 
 
