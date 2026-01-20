@@ -35,11 +35,11 @@ def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
                     for b in img_entries:
                         img = Image.open(BytesIO(b)).convert("RGB")
                         sample_imgs.append(img)
-                        images.append({"type": "image", "image": img})
+                        images.append({"type": "image", "text": None})
                 else:
                     img = Image.open(BytesIO(img_entries)).convert("RGB")
                     sample_imgs.append(img)
-                    images.append({"type": "image", "image": img})
+                    images.append({"type": "image", "text": None})
             except Exception as e:
                 print(f"Error decoding images: {e}")
 
@@ -76,7 +76,7 @@ def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
 
             imgs.append(sample_imgs)
 
-        return {"conversations": formatted_messages, "imgs": imgs}
+        return {"messages": formatted_messages, "images": imgs}
 
     dst = (
         ds["train"]
