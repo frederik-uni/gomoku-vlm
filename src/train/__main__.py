@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from peft import PeftModel
-from transformers import EarlyStoppingCallback
+from transformers import AutoProcessor, EarlyStoppingCallback
 from trl.trainer.sft_trainer import SFTTrainer
 
 from .args import parse_args
@@ -36,6 +36,10 @@ if __name__ == "__main__":
     final_dir = os.path.join(new_output_dir, "final-adapter")
 
     dst, dse = load_our_dataset(args.data_file, args.eval_path)
+    processor = AutoProcessor.from_pretrained(
+        args.model_id,
+        trust_remote_code=True,
+    )
     trainer = SFTTrainer(
         model=model,
         train_dataset=dst,
@@ -49,6 +53,7 @@ if __name__ == "__main__":
         ),
         peft_config=init_lora(args.lora_r, target(args.mode), modules(args.mode)),
         callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
+        processing_class=processor,
     )
 
     trainer.train()
