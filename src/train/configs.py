@@ -72,4 +72,4 @@ def modules(mode: Mode):
     if mode == "visual":
         return ["multi_modal_projector"]
     else:
-        return ["vision_tower"]
+        return []
