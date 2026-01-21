@@ -35,8 +35,9 @@ def init_train(
         weight_decay=0.01,
         num_train_epochs=epochs,
         save_strategy="steps",
-        save_steps=40,
+        save_steps=200,
         eval_strategy="steps",
+        eval_steps=200,
         save_total_limit=4,
         logging_dir=os.path.join(out, "logs"),
         logging_steps=20,
@@ -49,7 +50,7 @@ def init_train(
         greater_is_better=False,
         load_best_model_at_end=True,
         max_length=1024 * 4,
-        per_device_eval_batch_size = 1
+        per_device_eval_batch_size=1
     )
 
 
