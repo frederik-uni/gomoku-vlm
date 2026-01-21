@@ -41,13 +41,15 @@ def init_train(
         logging_dir=os.path.join(out, "logs"),
         logging_steps=20,
         bf16=True,
+        fp16=False,
         optim="adamw_torch",
         packing=False,
         report_to="none",
         metric_for_best_model="eval_loss",
         greater_is_better=False,
         load_best_model_at_end=True,
-        max_length=1024 * 8,
+        max_length=1024 * 4,
+        per_device_eval_batch_size = 1
     )
 
 
