@@ -2,6 +2,7 @@ import torch
 from transformers import AutoModelForImageTextToText, AutoProcessor
 
 from bots.ai_bot import generate_next_move_greedy
+from game_logic import position_is_empty
 from sim_game import render_game_step, simulate_game
 
 
@@ -66,7 +67,7 @@ def ask(model, processor, question, img, max_new_tokens):
     return pred
 
 
-def get_next_move(model, processor, state, player: int):
+def get_next_move_(model, processor, state, player: int):
     img = render_game_step(state)
     color = "Black" if player == 1 else "White"
     q = f"""
@@ -78,7 +79,30 @@ def get_next_move(model, processor, state, player: int):
     Answer format: "row col" (0-based). Output nothing else.
     """
     pred = ask(model, processor, q, img, 64)
-    print(pred)
+    y, x = map(int, pred.split())
+    return (y, x)
+
+
+_MODEL = None
+_PROC = None
+
+
+def get_next_move(state, player: int):
+    global _MODEL
+    global _PROC
+    if _MODEL is None or _PROC is None:
+        p, m = init("Qwen/Qwen3-VL-2B-Instruct")
+        _PROC = p
+        _MODEL = m
+    while True:
+        try:
+            y, x = get_next_move_(_MODEL, _PROC, state, player)
+            if position_is_empty(state, y, x):
+                return (y, x)
+            print("invalid move retry")
+        except:
+            print("invalid format retry")
+            pass
 
 
 if __name__ == "__main__":
@@ -87,5 +111,6 @@ if __name__ == "__main__":
     game = simulate_game(generate_next_move_greedy)
     idx = np.random.randint(game.shape[0])
     random_board = game[idx]
-    p, m = init("google/gemma-3-4b-it")
-    get_next_move(m, p, random_board)
+
+    pred = get_next_move(random_board, idx % 2 + 1)
+    print(pred)
