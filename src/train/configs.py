@@ -49,6 +49,7 @@ def init_train(
         greater_is_better=False,
         load_best_model_at_end=True,
         max_length=1024 * 4,
+        per_device_eval_batch_size = 1
     )
 
 
