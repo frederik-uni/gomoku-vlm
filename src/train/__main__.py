@@ -17,14 +17,14 @@ if __name__ == "__main__":
     adapter_paths = get_sorted_adapter_paths(args.output_dir)
     model = init_model(args.model_id)
 
-    if adapter_paths:
-        print(f"Found {len(adapter_paths)} adapters to apply sequentially.")
-        for adapter_path in adapter_paths:
-            print(f"  -> Applying adapter from: {adapter_path}")
-            model = PeftModel.from_pretrained(model, adapter_path)
-            model = model.merge_and_unload()
-    else:
-        print("No previous adapters found. Starting from base model.")
+    # if adapter_paths:
+    #     print(f"Found {len(adapter_paths)} adapters to apply sequentially.")
+    #     for adapter_path in adapter_paths:
+    #         print(f"  -> Applying adapter from: {adapter_path}")
+    #         model = PeftModel.from_pretrained(model, adapter_path)
+    #         model = model.merge_and_unload()
+    # else:
+    #     print("No previous adapters found. Starting from base model.")
 
     if args.peft:
         model.load_adapter(args.peft, adapter_name="vision_adapter", is_trainable=False)
