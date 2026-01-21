@@ -1,14 +1,29 @@
+from pathlib import Path
+
 import torch
+from peft import PeftModel
 from transformers import AutoModelForImageTextToText, AutoProcessor
 
 from bots.ai_bot import generate_next_move_greedy
 from game_logic import position_is_empty
 from sim_game import render_game_step, simulate_game
+from train.util import get_sorted_adapter_paths
 
 
-def init(model_id: str):
+def init(model_id: str, pefts: Path | None):
     processor = AutoProcessor.from_pretrained(model_id)
     model = AutoModelForImageTextToText.from_pretrained(model_id)
+    if pefts is not None:
+        adapter_paths = get_sorted_adapter_paths("./train_output")
+
+        if adapter_paths:
+            print(f"Found {len(adapter_paths)} adapters to apply sequentially.")
+            for adapter_path in adapter_paths:
+                print(f"  -> Applying adapter from: {adapter_path}")
+                model = PeftModel.from_pretrained(model, adapter_path)
+                model = model.merge_and_unload()
+        else:
+            print("No previous adapters found. Starting from base model.")
     return processor, model
 
 
@@ -87,11 +102,11 @@ _MODEL = None
 _PROC = None
 
 
-def get_next_move(state, player: int):
+def get_next_move(state, player: int, pefts: Path | None):
     global _MODEL
     global _PROC
     if _MODEL is None or _PROC is None:
-        p, m = init("Qwen/Qwen3-VL-2B-Instruct")
+        p, m = init("Qwen/Qwen3-VL-2B-Instruct", pefts)
         _PROC = p
         _MODEL = m
     while True:
@@ -112,5 +127,5 @@ if __name__ == "__main__":
     idx = np.random.randint(game.shape[0])
     random_board = game[idx]
 
-    pred = get_next_move(random_board, idx % 2 + 1)
+    pred = get_next_move(random_board, idx % 2 + 1, None)
     print(pred)
