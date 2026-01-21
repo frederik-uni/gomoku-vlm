@@ -17,58 +17,6 @@ Important:
 """
 
 # ============================================================
-# Q1001–Q1004: list_valid_moves
-# Output: comma-separated list of "row col" (0-based)
-# Assumes canonical order: row-major (row asc, col asc)
-# ============================================================
-
-[questions.Q1001]
-text = """
-It is {color}'s turn to move.
-
-Task:
-List all valid moves (all empty intersections).
-Output the moves in row-major order (increasing row, then increasing column).
-
-Answer format:
-A comma-separated list of 0-based coordinates: "row col, row col, ...".
-Do not output anything else.
-"""
-
-[questions.Q1002]
-text = """
-Current player: {color}.
-
-Task:
-Enumerate every legal placement (every empty intersection).
-Sort the moves by row ascending, then column ascending.
-
-Answer format: "row col, row col, ..." (comma + single space between moves).
-"""
-
-[questions.Q1003]
-text = """
-It is {color}'s move.
-
-Task:
-Output all legal moves (every empty coordinate).
-Use 0-based indexing and order moves in row-major order.
-
-Answer format: comma-separated "row col" pairs only.
-"""
-
-[questions.Q1004]
-text = """
-Player to move: {color}.
-
-Task:
-List every empty intersection as a valid move.
-Provide moves in row-major order (row then column).
-
-Answer format: "row col, row col, ..." and nothing else.
-"""
-
-# ============================================================
 # Q1101–Q1104: win_next_turn
 # Focus: win_next_turn
 # Input: board position immediately before the final move of a completed game
