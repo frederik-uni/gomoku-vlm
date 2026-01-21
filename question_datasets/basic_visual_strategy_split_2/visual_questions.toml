@@ -1,5 +1,5 @@
 [general]
-num_samples_per_question = 200
+num_samples_per_question = 250
 
 # global context that will be prepended to every question text.
 # If you leave this empty or remove it, nothing extra is added.
@@ -165,51 +165,6 @@ Answer format: a single integer.
 """
 
 # ============================================================
-# Q601–Q604: determine_who_won
-# Answer: one word: black|white|draw
-# ============================================================
-
-[questions.Q601]
-text = """
-This is the final board position of a finished game.
-
-Task:
-Determine the color of the winner from the final position.
-
-Answer format: exactly one word: black, white, or draw.
-"""
-
-[questions.Q602]
-text = """
-The game is over (final board).
-
-Task:
-Who won based on the final stones on the board?
-
-Answer format: exactly one word: black, white, or draw.
-"""
-
-[questions.Q603]
-text = """
-You are given the completed game position.
-
-Task:
-Decide whether Player 1 (black) won, Player 2 (white) won, or the game is a draw.
-
-Answer format: exactly one word: black, white, or draw.
-"""
-
-[questions.Q604]
-text = """
-Final position (no more moves will be played).
-
-Task:
-Determine the outcome.
-
-Answer format: exactly one word: black, white, or draw.
-"""
-
-# ============================================================
 # Q701–Q704: can_you_win
 # Answer: one word: yes|no
 # Definition: "yes" iff the current player has at least one immediate winning move.
@@ -271,36 +226,42 @@ Task:
 If you do not block, can your opponent win on their next turn?
 (That is: does the opponent currently have at least one immediate winning move available?)
 
-Answer format: exactly one word: yes or no.
+Output constraint:
+Return exactly one word: yes or no.
 """
 
 [questions.Q802]
 text = """
-You are Player {player} with {color} stones, and it is your move.
+You are Player {player} playing {color}. It is your turn.
 
 Task:
-Does your opponent have a one-move win available on their next turn?
+If you do not block, can your opponent win on their next turn?
+(That is: does the opponent currently have at least one immediate winning move available?)
 
-Answer format: exactly one word: yes or no.
+Output constraint:
+Return exactly one word: yes or no.
 """
 
 [questions.Q803]
 text = """
-It is your turn. You are Player {player} playing {color}.
+You are Player {player} playing {color}. It is your turn.
 
 Task:
-Determine whether there is an immediate winning threat by the opponent
-(a move that would win for them on their next turn).
+If you do not block, can your opponent win on their next turn?
+(That is: does the opponent currently have at least one immediate winning move available?)
 
-Answer format: exactly one word: yes or no.
+Output constraint:
+Return exactly one word: yes or no.
 """
 
 [questions.Q804]
 text = """
-You play {color} stones (Player {player}). It is your move.
+You are Player {player} playing {color}. It is your turn.
 
 Task:
-Is the opponent currently threatening a one-move win on their next turn?
+If you do not block, can your opponent win on their next turn?
+(That is: does the opponent currently have at least one immediate winning move available?)
 
-Answer format: exactly one word: yes or no.
+Output constraint:
+Return exactly one word: yes or no.
 """
