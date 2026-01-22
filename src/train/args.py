@@ -34,7 +34,7 @@ def parse_args():
     parser.add_argument(
         "--batch_size", type=int, default=4, help="Batch size for training"
     )
-    parser.add_argument("--lora_r", type=int, default=16, help="LoRA rank")
+    parser.add_argument("--lora_r", type=int, default=32, help="LoRA rank")
     parser.add_argument(
         "--mode",
         default="visual",
@@ -43,7 +43,7 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--learning_rate", type=float, default=2e-5, help="Learning rate for training"
+        "--learning_rate", type=float, default=2e-4, help="Learning rate for training"
     )
     parser.add_argument(
         "--gradient_accumulation_steps",

@@ -12,7 +12,7 @@ bot2 = None
 current_file = Path(__file__)
 
 home_dir = current_file.parent.parent
-policy = CNNPolicy.load_model(join(home_dir, "models", "gobang.pth"))
+policy = CNNPolicy.load_model(join(home_dir, "models", "gobang.pth"), device="cpu") # CHANGED HERE!
 
 
 def convert_board(board: npt.NDArray[np.int8]):
