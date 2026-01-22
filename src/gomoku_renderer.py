@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 
 def calc_coords_gomoku(
@@ -13,6 +13,11 @@ def calc_coords_gomoku(
     x = x0 + j * cell_size
     y = y0 + i * cell_size
     return x, y, w, h, "c", "c"
+
+
+def text_size(draw: ImageDraw.ImageDraw, text: str, font):
+    bbox = draw.textbbox((0, 0), text, font=font)
+    return bbox[2] - bbox[0], bbox[3] - bbox[1]
 
 
 def create_gomoku_board(
@@ -56,6 +61,29 @@ def create_gomoku_board(
                 ),
                 fill=line_color,
             )
+
+    font = ImageFont.load_default()
+
+    for i in range(size + 1):
+        x = margin + i * cell_size
+        y = margin + i * cell_size
+
+        label = str(i)
+        w, h = text_size(draw, label, font)
+        draw.text(
+            (x - w // 2, 12 - h - 4),
+            label,
+            fill=line_color,
+            font=font,
+        )
+
+        w, h = text_size(draw, label, font)
+        draw.text(
+            (18 - w - 6, y - h // 2),
+            label,
+            fill=line_color,
+            font=font,
+        )
 
     return img
 

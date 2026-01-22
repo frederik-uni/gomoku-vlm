@@ -94,7 +94,7 @@ def render_game_step(
     board_img = create_gomoku_board(
         size=15,  # fields
         cell_size=size,  # pixel for cell
-        margin=size // 2,  # margin on all sides in px
+        margin=size // 2 + 20,  # margin on all sides in px
         line_width=2,  # line width
         color=color,  # board color
         line_color=lcolor,  # line color
@@ -103,7 +103,7 @@ def render_game_step(
 
     def calc_coords_gomoku_wrapper(i: int, j: int):
         return calc_coords_gomoku(
-            i, j, size, (size // 2, size // 2)
+            i, j, size, (size // 2 + 20, size // 2 + 20)
         )  # 40 cell size in px, (20, 20) margin in px
 
     img = render(board_img, pieces, state, calc_coords=calc_coords_gomoku_wrapper)
