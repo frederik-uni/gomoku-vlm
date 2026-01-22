@@ -74,8 +74,15 @@ def ask_lisa(question1: str, question2: str) -> tuple[bool, str]:
                     <ANSWER2>
                     {question2}
                     </ANSWER2>
-
-                    RULES (strict):
+                    
+                    EXTRACTION RULES (apply before matching):
+                    1. If ANSWER2 contains a well-formed [Answer]...[/Answer] block:
+                        - Use ONLY the text inside [Answer] and [/Answer] as the answer.
+                        - Ignore everything else (including any [Reasoning] blocks).
+                    2. If there is no [Answer]...[/Answer] block present:
+                        - Treat the entire ANSWER2 as the answer.
+  
+                    MATCHING RULES (strict):
                     - If the answer content in ANSWER2 equals one or more complete elements from ANSWER1 exactly, character-for-character IT IS A MATCH.
                     - Do NOT accept substrings, partial matches or “close” answers.
                     - If ANSWER2 contains multiple answer contents, all of them must exactly match elements in ANSWER1 and they must not contradict each other; if any included answer content fails to exactly match ANSWER1, return no.
@@ -157,7 +164,7 @@ def eval_vlm_on_parquet(
     match_mode: Literal["exact", "contains", "fuzzy", "regex", "lisa"] = "exact",
     max_new_tokens=64,
     device: Literal["cpu", "cuda", "auto"] = "auto",
-    dataset: str = "eval",
+    dataset: str = "test",
 ) -> dict[str, float]:
     device = get_device(device)
     model = model.to(device)
