@@ -1,0 +1,267 @@
+[general]
+num_samples_per_question = 1000
+
+# global context that will be prepended to every question text.
+# If you leave this empty or remove it, nothing extra is added.
+context = """
+You are a vision-language model analyzing Gomoku game positions.
+
+Game rules (for this dataset):
+- The board is a 15×15 grid. Player 1 = black stones (value 1). Player 2 = white stones (value 2).
+- A legal move is placing exactly one stone on an empty intersection (value 0).
+- A player wins immediately if they can place one stone that creates 5 stones in a row (horizontal, vertical, or diagonal).
+
+Important:
+- Always follow the per-question instructions and output format exactly.
+- Do not add explanations or any extra text beyond what the question requests.
+"""
+
+# ============================================================
+# Q1–Q4: color_at_position
+# Answer: one word: black|white|empty
+# Params: {row}, {col} are 0-based
+# ============================================================
+
+[questions.Q1]
+text = """
+Task:
+Inspect exactly one intersection: row {row}, column {col} (0-based).
+Decide what is currently occupying that intersection.
+
+Output constraint:
+Return exactly one word: black, white, or empty.
+"""
+
+[questions.Q2]
+text = """
+Task:
+Look only at the intersection at (row {row}, column {col}) using 0-based indexing.
+Classify the current state of that single intersection (do not analyze the rest of the board).
+
+Output constraint:
+Return exactly one word: black, white, or empty.
+"""
+
+[questions.Q3]
+text = """
+Task:
+Focus on the single coordinate (row {row}, col {col}) with 0-based indexing.
+Determine which label applies to that intersection right now.
+
+Output constraint:
+Return exactly one word: black, white, or empty.
+"""
+
+[questions.Q4]
+text = """
+Task:
+At row {row} and column {col} (0-based), identify what is present at that intersection.
+Do not guess or infer future moves; answer only for the current position shown.
+
+Output constraint:
+Return exactly one word: black, white, or empty.
+"""
+
+# ============================================================
+# Q401–Q404: three_in_a_row
+# Here we define "three-in-a-row segments" (length-3 windows).
+# Answer: one integer
+# ============================================================
+
+[questions.Q401]
+text = """
+You are Player {player} playing {color}.
+
+Task:
+Count how many 3-in-a-row segments you have for your color.
+A 3-in-a-row segment is any contiguous window of exactly 3 intersections
+(horizontal, vertical, or diagonal) where all 3 are your stones.
+
+Answer format: a single integer.
+"""
+
+[questions.Q402]
+text = """
+You are Player {player} with {color} stones.
+
+Task:
+How many contiguous length-3 segments of your stones exist on the board?
+Count segments in horizontal, vertical, and diagonal directions.
+
+Answer format: a single integer (no extra text).
+"""
+
+[questions.Q403]
+text = """
+You play as {color} (Player {player}).
+
+Task:
+Count the number of 3-stone segments (three in a row) belonging to you.
+A segment is three adjacent intersections in a straight line, all your stones.
+
+Answer format: a single integer.
+"""
+
+[questions.Q404]
+text = """
+You are Player {player} and your stones are {color}.
+
+Task:
+Count every occurrence of three adjacent {color} stones in a straight line
+(horizontal, vertical, or diagonal).
+
+Answer format: a single integer.
+"""
+
+# ============================================================
+# Q501–Q504: four_in_a_row
+# Here we define "four-in-a-row segments" (length-4 windows).
+# Answer: one integer
+# ============================================================
+
+[questions.Q501]
+text = """
+You are Player {player} playing {color}.
+
+Task:
+Count how many 4-in-a-row segments you have for your color.
+A 4-in-a-row segment is any contiguous window of exactly 4 intersections
+(horizontal, vertical, or diagonal) where all 4 are your stones.
+
+Answer format: a single integer.
+"""
+
+[questions.Q502]
+text = """
+You are Player {player} with {color} stones.
+
+Task:
+How many contiguous length-4 segments of your stones exist on the board?
+Count segments in horizontal, vertical, and diagonal directions.
+
+Answer format: a single integer (no extra text).
+"""
+
+[questions.Q503]
+text = """
+You play as {color} (Player {player}).
+
+Task:
+Count the number of 4-stone segments (four in a row) belonging to you.
+A segment is four adjacent intersections in a straight line, all your stones.
+
+Answer format: a single integer.
+"""
+
+[questions.Q504]
+text = """
+You are Player {player} and your stones are {color}.
+
+Task:
+Count every occurrence of four adjacent {color} stones in a straight line
+(horizontal, vertical, or diagonal).
+
+Answer format: a single integer.
+"""
+
+# ============================================================
+# Q701–Q704: can_you_win
+# Answer: one word: yes|no
+# Definition: "yes" iff the current player has at least one immediate winning move.
+# ============================================================
+
+[questions.Q701]
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Task:
+Can you win immediately on this move?
+In other words: is there at least one legal placement of a {color} stone
+that creates 5 in a row right now?
+
+Answer format: exactly one word: yes or no.
+"""
+
+[questions.Q702]
+text = """
+You are Player {player} with {color} stones, and it is your move.
+
+Task:
+Does there exist a legal move that wins the game immediately (forms 5 in a row)?
+
+Answer format: exactly one word: yes or no.
+"""
+
+[questions.Q703]
+text = """
+It is your turn. You are Player {player} playing {color}.
+
+Task:
+Determine whether you have an immediate winning move available.
+
+Answer format: exactly one word: yes or no.
+"""
+
+[questions.Q704]
+text = """
+You play {color} stones (Player {player}). It is your move.
+
+Task:
+Is there at least one winning move right now (one move ends the game)?
+
+Answer format: exactly one word: yes or no.
+"""
+
+# ============================================================
+# Q801–Q804: can_you_lose
+# Answer: one word: yes|no
+# Definition: "yes" iff opponent has at least one immediate winning move on THEIR next move.
+# ============================================================
+
+[questions.Q801]
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Task:
+If you do not block, can your opponent win on their next turn?
+(That is: does the opponent currently have at least one immediate winning move available?)
+
+Output constraint:
+Return exactly one word: yes or no.
+"""
+
+[questions.Q802]
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Task:
+If you do not block, can your opponent win on their next turn?
+(That is: does the opponent currently have at least one immediate winning move available?)
+
+Output constraint:
+Return exactly one word: yes or no.
+"""
+
+[questions.Q803]
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Task:
+If you do not block, can your opponent win on their next turn?
+(That is: does the opponent currently have at least one immediate winning move available?)
+
+Output constraint:
+Return exactly one word: yes or no.
+"""
+
+[questions.Q804]
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Task:
+If you do not block, can your opponent win on their next turn?
+(That is: does the opponent currently have at least one immediate winning move available?)
+
+Output constraint:
+Return exactly one word: yes or no.
+"""

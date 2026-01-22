@@ -29,14 +29,15 @@ def init_train(
         per_device_train_batch_size=batch_size,
         gradient_accumulation_steps=gradient_accumulation_steps,
         learning_rate=learning_rate,
-        warmup_ratio=0.05,
+        warmup_ratio=0.1,
         lr_scheduler_type="cosine",
         max_grad_norm=1.0,
         weight_decay=0.01,
         num_train_epochs=epochs,
         save_strategy="steps",
-        save_steps=40,
+        save_steps=400,
         eval_strategy="steps",
+        eval_steps=400,
         save_total_limit=4,
         logging_dir=os.path.join(out, "logs"),
         logging_steps=20,
@@ -49,7 +50,7 @@ def init_train(
         greater_is_better=False,
         load_best_model_at_end=True,
         max_length=1024 * 4,
-        per_device_eval_batch_size = 1
+        per_device_eval_batch_size=1
     )
 
 

@@ -1,5 +1,5 @@
 [general]
-num_samples_per_question = 25
+num_samples_per_question = 250
 
 # global context that will be prepended to every question text.
 # If you leave this empty or remove it, nothing extra is added.
@@ -216,7 +216,8 @@ Return exactly one integer (no explanation).
 
 # ============================================================
 # Q401–Q404: three_in_a_row
-# Here we define "three-in-a-row segments" (length-3 windows).
+# Definition: EXACT three-in-a-row segments (maximal runs of length 3).
+# Excludes any length-3 window that is part of a longer contiguous run (4+).
 # Answer: one integer
 # ============================================================
 
@@ -225,9 +226,13 @@ text = """
 You are Player {player} playing {color}.
 
 Task:
-Count how many 3-in-a-row segments you have for your color.
-A 3-in-a-row segment is any contiguous window of exactly 3 intersections
-(horizontal, vertical, or diagonal) where all 3 are your stones.
+Count how many EXACT 3-in-a-row segments you have.
+An EXACT 3-in-a-row segment is a straight line of exactly 3 contiguous intersections
+(horizontal, vertical, or diagonal) occupied by your stones, and it is NOT part of a longer run.
+
+Formally: for each direction, a run of 3 qualifies only if the immediately adjacent intersection
+before the run and the immediately adjacent intersection after the run (in that same direction)
+are NOT your stones (they may be empty, opponent, or off-board).
 
 Answer format: a single integer.
 """
@@ -237,8 +242,12 @@ text = """
 You are Player {player} with {color} stones.
 
 Task:
-How many contiguous length-3 segments of your stones exist on the board?
-Count segments in horizontal, vertical, and diagonal directions.
+How many contiguous runs of EXACTLY 3 of your stones exist on the board?
+Count in horizontal, vertical, and diagonal directions.
+
+Important:
+Do NOT count any length-3 window that lies inside a longer contiguous run (length >= 4).
+A run counts only if it has length exactly 3.
 
 Answer format: a single integer (no extra text).
 """
@@ -248,8 +257,9 @@ text = """
 You play as {color} (Player {player}).
 
 Task:
-Count the number of 3-stone segments (three in a row) belonging to you.
-A segment is three adjacent intersections in a straight line, all your stones.
+Count the number of EXACT three-in-a-row segments belonging to you.
+A segment counts only if it consists of 3 adjacent intersections in a straight line, all your stones,
+and the segment cannot be extended on either end by another of your stones in the same direction.
 
 Answer format: a single integer.
 """
@@ -259,8 +269,11 @@ text = """
 You are Player {player} and your stones are {color}.
 
 Task:
-Count every occurrence of three adjacent {color} stones in a straight line
-(horizontal, vertical, or diagonal).
+Count every occurrence of exactly three adjacent {color} stones in a straight line
+(horizontal, vertical, or diagonal), where "exactly" means:
+- the three stones are contiguous, and
+- the immediately adjacent intersection on both ends (along that line) is NOT a {color} stone
+  (it may be empty, opponent, or off-board).
 
 Answer format: a single integer.
 """

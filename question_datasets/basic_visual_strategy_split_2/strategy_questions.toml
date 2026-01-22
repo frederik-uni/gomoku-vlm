@@ -1,0 +1,137 @@
+[general]
+num_samples_per_question = 1000
+
+# global context that will be prepended to every question text.
+# If you leave this empty or remove it, nothing extra is added.
+context = """
+You are a vision-language model analyzing Gomoku game positions.
+
+Game rules (for this dataset):
+- The board is a 15×15 grid. Player 1 = black stones (value 1). Player 2 = white stones (value 2).
+- A legal move is placing exactly one stone on an empty intersection (value 0).
+- A player wins immediately if they can place one stone that creates 5 stones in a row (horizontal, vertical, or diagonal).
+
+Important:
+- Always follow the per-question instructions and output format exactly.
+- Do not add explanations or any extra text beyond what the question requests.
+"""
+
+# ============================================================
+# Q1101–Q1104: win_next_turn
+# Output: exactly one move as two 0-based integers: "row col"
+# Input: board position immediately before the final move of a completed game
+# Context: {outcome_phrase} states the final game outcome
+# ============================================================
+
+[questions.Q1101]
+text = """
+This image shows the Gomoku position immediately before the final move of a completed game.
+Final outcome of the completed game: {outcome_phrase}.
+You are playing {color}, and it is your turn in this position.
+
+Task:
+Choose the final move.
+If there is a move that wins immediately, play that move (a placement that creates a 5-in-a-row for {color}).
+Otherwise, play the best available final move in this position.
+
+Output constraint:
+Return exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1102]
+text = """
+You are given the board state one move before the game ended.
+Final outcome: {outcome_phrase}.
+It is {color}'s turn.
+
+Task:
+Select the final move.
+Prefer a move that wins immediately (creates a 5-in-a-row for {color}) if such a move exists.
+Otherwise, choose the best available final move.
+
+Output constraint:
+Return exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1103]
+text = """
+This is the position directly before the last move of the game.
+Final outcome: {outcome_phrase}.
+Current player: {color}.
+
+Task:
+Output the final move.
+If an immediate win is possible, choose a winning move (creates a 5-in-a-row for {color}).
+If no immediate win is available, output the best available final move.
+
+Output constraint:
+Return exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1104]
+text = """
+Board state: one move before the end of the game.
+Final outcome: {outcome_phrase}.
+You are {color} and it is your turn.
+
+Task:
+Choose the final move.
+If you can win immediately, play a move that creates a 5-in-a-row for {color}.
+Otherwise, play the best available final move.
+
+Output constraint:
+Return exactly two 0-based integers: "row col".
+"""
+
+# ============================================================
+# Q1201–Q1204: best_next_move
+# Output: exactly one move as two 0-based integers: "row col"
+# ============================================================
+
+[questions.Q1201]
+text = """
+It is {color}'s turn.
+
+Task:
+Choose the single best move to play in the position shown.
+Your answer must be one specific coordinate for {color}'s next move.
+
+Output constraint:
+Return exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1202]
+text = """
+Current turn: {color} to move.
+
+Task:
+Select the best next move for {color} from the current board position.
+Output exactly one move only.
+
+Output constraint:
+Return exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1203]
+text = """
+{color} to move.
+
+Task:
+Determine the best move for {color} to play now, based on the position shown.
+Provide a single coordinate pair for the next move.
+
+Output constraint:
+Return exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1204]
+text = """
+It is {color}'s move.
+
+Task:
+Pick the best move for {color} in this position.
+Output one coordinate pair representing the next move.
+
+Output constraint:
+Return exactly two 0-based integers: "row col".
+"""
