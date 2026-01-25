@@ -82,28 +82,14 @@ Return a single integer (no extra text).
 [questions.Q901]
 num_samples = 25
 text = """
-You are looking at a Gomoku board image.
-
 Task:
-Transcribe the entire board into a 15×15 matrix of tokens that describe what you see:
-- empty = an empty intersection
-- black = a black stone
-- white = a white stone
-
-Output constraints (must follow exactly):
-- Output ONLY the matrix (no headers, no explanations, no extra text).
-- Exactly 15 lines total (top row to bottom row).
-- Each line must contain exactly 15 tokens separated by SINGLE spaces.
-- Allowed tokens are exactly: empty, black, white
-- Do NOT use numbers (0/1/2), commas, brackets, pipes, or any other symbols.
-
-Newline rules:
-- Each row must be on its own line separated by a single newline character.
-- Do not insert blank lines.
-- Do not wrap a row onto multiple lines.
+Output the full board as a 15×15 matrix of integers using:
+0 = empty, 1 = black (Player 1), 2 = white (Player 2).
 
 Answer format:
-15 lines of 15 tokens each.
+- Exactly 15 lines.
+- Each line must contain exactly 15 integers separated by single spaces.
+- Do not output any extra text, symbols, commas, or brackets.
 """
 
 # ============================================================
@@ -161,24 +147,11 @@ Return exactly one integer.
 [questions.Q902]
 num_samples = 250
 text = """
-You are given an image of a 15×15 Gomoku board.
-
-Task:
-Write the board as a token grid using ONLY:
-empty (no stone), black (black stone), white (white stone)
-
-Strict formatting rules:
-- Output only the grid.
-- The grid has exactly 15 rows and 15 columns.
-- Row order is top-to-bottom as seen in the image.
-- Each row must be exactly 15 tokens separated by single spaces.
-- Use only lowercase tokens: empty, black, white
-- No punctuation, no extra whitespace, no surrounding brackets, and no commentary.
-
-Newline rules:
-- Exactly 15 non-empty lines.
-- One row per line (no line-wrapping).
+Convert the board into a 15×15 integer matrix using:
+0 for empty, 1 for black stones, 2 for white stones.
 
 Answer format:
-15 lines, each line: 15 space-separated tokens.
+- Exactly 15 rows (top to bottom).
+- Each row contains 15 space-separated integers.
+- Output only the matrix.
 """

@@ -1,13 +1,8 @@
-# =========================
-# perception_replay.toml
-# =========================
-# Small rehearsal set to prevent forgetting during strategy training.
-# =========================
-
-# Dataset for TRAINING
 [general]
-num_samples_per_question = 25
+num_samples_per_question = 250
 
+# global context that will be prepended to every question text.
+# If you leave this empty or remove it, nothing extra is added.
 context = """
 You are a vision-language model analyzing Gomoku game positions.
 
@@ -22,407 +17,6 @@ Important:
 """
 
 # ============================================================
-# Q1–Q4: color_at_position
-# ============================================================
-
-[questions.Q1]
-text = """
-Task:
-Inspect exactly one intersection: row {row}, column {col} (0-based).
-Decide what is currently occupying that intersection.
-
-Output constraint:
-Return exactly one word: black, white, or empty.
-"""
-
-[questions.Q2]
-text = """
-Task:
-Look only at the intersection at (row {row}, column {col}) using 0-based indexing.
-
-Output constraint:
-Return exactly one word: black, white, or empty.
-"""
-
-[questions.Q3]
-text = """
-Task:
-Focus on the single coordinate (row {row}, col {col}) with 0-based indexing.
-
-Output constraint:
-Return exactly one word: black, white, or empty.
-"""
-
-[questions.Q4]
-text = """
-Task:
-At row {row} and column {col} (0-based), identify what is present at that intersection.
-
-Output constraint:
-Return exactly one word: black, white, or empty.
-"""
-
-# ============================================================
-# Q101–Q104: count_black_stones
-# ============================================================
-
-[questions.Q101]
-text = """
-Task:
-Count the total number of black stones currently placed on the board (Player 1).
-
-Output constraint:
-Return a single integer (no extra text).
-"""
-
-[questions.Q102]
-text = """
-Task:
-Determine how many stones belong to Player 1 (black) in the current position.
-
-Output constraint:
-Return exactly one integer.
-"""
-
-[questions.Q103]
-text = """
-Task:
-Compute the total number of black stones on the board as shown.
-
-Output constraint:
-Return one integer only.
-"""
-
-[questions.Q104]
-text = """
-Task:
-How many intersections are occupied by black stones (Player 1)?
-
-Output constraint:
-Return a single integer and nothing else.
-"""
-
-# ============================================================
-# Q201–Q204: count_white_stones
-# ============================================================
-
-[questions.Q201]
-text = """
-Task:
-Count the total number of white stones currently placed on the board (Player 2).
-
-Output constraint:
-Return a single integer (no extra text).
-"""
-
-[questions.Q202]
-text = """
-Task:
-Determine how many stones belong to Player 2 (white) in the current position.
-
-Output constraint:
-Return exactly one integer.
-"""
-
-[questions.Q203]
-text = """
-Task:
-Compute the total number of white stones on the board as shown.
-
-Output constraint:
-Return one integer only.
-"""
-
-[questions.Q204]
-text = """
-Task:
-How many intersections are occupied by white stones (Player 2)?
-
-Output constraint:
-Return a single integer and nothing else.
-"""
-
-# ============================================================
-# Q301–Q304: count_empty_intersections
-# ============================================================
-
-[questions.Q301]
-text = """
-Task:
-Count how many intersections are empty in the current board position.
-
-Output constraint:
-Return a single integer (no extra text).
-"""
-
-[questions.Q302]
-text = """
-Task:
-Determine the total number of empty intersections available right now.
-
-Output constraint:
-Return exactly one integer.
-"""
-
-[questions.Q303]
-text = """
-Task:
-Count every empty intersection on the board in the current position.
-
-Output constraint:
-Return a single integer and nothing else.
-"""
-
-[questions.Q304]
-text = """
-Task:
-Compute the number of remaining empty intersections in the shown snapshot.
-
-Output constraint:
-Return exactly one integer.
-"""
-
-# ============================================================
-# Q501–Q504: four_in_a_row
-# (kept as mid-level visual grounding)
-# ============================================================
-
-[questions.Q501]
-text = """
-You are Player {player} playing {color}.
-
-Task:
-Count how many 4-in-a-row segments you have for your color.
-A 4-in-a-row segment is any contiguous window of exactly 4 intersections
-(horizontal, vertical, or diagonal) where all 4 are your stones.
-
-Answer format: a single integer.
-"""
-
-[questions.Q502]
-text = """
-You are Player {player} with {color} stones.
-
-Task:
-How many contiguous length-4 segments of your stones exist on the board?
-
-Answer format: a single integer.
-"""
-
-[questions.Q503]
-text = """
-You play as {color} (Player {player}).
-
-Task:
-Count the number of 4-stone segments (four in a row) belonging to you.
-
-Answer format: a single integer.
-"""
-
-[questions.Q504]
-text = """
-You are Player {player} and your stones are {color}.
-
-Task:
-Count every occurrence of four adjacent {color} stones in a straight line.
-
-Answer format: a single integer.
-"""
-
-# ============================================================
-# Q601–Q604: determine_who_won
-# ============================================================
-
-[questions.Q601]
-text = """
-This is the final board position of a finished game.
-
-Task:
-Determine the color of the winner from the final position.
-
-Answer format: exactly one word: black, white, or draw.
-"""
-
-[questions.Q602]
-text = """
-The game is over (final board).
-
-Task:
-Who won based on the final stones on the board?
-
-Answer format: exactly one word: black, white, or draw.
-"""
-
-[questions.Q603]
-text = """
-You are given the completed game position.
-
-Task:
-Decide whether Player 1 (black) won, Player 2 (white) won, or the game is a draw.
-
-Answer format: exactly one word: black, white, or draw.
-"""
-
-[questions.Q604]
-text = """
-Final position.
-
-Task:
-Determine the outcome.
-
-Answer format: exactly one word: black, white, or draw.
-"""
-
-# ============================================================
-# Q901–Q904: print_board_matrix (token grid)
-# ============================================================
-
-[questions.Q901]
-text = """
-Task:
-Transcribe the entire board into a 15×15 matrix of tokens:
-empty, black, white.
-
-Output constraints:
-- Output ONLY the matrix (no extra text).
-- Exactly 15 lines.
-- Each line: exactly 15 tokens separated by single spaces.
-
-Answer format:
-15 lines of 15 tokens each.
-"""
-
-[questions.Q902]
-text = """
-Task:
-Write the board as a 15×15 token grid using ONLY:
-empty, black, white
-
-Strict formatting:
-- Output only the grid.
-- Exactly 15 lines.
-- Each line exactly 15 tokens separated by single spaces.
-
-Answer format:
-15 lines × 15 tokens.
-"""
-
-[questions.Q903]
-text = """
-Task:
-Convert the current board position from the image into a 15×15 token matrix.
-
-Hard constraints:
-- Exactly 15 lines.
-- Each line exactly 15 tokens.
-- Tokens: empty, black, white
-- Output ONLY the matrix.
-
-Answer format:
-The 15-line token matrix only.
-"""
-
-[questions.Q904]
-text = """
-Task:
-Produce a complete 15×15 grid describing the stones you see.
-
-Formatting:
-- Output only the grid.
-- Exactly 15 lines.
-- Each line has exactly 15 tokens separated by single spaces.
-- Tokens: empty, black, white
-
-Answer format:
-15 lines × 15 tokens.
-"""
-
-# ============================================================
-# Q1000–Q1004: list_valid_moves
-# Focus: list_valid_moves
-# Output: exactly one move as two 0-based integers: "row col"
-# Valid = an EMPTY intersection (no stone on it). Any valid move is acceptable.
-# ============================================================
-
-[questions.Q1000]
-num_samples=250
-text = """
-It is {color}'s turn.
-
-Task:
-Output ONE valid move by choosing any empty intersection on the board.
-
-Rules:
-- A valid move is placing a stone on an intersection that is currently empty (no stone).
-- Do NOT choose an intersection that already contains a black or white stone.
-- Any empty intersection is acceptable.
-
-Answer format: exactly two 0-based integers: "row col".
-Do not output anything else.
-"""
-
-[questions.Q1001]
-num_samples=250
-text = """
-Current player: {color}.
-
-Task:
-Pick any legal placement for {color}.
-A placement is legal if the chosen intersection is empty (no stone is on it).
-
-Constraints:
-- Output exactly one move.
-- Use 0-based indexing.
-
-Answer format: "row col" and nothing else.
-"""
-
-[questions.Q1002]
-num_samples=250
-text = """
-You are {color}. It is your move.
-
-Task:
-Provide a single valid move from this position:
-choose any empty intersection (no stone) and output its coordinates.
-
-Important:
-- Any empty coordinate is fine.
-- Output only one move.
-
-Answer format: exactly "row col" (0-based).
-"""
-
-[questions.Q1003]
-num_samples=250
-text = """
-Player to move: {color}.
-
-Task:
-Output ONE valid move: the coordinates of any empty intersection where a stone can be placed.
-
-Definition:
-- Valid move ⇔ the chosen intersection is empty (it contains no black stone and no white stone).
-
-Answer format: two integers "row col" (0-based). Output nothing else.
-"""
-
-[questions.Q1004]
-num_samples=250
-text = """
-{color} to move.
-
-Task:
-Choose any empty intersection (no stone) and output its coordinates as a valid move.
-
-Restrictions:
-- Output exactly one coordinate pair.
-- Do not include commas, extra words, or multiple moves.
-
-Answer format: "row col" (0-based) only.
-"""
-
-# ============================================================
 # Q1101–Q1104: win_next_turn
 # Focus: win_next_turn
 # Input: board position immediately before the final move of a completed game
@@ -432,7 +26,6 @@ Answer format: "row col" (0-based) only.
 # ============================================================
 
 [questions.Q1101]
-num_samples=250
 text = """
 This image shows the Gomoku position immediately before the final move of a completed game.
 Final outcome of the completed game: {outcome_phrase}.
@@ -446,7 +39,6 @@ Answer format: exactly two 0-based integers: "row col".
 """
 
 [questions.Q1102]
-num_samples=250
 text = """
 You are given the board state one move before the game ended.
 Final outcome: {outcome_phrase}.
@@ -459,7 +51,6 @@ Answer format: "row col" (0-based) and nothing else.
 """
 
 [questions.Q1103]
-num_samples=250
 text = """
 This is the position directly before the last move of the game.
 Final outcome: {outcome_phrase}.
@@ -473,7 +64,6 @@ Answer format: exactly "row col" using 0-based indexing.
 """
 
 [questions.Q1104]
-num_samples=250
 text = """
 Board state: one move before the end of the game.
 Final outcome: {outcome_phrase}.
@@ -492,7 +82,6 @@ Answer format: two 0-based integers: "row col".
 # ============================================================
 
 [questions.Q1201]
-num_samples=250
 text = """
 It is {color}'s turn.
 
@@ -503,7 +92,6 @@ Answer format: "row col" (0-based). Output nothing else.
 """
 
 [questions.Q1202]
-num_samples=250
 text = """
 Current turn: {color} to move.
 
@@ -514,7 +102,6 @@ Answer format: exactly two 0-based integers: "row col".
 """
 
 [questions.Q1203]
-num_samples=250
 text = """
 {color} to move.
 
@@ -525,7 +112,6 @@ Answer format: "row col" using 0-based indexing, and nothing else.
 """
 
 [questions.Q1204]
-num_samples=250
 text = """
 It is {color}'s move.
 
@@ -537,31 +123,24 @@ Answer format: exactly "row col" (0-based).
 
 # ============================================================
 # Q1301–Q1304: reason_next_move
-# Output: 15-line token matrix + two labeled lines.
-# NOTE: Rigid format to support parsing.
-# Board tokens: empty|black|white
+# Output: 15-line matrix + three labeled lines.
+# NOTE: This is deliberately rigid to support parsing.
 # ============================================================
 
 [questions.Q1301]
-num_samples=250
 text = """
 You are Player {player} playing {color}. It is your turn.
 
 Complete the following tasks in order:
 
-1) Board matrix (token grid):
-   - Output the current board as a 15×15 matrix of tokens.
-   - Tokens must be exactly one of: empty, black, white.
-   - Meaning:
-       empty = no stone on that intersection
-       black = black stone on that intersection
-       white = white stone on that intersection
+1) Board matrix:
+   - Output the current board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
    - Output exactly 15 lines.
-   - Each line must contain exactly 15 tokens separated by single spaces.
-   - Do not output brackets, commas, or any other symbols.
+   - Each line must contain exactly 15 integers separated by single spaces.
 
 2) One-move win (you):
-   - Decide whether you have an immediate winning move this turn (a move that creates 5 in a row).
+   - Decide whether you have an immediate winning move this turn.
 
 3) One-move win (opponent):
    - Decide whether your opponent has an immediate winning move on their next turn.
@@ -569,13 +148,13 @@ Complete the following tasks in order:
 4) Best move:
    - Output the best next move as two 0-based integers: "row col".
    - If you have an immediate winning move, choose a winning move.
-   - Otherwise, if the opponent has an immediate winning move next, choose a blocking move.
+   - Otherwise, if the opponent has an immediate winning move, choose a blocking move.
    - Otherwise, choose the best available move.
 
 Output format (must match exactly):
 
 [Reasoning]
-<15 lines: board token matrix>
+<15 lines: board matrix>
 CAN_WIN_NEXT_TURN: yes|no
 CAN_LOSE_NEXT_TURN: yes|no
 [/Reasoning]
@@ -585,34 +164,33 @@ row col
 """
 
 [questions.Q1302]
-num_samples=250
 text = """
-You are {color} (Player {player}). It is your turn.
+You are Player {player} playing {color}. It is your turn.
 
-Follow the steps below in order:
+Complete the following tasks in order:
 
-1) Print the board as a 15×15 token matrix:
-   - Tokens: empty, black, white only.
-   - Exactly 15 lines total.
-   - Each line: exactly 15 tokens separated by single spaces.
-   - No additional formatting (no commas, no brackets, no extra words).
+1) Board matrix:
+   - Output the current board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
+   - Output exactly 15 lines.
+   - Each line must contain exactly 15 integers separated by single spaces.
 
-2) CAN_WIN_NEXT_TURN:
-   - Output yes if you have a one-move win now, otherwise no.
+2) One-move win (you):
+   - Decide whether you have an immediate winning move this turn.
 
-3) CAN_LOSE_NEXT_TURN:
-   - Output yes if the opponent has a one-move win on their next move, otherwise no.
+3) One-move win (opponent):
+   - Decide whether your opponent has an immediate winning move on their next turn.
 
 4) Best move:
-   - Output one move "row col" (0-based).
-   - Prefer a winning move if available.
-   - Otherwise prefer a blocking move if the opponent can win next.
-   - Otherwise output the best available move.
+   - Output the best next move as two 0-based integers: "row col".
+   - If you have an immediate winning move, choose a winning move.
+   - Otherwise, if the opponent has an immediate winning move, choose a blocking move.
+   - Otherwise, choose the best available move.
 
 Output format (must match exactly):
 
 [Reasoning]
-<15 lines: board token matrix>
+<15 lines: board matrix>
 CAN_WIN_NEXT_TURN: yes|no
 CAN_LOSE_NEXT_TURN: yes|no
 [/Reasoning]
@@ -622,34 +200,33 @@ row col
 """
 
 [questions.Q1303]
-num_samples=250
 text = """
-Player {player} ({color}) to move.
+It is {color}'s turn (Player {player}).
 
-Tasks (in order):
+Complete the following tasks in order:
 
-1) Board token matrix:
+1) Board matrix:
+   - Print the board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
    - Output exactly 15 lines.
-   - Each line must contain exactly 15 tokens separated by single spaces.
-   - Allowed tokens only: empty, black, white.
-   - Use tokens to describe the visual board (not numbers).
+   - Each line must contain exactly 15 integers separated by single spaces.
 
-2) Immediate win check (you):
-   - Determine whether you can win immediately with one move.
+2) One-move win (you):
+   - Decide whether {color} has an immediate winning move on this turn.
 
-3) Immediate win check (opponent):
-   - Determine whether the opponent can win immediately on their next move.
+3) One-move win (opponent):
+   - Decide whether the opponent has an immediate winning move on their next turn.
 
-4) Best next move:
-   - Output exactly one move as "row col" (0-based).
-   - If you can win now, choose a winning move.
-   - Else if the opponent can win next, choose a blocking move.
-   - Else choose the best available move.
+4) Best move:
+   - Output the best next move as two 0-based integers: "row col".
+   - Prefer an immediate winning move if one exists.
+   - Otherwise, if the opponent has an immediate winning move next, output a blocking move.
+   - Otherwise, output the best available move.
 
 Output format (must match exactly):
 
 [Reasoning]
-<15 lines: board token matrix>
+<15 lines: board matrix>
 CAN_WIN_NEXT_TURN: yes|no
 CAN_LOSE_NEXT_TURN: yes|no
 [/Reasoning]
@@ -659,32 +236,33 @@ row col
 """
 
 [questions.Q1304]
-num_samples=250
 text = """
-It is your move. You are Player {player} playing {color}.
+Player {player} ({color}) to move.
 
-Required output, in order:
+Complete the following tasks in order:
 
-1) Token board matrix:
-   - Print the full 15×15 board as tokens.
-   - Exactly 15 lines, each line exactly 15 tokens separated by single spaces.
-   - Tokens must be exactly: empty, black, white.
-   - Do not output numbers, punctuation, brackets, or extra text.
+1) Board matrix:
+   - Output the board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
+   - Output exactly 15 lines.
+   - Each line must contain exactly 15 integers separated by single spaces.
 
-2) CAN_WIN_NEXT_TURN:
-   - yes if you have a one-move win now, otherwise no.
+2) Immediate win check:
+   - Determine whether you have a one-move win now.
 
-3) CAN_LOSE_NEXT_TURN:
-   - yes if the opponent has a one-move win next, otherwise no.
+3) Immediate loss check:
+   - Determine whether your opponent has a one-move win on their next turn.
 
-4) Best move:
-   - Output one legal move "row col" (0-based).
-   - Prefer a winning move; otherwise a blocking move; otherwise the best move.
+4) Best next move:
+   - Output the best move as "row col" (0-based).
+   - If you can win immediately, output a winning move.
+   - Else if the opponent can win immediately next, output a blocking move.
+   - Else output the best available move.
 
 Output format (must match exactly):
 
 [Reasoning]
-<15 lines: board token matrix>
+<15 lines: board matrix>
 CAN_WIN_NEXT_TURN: yes|no
 CAN_LOSE_NEXT_TURN: yes|no
 [/Reasoning]

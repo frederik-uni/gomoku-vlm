@@ -9,47 +9,6 @@ from gen_dataset.sphinx.core import (
     get_question_text
 )
 
-TOKEN_EMPTY = "empty"
-TOKEN_BLACK = "black"
-TOKEN_WHITE = "white"
-
-def board_to_token_matrix_string(
-    board: np.ndarray,
-    *,
-    token_empty: str = TOKEN_EMPTY,
-    token_black: str = TOKEN_BLACK,
-    token_white: str = TOKEN_WHITE,
-) -> str:
-    """
-    Convert a 15x15 board array into a strict plain-text matrix of tokens.
-
-    Output:
-      - exactly H lines
-      - each line: exactly W tokens separated by single spaces
-      - tokens are: empty|black|white
-
-    Expected encoding in `board`:
-      0 = empty, 1 = black, 2 = white
-    """
-    if board.ndim != 2:
-        raise ValueError(f"Expected 2D board, got shape {board.shape}")
-
-    h, w = board.shape
-
-    # Validate values early (catches bugs upstream)
-    vals = set(np.unique(board).tolist())
-    allowed = {0, 1, 2}
-    if not vals.issubset(allowed):
-        raise ValueError(f"Board contains unexpected values {vals}, allowed={allowed}")
-
-    # Map integers -> tokens
-    mapping = {0: token_empty, 1: token_black, 2: token_white}
-
-    lines = []
-    for r in range(h):
-        row_tokens = [mapping[int(board[r, c])] for c in range(w)]
-        lines.append(" ".join(row_tokens))
-    return "\n".join(lines)
 
 def board_to_matrix_string(board: np.ndarray) -> str:
     """
@@ -101,7 +60,7 @@ def _focus_print_board_matrix(
     persist_turn_game_state(board, turn_index, sim_id)
 
     # serialize the board as text matrix
-    answer = board_to_token_matrix_string(board)
+    answer = board_to_matrix_string(board)
     valid_answers = [answer]
 
     return DatasetRow(
