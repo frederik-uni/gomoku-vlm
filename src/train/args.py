@@ -43,7 +43,7 @@ def parse_args():
     )
 
     # 2e-4 for visual
-    # 5e-5 for strategy
+    # (2e-5 for strategy might make more sense?)
     parser.add_argument(
         "--learning_rate", type=float, default=2e-4, help="Learning rate for training"
     )
