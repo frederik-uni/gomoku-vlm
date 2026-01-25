@@ -1,0 +1,117 @@
+[general]
+# Visual Curriculum Step 1 (Early Game)
+# - Visual-only curriculum
+# - Early turns / low stone density: Q1-variants
+# - Include print_board_matrix from the start to stabilize full-board reconstruction
+#
+# Note: Total size is allowed to deviate slightly from the non-curriculum baseline.
+
+num_samples_per_question = 0
+
+context = """
+You are a vision-language model analyzing Gomoku game positions.
+
+Game rules (for this dataset):
+- The board is a 15×15 grid. Player 1 = black stones (value 1). Player 2 = white stones (value 2).
+- A legal move is placing exactly one stone on an empty intersection (value 0).
+- A player wins immediately if they can place one stone that creates 5 stones in a row (horizontal, vertical, or diagonal).
+
+Important:
+- Always follow the per-question instructions and output format exactly.
+- Do not add explanations or any extra text beyond what the question requests.
+"""
+
+# ============================================================
+# STEP 1 (Early Game): Q1-variants of basic visual focuses
+# - color_at_position
+# - count_black_stones
+# - count_white_stones
+# - count_empty_intersections
+# PLUS: print_board_matrix from the beginning
+#
+# Sampling / difficulty:
+# Your generator should ensure Q1/Q101/Q201/Q301 and Q901 sample early turns.
+# ============================================================
+
+[questions.Q1]
+num_samples = 250
+text = """
+Task:
+Inspect exactly one intersection: row {row}, column {col} (0-based).
+Decide what is currently occupying that intersection.
+
+Output constraint:
+Return exactly one word: black, white, or empty.
+"""
+
+[questions.Q101]
+num_samples = 250
+text = """
+Task:
+Count the total number of black stones currently placed on the board (Player 1).
+
+What to ignore:
+- Do not count white stones.
+- Do not count empty intersections.
+
+Output constraint:
+Return a single integer (no extra text).
+"""
+
+[questions.Q201]
+num_samples = 250
+text = """
+Task:
+Count the total number of white stones currently placed on the board (Player 2).
+
+What to ignore:
+- Do not count black stones.
+- Do not count empty intersections.
+
+Output constraint:
+Return a single integer (no extra text).
+"""
+
+[questions.Q301]
+num_samples = 250
+text = """
+Task:
+Count how many intersections are empty in the current board position.
+
+What to count:
+Count only intersections that contain no stone.
+
+Output constraint:
+Return a single integer (no extra text).
+"""
+
+# ============================================================
+# Include full-board transcription from Step 1
+# ============================================================
+
+[questions.Q901]
+num_samples = 250
+text = """
+You are looking at a Gomoku board image.
+
+Task:
+Transcribe the entire board into a 15×15 matrix of tokens that describe what you see:
+- empty = an empty intersection
+- black = a black stone
+- white = a white stone
+
+Output constraints (must follow exactly):
+- Output ONLY the matrix (no headers, no explanations, no extra text).
+- Exactly 15 lines total (top row to bottom row).
+- Each line must contain exactly 15 tokens separated by SINGLE spaces.
+- Allowed tokens are exactly: empty, black, white
+- Do NOT use numbers (0/1/2), commas, brackets, pipes, or any other symbols.
+
+Newline rules:
+- Each row must be on its own line separated by a single newline character.
+- Do not insert blank lines.
+- Do not wrap a row onto multiple lines.
+
+Answer format:
+15 lines of 15 tokens each.
+"""

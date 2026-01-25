@@ -1,3 +1,4 @@
+# Dataset for TRAINING
 [general]
 num_samples_per_question = 250
 
@@ -472,46 +473,110 @@ Answer format: exactly one word: yes or no.
 
 # ============================================================
 # Q901–Q904: print_board_matrix
-# Answer: exactly 15 lines, each 15 integers separated by single spaces.
+# Output: exactly 15 lines; each line exactly 15 tokens separated by single spaces.
+# Tokens: empty | black | white
+# NOTE: This is deliberately rigid to support parsing.
 # ============================================================
 
 [questions.Q901]
 text = """
+You are looking at a Gomoku board image.
+
 Task:
-Output the full board as a 15×15 matrix of integers using:
-0 = empty, 1 = black (Player 1), 2 = white (Player 2).
+Transcribe the entire board into a 15×15 matrix of tokens that describe what you see:
+- empty = an empty intersection
+- black = a black stone
+- white = a white stone
+
+Output constraints (must follow exactly):
+- Output ONLY the matrix (no headers, no explanations, no extra text).
+- Exactly 15 lines total (top row to bottom row).
+- Each line must contain exactly 15 tokens separated by SINGLE spaces.
+- Allowed tokens are exactly: empty, black, white
+- Do NOT use numbers (0/1/2), commas, brackets, pipes, or any other symbols.
+
+Newline rules:
+- Each row must be on its own line separated by a single newline character.
+- Do not insert blank lines.
+- Do not wrap a row onto multiple lines.
 
 Answer format:
-- Exactly 15 lines.
-- Each line must contain exactly 15 integers separated by single spaces.
-- Do not output any extra text, symbols, commas, or brackets.
+15 lines of 15 tokens each.
 """
 
 [questions.Q902]
 text = """
-Convert the board into a 15×15 integer matrix using:
-0 for empty, 1 for black stones, 2 for white stones.
+You are given an image of a 15×15 Gomoku board.
+
+Task:
+Write the board as a token grid using ONLY:
+empty (no stone), black (black stone), white (white stone)
+
+Strict formatting rules:
+- Output only the grid.
+- The grid has exactly 15 rows and 15 columns.
+- Row order is top-to-bottom as seen in the image.
+- Each row must be exactly 15 tokens separated by single spaces.
+- Use only lowercase tokens: empty, black, white
+- No punctuation, no extra whitespace, no surrounding brackets, and no commentary.
+
+Newline rules:
+- Exactly 15 non-empty lines.
+- One row per line (no line-wrapping).
 
 Answer format:
-- Exactly 15 rows (top to bottom).
-- Each row contains 15 space-separated integers.
-- Output only the matrix.
+15 lines, each line: 15 space-separated tokens.
 """
 
 [questions.Q903]
 text = """
-Task:
-Print the board state as numbers with the encoding:
-0 = empty, 1 = black, 2 = white.
+Transcription task (vision only):
 
-Answer format: the matrix only, as 15 lines of 15 space-separated integers.
+Convert the current board position from the image into a 15×15 token matrix.
+
+Token encoding:
+- empty = empty intersection
+- black = black stone
+- white = white stone
+
+Hard constraints:
+- Output MUST be exactly 15 lines.
+- Every line MUST contain exactly 15 tokens.
+- Tokens MUST be separated by single spaces.
+- Tokens MUST be exactly one of: empty, black, white
+- Do NOT output any other text before or after the matrix.
+
+Newline rules:
+- No blank lines.
+- Do not split a row across multiple lines.
+
+Answer format:
+The 15-line token matrix only.
 """
 
 [questions.Q904]
 text = """
-Represent the position as a 15×15 grid of integers:
-0 (empty), 1 (black), 2 (white).
+You are viewing a Gomoku board (15×15).
+
+Task:
+Produce a complete 15×15 grid describing the stones you see.
+
+Allowed tokens (and only these):
+- empty
+- black
+- white
+
+Formatting requirements (strict):
+- Output only the grid, nothing else.
+- Exactly 15 lines (top row first).
+- Each line has exactly 15 tokens separated by single spaces.
+- No commas, no brackets, no numbering, no extra spaces.
+
+Newline rules:
+- One row per line.
+- No blank lines.
+- No line wrapping.
 
 Answer format:
-Exactly 15 lines, each with 15 integers separated by single spaces, and nothing else.
+15 lines × 15 tokens.
 """
