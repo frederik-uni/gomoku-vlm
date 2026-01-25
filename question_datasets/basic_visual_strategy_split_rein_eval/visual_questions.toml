@@ -1,5 +1,5 @@
 [general]
-num_samples_per_question = 250
+num_samples_per_question = 25
 
 # global context that will be prepended to every question text.
 # If you leave this empty or remove it, nothing extra is added.

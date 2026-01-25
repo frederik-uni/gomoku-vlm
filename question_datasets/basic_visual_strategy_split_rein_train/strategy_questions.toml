@@ -1,5 +1,6 @@
+# 25 Samples of all Visual Questions are still generated, to have a reinforcement effect.
 [general]
-num_samples_per_question = 250
+num_samples_per_question = 25
 
 # global context that will be prepended to every question text.
 # If you leave this empty or remove it, nothing extra is added.
@@ -514,4 +515,271 @@ Represent the position as a 15×15 grid of integers:
 
 Answer format:
 Exactly 15 lines, each with 15 integers separated by single spaces, and nothing else.
+"""
+
+# ============================================================
+# Q1101–Q1104: win_next_turn
+# Focus: win_next_turn
+# Input: board position immediately before the final move of a completed game
+# Context: {outcome_phrase} states the final game outcome ("win for black", "win for white", or "draw")
+# Output: exactly one move as two 0-based integers: "row col"
+# Note: A one-move win may or may not exist in this position (e.g., the game may end in a draw).
+# ============================================================
+
+[questions.Q1101]
+num_samples = 250
+text = """
+This image shows the Gomoku position immediately before the final move of a completed game.
+Final outcome of the completed game: {outcome_phrase}.
+You are playing {color}, and it is your turn in this position.
+
+Task:
+Play the best final move with the goal of winning immediately if a one-move win exists.
+Otherwise, play the best final move available in this position.
+
+Answer format: exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1102]
+num_samples = 250
+text = """
+You are given the board state one move before the game ended.
+Final outcome: {outcome_phrase}.
+It is {color}'s turn.
+
+Task:
+Choose the final move. Prefer an immediate win if possible; otherwise choose the best move available.
+
+Answer format: "row col" (0-based) and nothing else.
+"""
+
+[questions.Q1103]
+num_samples = 250
+text = """
+This is the position directly before the last move of the game.
+Final outcome: {outcome_phrase}.
+Current player: {color}.
+
+Task:
+Output the final move, aiming to win immediately if possible.
+If an immediate win is not available, output the best available move.
+
+Answer format: exactly "row col" using 0-based indexing.
+"""
+
+[questions.Q1104]
+num_samples = 250
+text = """
+Board state: one move before the end of the game.
+Final outcome: {outcome_phrase}.
+You are {color} and it is your turn.
+
+Task:
+Select the final move. If you can win immediately with one move, play that winning move.
+Otherwise, play the best available move.
+
+Answer format: two 0-based integers: "row col".
+"""
+
+# ============================================================
+# Q1201–Q1204: best_next_move
+# Output: exactly one move as two 0-based integers: "row col"
+# ============================================================
+
+[questions.Q1201]
+num_samples = 250
+text = """
+It is {color}'s turn.
+
+Task:
+What is the best move to play now for {color}?
+
+Answer format: "row col" (0-based). Output nothing else.
+"""
+
+[questions.Q1202]
+num_samples = 250
+text = """
+Current turn: {color} to move.
+
+Task:
+Choose the single best next move for {color} in this position.
+
+Answer format: exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1203]
+num_samples = 250
+text = """
+{color} to move.
+
+Task:
+Determine the best next action for {color}.
+
+Answer format: "row col" using 0-based indexing, and nothing else.
+"""
+
+[questions.Q1204]
+num_samples = 250
+text = """
+It is {color}'s move.
+
+Task:
+Select the best move for {color} to play next.
+
+Answer format: exactly "row col" (0-based).
+"""
+
+# ============================================================
+# Q1301–Q1304: reason_next_move
+# Output: 15-line matrix + three labeled lines.
+# NOTE: This is deliberately rigid to support parsing.
+# ============================================================
+
+[questions.Q1301]
+num_samples = 250
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Complete the following tasks in order:
+
+1) Board matrix:
+   - Output the current board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
+   - Output exactly 15 lines.
+   - Each line must contain exactly 15 integers separated by single spaces.
+
+2) One-move win (you):
+   - Decide whether you have an immediate winning move this turn.
+
+3) One-move win (opponent):
+   - Decide whether your opponent has an immediate winning move on their next turn.
+
+4) Best move:
+   - Output the best next move as two 0-based integers: "row col".
+   - If you have an immediate winning move, choose a winning move.
+   - Otherwise, if the opponent has an immediate winning move, choose a blocking move.
+   - Otherwise, choose the best available move.
+
+Output format (must match exactly):
+
+[Reasoning]
+<15 lines: board matrix>
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+[/Reasoning]
+[Answer]
+row col
+[/Answer]
+"""
+
+[questions.Q1302]
+num_samples = 250
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Complete the following tasks in order:
+
+1) Board matrix:
+   - Output the current board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
+   - Output exactly 15 lines.
+   - Each line must contain exactly 15 integers separated by single spaces.
+
+2) One-move win (you):
+   - Decide whether you have an immediate winning move this turn.
+
+3) One-move win (opponent):
+   - Decide whether your opponent has an immediate winning move on their next turn.
+
+4) Best move:
+   - Output the best next move as two 0-based integers: "row col".
+   - If you have an immediate winning move, choose a winning move.
+   - Otherwise, if the opponent has an immediate winning move, choose a blocking move.
+   - Otherwise, choose the best available move.
+
+Output format (must match exactly):
+
+[Reasoning]
+<15 lines: board matrix>
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+[/Reasoning]
+[Answer]
+row col
+[/Answer]
+"""
+
+[questions.Q1303]
+num_samples = 250
+text = """
+It is {color}'s turn (Player {player}).
+
+Complete the following tasks in order:
+
+1) Board matrix:
+   - Print the board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
+   - Output exactly 15 lines.
+   - Each line must contain exactly 15 integers separated by single spaces.
+
+2) One-move win (you):
+   - Decide whether {color} has an immediate winning move on this turn.
+
+3) One-move win (opponent):
+   - Decide whether the opponent has an immediate winning move on their next turn.
+
+4) Best move:
+   - Output the best next move as two 0-based integers: "row col".
+   - Prefer an immediate winning move if one exists.
+   - Otherwise, if the opponent has an immediate winning move next, output a blocking move.
+   - Otherwise, output the best available move.
+
+Output format (must match exactly):
+
+[Reasoning]
+<15 lines: board matrix>
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+[/Reasoning]
+[Answer]
+row col
+[/Answer]
+"""
+
+[questions.Q1304]
+num_samples = 250
+text = """
+Player {player} ({color}) to move.
+
+Complete the following tasks in order:
+
+1) Board matrix:
+   - Output the board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
+   - Output exactly 15 lines.
+   - Each line must contain exactly 15 integers separated by single spaces.
+
+2) Immediate win check:
+   - Determine whether you have a one-move win now.
+
+3) Immediate loss check:
+   - Determine whether your opponent has a one-move win on their next turn.
+
+4) Best next move:
+   - Output the best move as "row col" (0-based).
+   - If you can win immediately, output a winning move.
+   - Else if the opponent can win immediately next, output a blocking move.
+   - Else output the best available move.
+
+Output format (must match exactly):
+
+[Reasoning]
+<15 lines: board matrix>
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+[/Reasoning]
+[Answer]
+row col
+[/Answer]
 """
