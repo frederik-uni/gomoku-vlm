@@ -1,0 +1,157 @@
+[general]
+# ============================================================
+# Visual Curriculum Step 2 (Mid Game) — self-contained with SMALL rehearsal
+#
+# New (Step 2) variants: 250 samples each
+# Rehearsal (Step 1) variants: 25 samples each (minimal to reduce forgetting)
+#
+# Any question NOT listed here is excluded and will not be generated.
+# ============================================================
+
+num_samples_per_question = 0
+
+context = """
+You are a vision-language model analyzing Gomoku game positions.
+
+Game rules (for this dataset):
+- The board is a 15×15 grid. Player 1 = black stones (value 1). Player 2 = white stones (value 2).
+- A legal move is placing exactly one stone on an empty intersection (value 0).
+- A player wins immediately if they can place one stone that creates 5 stones in a row (horizontal, vertical, or diagonal).
+
+Important:
+- Always follow the per-question instructions and output format exactly.
+- Do not add explanations or any extra text beyond what the question requests.
+"""
+
+# ============================================================
+# REHEARSAL: Step 1 (Early Game variants) — VERY SMALL sampling
+# ============================================================
+
+[questions.Q1]
+num_samples = 25
+text = """
+Task:
+Inspect exactly one intersection: row {row}, column {col} (0-based).
+Decide what is currently occupying that intersection.
+
+Output constraint:
+Return exactly one word: black, white, or empty.
+"""
+
+[questions.Q101]
+num_samples = 25
+text = """
+Task:
+Count the total number of black stones currently placed on the board (Player 1).
+
+What to ignore:
+- Do not count white stones.
+- Do not count empty intersections.
+
+Output constraint:
+Return a single integer (no extra text).
+"""
+
+[questions.Q201]
+num_samples = 25
+text = """
+Task:
+Count the total number of white stones currently placed on the board (Player 2).
+
+What to ignore:
+- Do not count black stones.
+- Do not count empty intersections.
+
+Output constraint:
+Return a single integer (no extra text).
+"""
+
+[questions.Q301]
+num_samples = 25
+text = """
+Task:
+Count how many intersections are empty in the current board position.
+
+What to count:
+Count only intersections that contain no stone.
+
+Output constraint:
+Return a single integer (no extra text).
+"""
+
+[questions.Q901]
+num_samples = 25
+text = """
+Task:
+Output the full board as a 15×15 matrix of integers using:
+0 = empty, 1 = black (Player 1), 2 = white (Player 2).
+
+Answer format:
+- Exactly 15 lines.
+- Each line must contain exactly 15 integers separated by single spaces.
+- Do not output any extra text, symbols, commas, or brackets.
+"""
+
+# ============================================================
+# NEW: Step 2 (Mid Game variants) — full sampling
+# ============================================================
+
+[questions.Q2]
+num_samples = 250
+text = """
+Task:
+Look only at the intersection at (row {row}, column {col}) using 0-based indexing.
+Classify the current state of that single intersection (do not analyze the rest of the board).
+
+Output constraint:
+Return exactly one word: black, white, or empty.
+"""
+
+[questions.Q102]
+num_samples = 250
+text = """
+Task:
+Determine how many stones belong to Player 1 (black) in the current position.
+
+What to ignore:
+Ignore everything that is not a black stone (white stones and empty intersections).
+
+Output constraint:
+Return exactly one integer.
+"""
+
+[questions.Q202]
+num_samples = 250
+text = """
+Task:
+Determine how many stones belong to Player 2 (white) in the current position.
+
+What to ignore:
+Ignore everything that is not a white stone (black stones and empty intersections).
+
+Output constraint:
+Return exactly one integer.
+"""
+
+[questions.Q302]
+num_samples = 250
+text = """
+Task:
+Determine the total number of empty intersections available right now.
+Treat any intersection with a stone as non-empty.
+
+Output constraint:
+Return exactly one integer.
+"""
+
+[questions.Q902]
+num_samples = 250
+text = """
+Convert the board into a 15×15 integer matrix using:
+0 for empty, 1 for black stones, 2 for white stones.
+
+Answer format:
+- Exactly 15 rows (top to bottom).
+- Each row contains 15 space-separated integers.
+- Output only the matrix.
+"""

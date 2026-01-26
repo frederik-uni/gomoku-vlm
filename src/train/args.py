@@ -42,6 +42,8 @@ def parse_args():
         help="Target modules for LoRA",
     )
 
+    # 2e-4 for visual
+    # (2e-5 for strategy might make more sense?)
     parser.add_argument(
         "--learning_rate", type=float, default=2e-4, help="Learning rate for training"
     )

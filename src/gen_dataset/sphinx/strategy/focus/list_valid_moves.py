@@ -62,22 +62,21 @@ def _focus_list_valid_moves(
     # Persist the image and get img_bytes
     img_path, img_bytes = persist_turn_image(board, turn_index, sim_id, non_rand_img=non_rand_img)
 
-    # Collect all valid moves = all empty cells (0's)
-    mask = board == 0  # shape (15, 15)
-    valid_moves = np.argwhere(mask)  # shape (N, 2), each row = [row_idx, col_idx]
-    num_valid_moves = valid_moves.shape[0]
-    if num_valid_moves < 1:
-        raise ValueError("Expected at least one valid move, but found none (board has no empty cells).")
+    # All valid moves are all empty cells (0)
+    mask = board == 0
+    valid_moves = np.argwhere(mask)  # [[row, col], ...]
+    if valid_moves.size == 0:
+        raise ValueError("Expected at least one valid move, but found none (board full).")
 
-    # Ensure strict row-major order: row asc, then col asc
+    # Row-major order
     valid_moves = valid_moves[np.lexsort((valid_moves[:, 1], valid_moves[:, 0]))]
 
-    # Build a single answer string like: "r0 c0, r0 c3, r1 c2, ..."
-    move_strings = [f"{row_idx} {col_idx}" for row_idx, col_idx in valid_moves]
-    answer = ", ".join(move_strings)
+    # Atomic answers: each move is its own answer unit
+    valid_answers = [f"{r} {c}" for r, c in valid_moves]
 
-    # only one correct answer
-    valid_answers = [answer]
+    # Pick one valid move at random as the canonical "answer" for this sample.
+    # valid_answers remains the full set for evaluation.
+    answer = valid_answers[np.random.randint(len(valid_answers))]
 
     # get color of the player who must perform this turn
     if (turn_index + 1) % 2 == 0:

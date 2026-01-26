@@ -1,8 +1,8 @@
 [general]
 max_simulation_attempts = 999999  # how many times to re-simulate to avoid draws
-num_workers = -1 # Number of worker threads to spawn when simulating the games. -1 -> num of cpu cores - 1
+num_workers = 10 # Number of worker threads to spawn when simulating the games. -1 -> num of cpu cores - 1
 
 [general.split_ratios]
-train = 1.0
+train = 0.0
 eval = 0.0
-test = 0.0
+test = 1.0

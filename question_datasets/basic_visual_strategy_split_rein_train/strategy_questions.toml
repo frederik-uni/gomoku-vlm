@@ -1,0 +1,785 @@
+# 25 Samples of all Visual Questions are still generated, to have a reinforcement effect.
+[general]
+num_samples_per_question = 25
+
+# global context that will be prepended to every question text.
+# If you leave this empty or remove it, nothing extra is added.
+context = """
+You are a vision-language model analyzing Gomoku game positions.
+
+Game rules (for this dataset):
+- The board is a 15×15 grid. Player 1 = black stones (value 1). Player 2 = white stones (value 2).
+- A legal move is placing exactly one stone on an empty intersection (value 0).
+- A player wins immediately if they can place one stone that creates 5 stones in a row (horizontal, vertical, or diagonal).
+
+Important:
+- Always follow the per-question instructions and output format exactly.
+- Do not add explanations or any extra text beyond what the question requests.
+"""
+
+# ============================================================
+# Q1–Q4: color_at_position
+# Answer: one word: black|white|empty
+# Params: {row}, {col} are 0-based
+# ============================================================
+
+[questions.Q1]
+text = """
+Task:
+Inspect exactly one intersection: row {row}, column {col} (0-based).
+Decide what is currently occupying that intersection.
+
+Output constraint:
+Return exactly one word: black, white, or empty.
+"""
+
+[questions.Q2]
+text = """
+Task:
+Look only at the intersection at (row {row}, column {col}) using 0-based indexing.
+Classify the current state of that single intersection (do not analyze the rest of the board).
+
+Output constraint:
+Return exactly one word: black, white, or empty.
+"""
+
+[questions.Q3]
+text = """
+Task:
+Focus on the single coordinate (row {row}, col {col}) with 0-based indexing.
+Determine which label applies to that intersection right now.
+
+Output constraint:
+Return exactly one word: black, white, or empty.
+"""
+
+[questions.Q4]
+text = """
+Task:
+At row {row} and column {col} (0-based), identify what is present at that intersection.
+Do not guess or infer future moves; answer only for the current position shown.
+
+Output constraint:
+Return exactly one word: black, white, or empty.
+"""
+
+
+# ============================================================
+# Q101–Q104: count_black_stones
+# Answer: one integer
+# ============================================================
+
+[questions.Q101]
+text = """
+Task:
+Count the total number of black stones currently placed on the board (Player 1).
+
+What to ignore:
+- Do not count white stones.
+- Do not count empty intersections.
+
+Output constraint:
+Return a single integer (no extra text).
+"""
+
+[questions.Q102]
+text = """
+Task:
+Determine how many stones belong to Player 1 (black) in the current position.
+
+What to ignore:
+Ignore everything that is not a black stone (white stones and empty intersections).
+
+Output constraint:
+Return exactly one integer.
+"""
+
+[questions.Q103]
+text = """
+Task:
+Compute the total number of black stones on the board as shown.
+This is a simple count of already placed black stones (not a prediction).
+
+Output constraint:
+Return one integer only (no explanation).
+"""
+
+[questions.Q104]
+text = """
+Task:
+How many intersections are occupied by black stones (Player 1) in the current snapshot?
+Count each black stone exactly once.
+
+Output constraint:
+Return a single integer and nothing else.
+"""
+
+
+# ============================================================
+# Q201–Q204: count_white_stones
+# Answer: one integer
+# ============================================================
+
+[questions.Q201]
+text = """
+Task:
+Count the total number of white stones currently placed on the board (Player 2).
+
+What to ignore:
+- Do not count black stones.
+- Do not count empty intersections.
+
+Output constraint:
+Return a single integer (no extra text).
+"""
+
+[questions.Q202]
+text = """
+Task:
+Determine how many stones belong to Player 2 (white) in the current position.
+
+What to ignore:
+Ignore everything that is not a white stone (black stones and empty intersections).
+
+Output constraint:
+Return exactly one integer.
+"""
+
+[questions.Q203]
+text = """
+Task:
+Compute the total number of white stones on the board as shown.
+This is a direct count of placed stones in the current snapshot.
+
+Output constraint:
+Return one integer only (no explanation).
+"""
+
+[questions.Q204]
+text = """
+Task:
+How many intersections are occupied by white stones (Player 2) in the current snapshot?
+Count each white stone exactly once.
+
+Output constraint:
+Return a single integer and nothing else.
+"""
+
+
+# ============================================================
+# Q301–Q304: count_empty_intersections
+# Answer: one integer
+# ============================================================
+
+[questions.Q301]
+text = """
+Task:
+Count how many intersections are empty in the current board position.
+
+What to count:
+Count only intersections that contain no stone.
+
+Output constraint:
+Return a single integer (no extra text).
+"""
+
+[questions.Q302]
+text = """
+Task:
+Determine the total number of empty intersections available right now.
+Treat any intersection with a stone as non-empty.
+
+Output constraint:
+Return exactly one integer.
+"""
+
+[questions.Q303]
+text = """
+Task:
+Count every empty intersection on the board in the current position.
+
+What to ignore:
+Do not count any intersection containing a black or white stone.
+
+Output constraint:
+Return a single integer and nothing else.
+"""
+
+[questions.Q304]
+text = """
+Task:
+Compute the number of remaining empty intersections in the shown snapshot.
+This is purely a count of empty cells (not a move recommendation).
+
+Output constraint:
+Return exactly one integer (no explanation).
+"""
+
+# ============================================================
+# Q401–Q404: three_in_a_row
+# Definition: EXACT three-in-a-row segments (maximal runs of length 3).
+# Excludes any length-3 window that is part of a longer contiguous run (4+).
+# Answer: one integer
+# ============================================================
+
+[questions.Q401]
+text = """
+You are Player {player} playing {color}.
+
+Task:
+Count how many EXACT 3-in-a-row segments you have.
+An EXACT 3-in-a-row segment is a straight line of exactly 3 contiguous intersections
+(horizontal, vertical, or diagonal) occupied by your stones, and it is NOT part of a longer run.
+
+Formally: for each direction, a run of 3 qualifies only if the immediately adjacent intersection
+before the run and the immediately adjacent intersection after the run (in that same direction)
+are NOT your stones (they may be empty, opponent, or off-board).
+
+Answer format: a single integer.
+"""
+
+[questions.Q402]
+text = """
+You are Player {player} with {color} stones.
+
+Task:
+How many contiguous runs of EXACTLY 3 of your stones exist on the board?
+Count in horizontal, vertical, and diagonal directions.
+
+Important:
+Do NOT count any length-3 window that lies inside a longer contiguous run (length >= 4).
+A run counts only if it has length exactly 3.
+
+Answer format: a single integer (no extra text).
+"""
+
+[questions.Q403]
+text = """
+You play as {color} (Player {player}).
+
+Task:
+Count the number of EXACT three-in-a-row segments belonging to you.
+A segment counts only if it consists of 3 adjacent intersections in a straight line, all your stones,
+and the segment cannot be extended on either end by another of your stones in the same direction.
+
+Answer format: a single integer.
+"""
+
+[questions.Q404]
+text = """
+You are Player {player} and your stones are {color}.
+
+Task:
+Count every occurrence of exactly three adjacent {color} stones in a straight line
+(horizontal, vertical, or diagonal), where "exactly" means:
+- the three stones are contiguous, and
+- the immediately adjacent intersection on both ends (along that line) is NOT a {color} stone
+  (it may be empty, opponent, or off-board).
+
+Answer format: a single integer.
+"""
+
+# ============================================================
+# Q501–Q504: four_in_a_row
+# Here we define "four-in-a-row segments" (length-4 windows).
+# Answer: one integer
+# ============================================================
+
+[questions.Q501]
+text = """
+You are Player {player} playing {color}.
+
+Task:
+Count how many 4-in-a-row segments you have for your color.
+A 4-in-a-row segment is any contiguous window of exactly 4 intersections
+(horizontal, vertical, or diagonal) where all 4 are your stones.
+
+Answer format: a single integer.
+"""
+
+[questions.Q502]
+text = """
+You are Player {player} with {color} stones.
+
+Task:
+How many contiguous length-4 segments of your stones exist on the board?
+Count segments in horizontal, vertical, and diagonal directions.
+
+Answer format: a single integer (no extra text).
+"""
+
+[questions.Q503]
+text = """
+You play as {color} (Player {player}).
+
+Task:
+Count the number of 4-stone segments (four in a row) belonging to you.
+A segment is four adjacent intersections in a straight line, all your stones.
+
+Answer format: a single integer.
+"""
+
+[questions.Q504]
+text = """
+You are Player {player} and your stones are {color}.
+
+Task:
+Count every occurrence of four adjacent {color} stones in a straight line
+(horizontal, vertical, or diagonal).
+
+Answer format: a single integer.
+"""
+
+# ============================================================
+# Q601–Q604: determine_who_won
+# Answer: one word: black|white|draw
+# ============================================================
+
+[questions.Q601]
+text = """
+This is the final board position of a finished game.
+
+Task:
+Determine the color of the winner from the final position.
+
+Answer format: exactly one word: black, white, or draw.
+"""
+
+[questions.Q602]
+text = """
+The game is over (final board).
+
+Task:
+Who won based on the final stones on the board?
+
+Answer format: exactly one word: black, white, or draw.
+"""
+
+[questions.Q603]
+text = """
+You are given the completed game position.
+
+Task:
+Decide whether Player 1 (black) won, Player 2 (white) won, or the game is a draw.
+
+Answer format: exactly one word: black, white, or draw.
+"""
+
+[questions.Q604]
+text = """
+Final position (no more moves will be played).
+
+Task:
+Determine the outcome.
+
+Answer format: exactly one word: black, white, or draw.
+"""
+
+# ============================================================
+# Q701–Q704: can_you_win
+# Answer: one word: yes|no
+# Definition: "yes" iff the current player has at least one immediate winning move.
+# ============================================================
+
+[questions.Q701]
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Task:
+Can you win immediately on this move?
+In other words: is there at least one legal placement of a {color} stone
+that creates 5 in a row right now?
+
+Answer format: exactly one word: yes or no.
+"""
+
+[questions.Q702]
+text = """
+You are Player {player} with {color} stones, and it is your move.
+
+Task:
+Does there exist a legal move that wins the game immediately (forms 5 in a row)?
+
+Answer format: exactly one word: yes or no.
+"""
+
+[questions.Q703]
+text = """
+It is your turn. You are Player {player} playing {color}.
+
+Task:
+Determine whether you have an immediate winning move available.
+
+Answer format: exactly one word: yes or no.
+"""
+
+[questions.Q704]
+text = """
+You play {color} stones (Player {player}). It is your move.
+
+Task:
+Is there at least one winning move right now (one move ends the game)?
+
+Answer format: exactly one word: yes or no.
+"""
+
+# ============================================================
+# Q801–Q804: can_you_lose
+# Answer: one word: yes|no
+# Definition: "yes" iff opponent has at least one immediate winning move on THEIR next move.
+# ============================================================
+
+[questions.Q801]
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Task:
+If you do not block, can your opponent win on their next turn?
+(That is: does the opponent currently have at least one immediate winning move available?)
+
+Answer format: exactly one word: yes or no.
+"""
+
+[questions.Q802]
+text = """
+You are Player {player} with {color} stones, and it is your move.
+
+Task:
+Does your opponent have a one-move win available on their next turn?
+
+Answer format: exactly one word: yes or no.
+"""
+
+[questions.Q803]
+text = """
+It is your turn. You are Player {player} playing {color}.
+
+Task:
+Determine whether there is an immediate winning threat by the opponent
+(a move that would win for them on their next turn).
+
+Answer format: exactly one word: yes or no.
+"""
+
+[questions.Q804]
+text = """
+You play {color} stones (Player {player}). It is your move.
+
+Task:
+Is the opponent currently threatening a one-move win on their next turn?
+
+Answer format: exactly one word: yes or no.
+"""
+
+# ============================================================
+# Q901–Q904: print_board_matrix
+# Answer: exactly 15 lines, each 15 integers separated by single spaces.
+# ============================================================
+
+[questions.Q901]
+text = """
+Task:
+Output the full board as a 15×15 matrix of integers using:
+0 = empty, 1 = black (Player 1), 2 = white (Player 2).
+
+Answer format:
+- Exactly 15 lines.
+- Each line must contain exactly 15 integers separated by single spaces.
+- Do not output any extra text, symbols, commas, or brackets.
+"""
+
+[questions.Q902]
+text = """
+Convert the board into a 15×15 integer matrix using:
+0 for empty, 1 for black stones, 2 for white stones.
+
+Answer format:
+- Exactly 15 rows (top to bottom).
+- Each row contains 15 space-separated integers.
+- Output only the matrix.
+"""
+
+[questions.Q903]
+text = """
+Task:
+Print the board state as numbers with the encoding:
+0 = empty, 1 = black, 2 = white.
+
+Answer format: the matrix only, as 15 lines of 15 space-separated integers.
+"""
+
+[questions.Q904]
+text = """
+Represent the position as a 15×15 grid of integers:
+0 (empty), 1 (black), 2 (white).
+
+Answer format:
+Exactly 15 lines, each with 15 integers separated by single spaces, and nothing else.
+"""
+
+# ============================================================
+# Q1101–Q1104: win_next_turn
+# Focus: win_next_turn
+# Input: board position immediately before the final move of a completed game
+# Context: {outcome_phrase} states the final game outcome ("win for black", "win for white", or "draw")
+# Output: exactly one move as two 0-based integers: "row col"
+# Note: A one-move win may or may not exist in this position (e.g., the game may end in a draw).
+# ============================================================
+
+[questions.Q1101]
+num_samples = 250
+text = """
+This image shows the Gomoku position immediately before the final move of a completed game.
+Final outcome of the completed game: {outcome_phrase}.
+You are playing {color}, and it is your turn in this position.
+
+Task:
+Play the best final move with the goal of winning immediately if a one-move win exists.
+Otherwise, play the best final move available in this position.
+
+Answer format: exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1102]
+num_samples = 250
+text = """
+You are given the board state one move before the game ended.
+Final outcome: {outcome_phrase}.
+It is {color}'s turn.
+
+Task:
+Choose the final move. Prefer an immediate win if possible; otherwise choose the best move available.
+
+Answer format: "row col" (0-based) and nothing else.
+"""
+
+[questions.Q1103]
+num_samples = 250
+text = """
+This is the position directly before the last move of the game.
+Final outcome: {outcome_phrase}.
+Current player: {color}.
+
+Task:
+Output the final move, aiming to win immediately if possible.
+If an immediate win is not available, output the best available move.
+
+Answer format: exactly "row col" using 0-based indexing.
+"""
+
+[questions.Q1104]
+num_samples = 250
+text = """
+Board state: one move before the end of the game.
+Final outcome: {outcome_phrase}.
+You are {color} and it is your turn.
+
+Task:
+Select the final move. If you can win immediately with one move, play that winning move.
+Otherwise, play the best available move.
+
+Answer format: two 0-based integers: "row col".
+"""
+
+# ============================================================
+# Q1201–Q1204: best_next_move
+# Output: exactly one move as two 0-based integers: "row col"
+# ============================================================
+
+[questions.Q1201]
+num_samples = 250
+text = """
+It is {color}'s turn.
+
+Task:
+What is the best move to play now for {color}?
+
+Answer format: "row col" (0-based). Output nothing else.
+"""
+
+[questions.Q1202]
+num_samples = 250
+text = """
+Current turn: {color} to move.
+
+Task:
+Choose the single best next move for {color} in this position.
+
+Answer format: exactly two 0-based integers: "row col".
+"""
+
+[questions.Q1203]
+num_samples = 250
+text = """
+{color} to move.
+
+Task:
+Determine the best next action for {color}.
+
+Answer format: "row col" using 0-based indexing, and nothing else.
+"""
+
+[questions.Q1204]
+num_samples = 250
+text = """
+It is {color}'s move.
+
+Task:
+Select the best move for {color} to play next.
+
+Answer format: exactly "row col" (0-based).
+"""
+
+# ============================================================
+# Q1301–Q1304: reason_next_move
+# Output: 15-line matrix + three labeled lines.
+# NOTE: This is deliberately rigid to support parsing.
+# ============================================================
+
+[questions.Q1301]
+num_samples = 250
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Complete the following tasks in order:
+
+1) Board matrix:
+   - Output the current board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
+   - Output exactly 15 lines.
+   - Each line must contain exactly 15 integers separated by single spaces.
+
+2) One-move win (you):
+   - Decide whether you have an immediate winning move this turn.
+
+3) One-move win (opponent):
+   - Decide whether your opponent has an immediate winning move on their next turn.
+
+4) Best move:
+   - Output the best next move as two 0-based integers: "row col".
+   - If you have an immediate winning move, choose a winning move.
+   - Otherwise, if the opponent has an immediate winning move, choose a blocking move.
+   - Otherwise, choose the best available move.
+
+Output format (must match exactly):
+
+[Reasoning]
+<15 lines: board matrix>
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+[/Reasoning]
+[Answer]
+row col
+[/Answer]
+"""
+
+[questions.Q1302]
+num_samples = 250
+text = """
+You are Player {player} playing {color}. It is your turn.
+
+Complete the following tasks in order:
+
+1) Board matrix:
+   - Output the current board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
+   - Output exactly 15 lines.
+   - Each line must contain exactly 15 integers separated by single spaces.
+
+2) One-move win (you):
+   - Decide whether you have an immediate winning move this turn.
+
+3) One-move win (opponent):
+   - Decide whether your opponent has an immediate winning move on their next turn.
+
+4) Best move:
+   - Output the best next move as two 0-based integers: "row col".
+   - If you have an immediate winning move, choose a winning move.
+   - Otherwise, if the opponent has an immediate winning move, choose a blocking move.
+   - Otherwise, choose the best available move.
+
+Output format (must match exactly):
+
+[Reasoning]
+<15 lines: board matrix>
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+[/Reasoning]
+[Answer]
+row col
+[/Answer]
+"""
+
+[questions.Q1303]
+num_samples = 250
+text = """
+It is {color}'s turn (Player {player}).
+
+Complete the following tasks in order:
+
+1) Board matrix:
+   - Print the board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
+   - Output exactly 15 lines.
+   - Each line must contain exactly 15 integers separated by single spaces.
+
+2) One-move win (you):
+   - Decide whether {color} has an immediate winning move on this turn.
+
+3) One-move win (opponent):
+   - Decide whether the opponent has an immediate winning move on their next turn.
+
+4) Best move:
+   - Output the best next move as two 0-based integers: "row col".
+   - Prefer an immediate winning move if one exists.
+   - Otherwise, if the opponent has an immediate winning move next, output a blocking move.
+   - Otherwise, output the best available move.
+
+Output format (must match exactly):
+
+[Reasoning]
+<15 lines: board matrix>
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+[/Reasoning]
+[Answer]
+row col
+[/Answer]
+"""
+
+[questions.Q1304]
+num_samples = 250
+text = """
+Player {player} ({color}) to move.
+
+Complete the following tasks in order:
+
+1) Board matrix:
+   - Output the board as a 15×15 integer matrix.
+   - Encoding: 0 = empty, 1 = black, 2 = white.
+   - Output exactly 15 lines.
+   - Each line must contain exactly 15 integers separated by single spaces.
+
+2) Immediate win check:
+   - Determine whether you have a one-move win now.
+
+3) Immediate loss check:
+   - Determine whether your opponent has a one-move win on their next turn.
+
+4) Best next move:
+   - Output the best move as "row col" (0-based).
+   - If you can win immediately, output a winning move.
+   - Else if the opponent can win immediately next, output a blocking move.
+   - Else output the best available move.
+
+Output format (must match exactly):
+
+[Reasoning]
+<15 lines: board matrix>
+CAN_WIN_NEXT_TURN: yes|no
+CAN_LOSE_NEXT_TURN: yes|no
+[/Reasoning]
+[Answer]
+row col
+[/Answer]
+"""
