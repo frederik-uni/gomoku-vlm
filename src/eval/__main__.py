@@ -66,8 +66,6 @@ def main():
     parser = build_arg_parser()
     args = parser.parse_args()
     processor, model = init(args.model_id, args.pefts)
-    for name, param in model.named_parameters():
-        print(name)
 
     result = eval_vlm_on_parquet(
         processor=processor,
