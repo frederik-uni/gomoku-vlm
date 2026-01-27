@@ -1,16 +1,6 @@
 [general]
 # ============================================================
 # Visual Curriculum Step 3 (Mid/Late Game) — self-contained with SMALL rehearsal
-#
-# New (Step 3) variants: 250 samples each
-# Rehearsal (Steps 1–2) variants: 25 samples each (minimal to reduce forgetting)
-#
-# Step 3 adds pattern-focused visual tasks:
-# - three_in_a_row (Q403)
-# - four_in_a_row  (Q503)
-# while keeping print_board_matrix in-curriculum (Q903).
-#
-# Any question NOT listed here is excluded and will not be generated.
 # ============================================================
 
 num_samples_per_question = 0
@@ -29,7 +19,7 @@ Important:
 """
 
 # ============================================================
-# REHEARSAL: Step 1 variants (Q1*, Q101*, Q201*, Q301*, Q901*) — small
+# REHEARSAL: Step 1 (Early Game) — small
 # ============================================================
 
 [questions.Q1]
@@ -71,7 +61,8 @@ Output constraint:
 Return a single integer (no extra text).
 """
 
-[questions.Q301]
+# Inverse-focus rehearsal: keep the late-game (easier) variant around as anchor.
+[questions.Q304]
 num_samples = 25
 text = """
 Task:
@@ -98,7 +89,7 @@ Answer format:
 """
 
 # ============================================================
-# REHEARSAL: Step 2 variants (Q2*, Q102*, Q202*, Q302*, Q902*) — small
+# REHEARSAL: Step 2 (Mid Game) — small
 # ============================================================
 
 [questions.Q2]
@@ -138,17 +129,6 @@ Output constraint:
 Return exactly one integer.
 """
 
-[questions.Q302]
-num_samples = 25
-text = """
-Task:
-Determine the total number of empty intersections available right now.
-Treat any intersection with a stone as non-empty.
-
-Output constraint:
-Return exactly one integer.
-"""
-
 [questions.Q902]
 num_samples = 25
 text = """
@@ -162,7 +142,7 @@ Answer format:
 """
 
 # ============================================================
-# NEW: Step 3 variants (pattern tasks + mid/late matrix) — full
+# NEW: Step 3 (Mid/Late Game) — full sampling
 # ============================================================
 
 [questions.Q3]
@@ -196,19 +176,6 @@ This is a direct count of placed stones in the current snapshot.
 
 Output constraint:
 Return one integer only (no explanation).
-"""
-
-[questions.Q303]
-num_samples = 250
-text = """
-Task:
-Count every empty intersection on the board in the current position.
-
-What to ignore:
-Do not count any intersection containing a black or white stone.
-
-Output constraint:
-Return a single integer and nothing else.
 """
 
 [questions.Q403]

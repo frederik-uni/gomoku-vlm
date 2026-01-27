@@ -2,15 +2,11 @@
 # ============================================================
 # Visual Curriculum Step 4 (Late Game) — self-contained with SMALL rehearsal
 #
-# New (Step 4) variants: 250 samples each
-# Rehearsal (Steps 1–3) variants: 25 samples each (minimal to reduce forgetting)
+# Step 4 = late-game variants (Q4*, Q104*, Q204*, Q304*, Q704, Q804, Q904*)
+# plus rehearsal from previous steps (25 samples each).
 #
-# Step 4 adds late-game tactical visual tasks:
-# - can_you_win  (Q704)
-# - can_you_lose (Q804)
-# while keeping print_board_matrix in-curriculum (Q904).
-#
-# Any question NOT listed here is excluded and will not be generated.
+# IMPORTANT: count_empty_intersections is inverse-curriculized (Q304 → Q303 → Q302 → Q301).
+# Therefore, Step 4 trains Q301 as the NEW (hardest / earliest) variant.
 # ============================================================
 
 num_samples_per_question = 0
@@ -29,7 +25,7 @@ Important:
 """
 
 # ============================================================
-# REHEARSAL: Step 1 variants (Q1*, Q101*, Q201*, Q301*, Q901*) — small
+# REHEARSAL: Step 1 (Early Game) — small
 # ============================================================
 
 [questions.Q1]
@@ -71,20 +67,20 @@ Output constraint:
 Return a single integer (no extra text).
 """
 
-[questions.Q301]
+# Inverse focus anchor (from Step 1): late-game easiest variant
+[questions.Q304]
 num_samples = 25
 text = """
 Task:
-Count how many intersections are empty in the current board position.
-
-What to count:
-Count only intersections that contain no stone.
+Compute the number of remaining empty intersections in the shown snapshot.
+This is purely a count of empty cells (not a move recommendation).
 
 Output constraint:
-Return a single integer (no extra text).
+Return exactly one integer (no explanation).
 """
 
 [questions.Q901]
+num_samples = 25
 text = """
 Task:
 Output the full board as a 15×15 matrix of integers using:
@@ -97,7 +93,7 @@ Answer format:
 """
 
 # ============================================================
-# REHEARSAL: Step 2 variants (Q2*, Q102*, Q202*, Q302*, Q902*) — small
+# REHEARSAL: Step 2 (Mid Game) — small
 # ============================================================
 
 [questions.Q2]
@@ -137,17 +133,6 @@ Output constraint:
 Return exactly one integer.
 """
 
-[questions.Q302]
-num_samples = 25
-text = """
-Task:
-Determine the total number of empty intersections available right now.
-Treat any intersection with a stone as non-empty.
-
-Output constraint:
-Return exactly one integer.
-"""
-
 [questions.Q902]
 num_samples = 25
 text = """
@@ -161,7 +146,8 @@ Answer format:
 """
 
 # ============================================================
-# REHEARSAL: Step 3 variants (Q3*, Q103*, Q203*, Q303*, Q403*, Q503*, Q903*) — small
+# REHEARSAL: Step 3 (Mid/Late Game) — small
+# Note: We keep the inverse-focus anchor (Q304) already above; no extra Q303/Q302 here.
 # ============================================================
 
 [questions.Q3]
@@ -195,19 +181,6 @@ This is a direct count of placed stones in the current snapshot.
 
 Output constraint:
 Return one integer only (no explanation).
-"""
-
-[questions.Q303]
-num_samples = 25
-text = """
-Task:
-Count every empty intersection on the board in the current position.
-
-What to ignore:
-Do not count any intersection containing a black or white stone.
-
-Output constraint:
-Return a single integer and nothing else.
 """
 
 [questions.Q403]
@@ -246,7 +219,7 @@ Answer format: the matrix only, as 15 lines of 15 space-separated integers.
 """
 
 # ============================================================
-# NEW: Step 4 variants (late-game tactical + late matrix) — full
+# NEW: Step 4 (Late Game) — full sampling
 # ============================================================
 
 [questions.Q4]
@@ -282,15 +255,19 @@ Output constraint:
 Return a single integer and nothing else.
 """
 
-[questions.Q304]
+# Inverse focus: Step 4 trains the earliest / hardest variant as NEW (Q301).
+# (Progression over curriculum: Q304 → Q303 → Q302 → Q301)
+[questions.Q301]
 num_samples = 250
 text = """
 Task:
-Compute the number of remaining empty intersections in the shown snapshot.
-This is purely a count of empty cells (not a move recommendation).
+Count how many intersections are empty in the current board position.
+
+What to count:
+Count only intersections that contain no stone.
 
 Output constraint:
-Return exactly one integer (no explanation).
+Return a single integer (no extra text).
 """
 
 [questions.Q704]

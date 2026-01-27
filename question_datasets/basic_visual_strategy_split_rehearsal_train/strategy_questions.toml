@@ -1,4 +1,4 @@
-# 25 Samples of all Visual Questions are still generated, to have a reinforcement effect.
+# 25 Samples of all Visual Questions are still generated, we keep a small rehearsal set from prior tasks.
 [general]
 num_samples_per_question = 25
 
