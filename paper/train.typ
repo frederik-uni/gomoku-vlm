@@ -1,4 +1,6 @@
 = Training
+Die Datensätze, die für das Training verwendet wurden, sind das eganscha/gomoku_vlm_ds Dataset, die Repository für den Trainingscode und Dataset generation befindet sich unter github.com/frederik-uni/robo-muehle, und als Basis-Modell diente Qwen/Qwen3-VL-2B-Instruct.
+
 == Überarbeitung des Trainingsskripts
 Das ursprüngliche Trainingsskript wies mehrere Fehler und Inkonsistenzen auf, die zu instabilen Trainingsläufen und unzuverlässigen Evaluierungen führten. Insbesondere waren Teile des Datensatz preprocessing fehlerhaft implementiert. Aus diesem Grund wurde das Skript gänzlich überarbeitet.
 
