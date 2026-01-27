@@ -1,4 +1,7 @@
 = Training
+== Überarbeitung des Trainingsskripts
+Das ursprüngliche Trainingsskript wies mehrere Fehler und Inkonsistenzen auf, die zu instabilen Trainingsläufen und unzuverlässigen Evaluierungen führten. Insbesondere waren Teile des Datensatz preprocessing fehlerhaft implementiert. Aus diesem Grund wurde das Skript gänzlich überarbeitet.
+
 == Trainingskonfiguration und Hyperparameterwahl
 
 Das Fine-Tuning des Modells erfolgte mittels Supervised Fine-Tuning (SFT) unter Verwendung von Low-Rank Adaptation (LoRA), um eine parameter-effiziente Anpassung großer Sprach- und Multimodalmodelle zu ermöglichen. Ziel war es, sowohl visuelle als auch logische Fähigkeiten schrittweise zu verbessern, ohne das Basismodell vollständig neu zu trainieren.
