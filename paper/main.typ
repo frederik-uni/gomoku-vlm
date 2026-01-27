@@ -10,6 +10,11 @@
       department: [Informatik],
       organization: [Hof-University],
     ),
+    (
+      name: "Eugen",
+      department: [Informatik],
+      organization: [Hof-University],
+    ),
   ),
   bibliography: bibliography("refs.bib"),
 )
