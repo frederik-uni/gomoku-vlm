@@ -35,9 +35,9 @@ def init_train(
         weight_decay=0.01,
         num_train_epochs=epochs,
         save_strategy="steps",
-        save_steps=200, # 200 for vision due to dataset-size and iteration speed, 50 for strategy makes more sense
+        save_steps=100,
         eval_strategy="steps",
-        eval_steps=200, # 200 for vision due to dataset-size and iteration speed, 50 for strategy makes more sense
+        eval_steps=100,
         save_total_limit=4,
         logging_dir=os.path.join(out, "logs"),
         logging_steps=20,

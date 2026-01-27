@@ -1,10 +1,29 @@
 [general]
+# ============================================================
 # Visual Curriculum Step 1 (Early Game)
-# - Visual-only curriculum
-# - Early turns / low stone density: Q1-variants
-# - Include print_board_matrix from the start to stabilize full-board reconstruction
 #
-# Note: Total size is allowed to deviate slightly from the non-curriculum baseline.
+# Ziel:
+# - Visuelle Basisfoki werden schrittweise über Spielphasen curriculisiert.
+# - Für Stern-Fragetypen gilt die feste Turn-Intervall-Zuordnung:
+#   Q1*  -> t ∈ [0, 30]
+#   Q2*  -> t ∈ [31, 75]
+#   Q3*  -> t ∈ [76, 150]
+#   Q4*  -> t ∈ [151, 224]
+#
+# Wichtig:
+# - print_board_matrix wird bewusst NICHT in Stufe 1 trainiert,
+#   sondern erst ab Stufe 2 eingeführt (nach Vortraining von color_at_position).
+#
+# Ausnahme:
+# - count_empty_intersections wird invers curriculisiert (Q4* -> Q1*),
+#   da die Aufgabe mit zunehmender Rundenzahl typischerweise leichter wird.
+#
+# Enthaltene Foki in Stufe 1:
+# - color_at_position (Q1*)
+# - count_black_stones (Q101*)
+# - count_white_stones (Q201*)
+# - count_empty_intersections (INVERTIERT: Q304* statt Q301*)
+# ============================================================
 
 num_samples_per_question = 0
 
@@ -22,15 +41,9 @@ Important:
 """
 
 # ============================================================
-# STEP 1 (Early Game): Q1-variants of basic visual focuses
-# - color_at_position
-# - count_black_stones
-# - count_white_stones
-# - count_empty_intersections
-# PLUS: print_board_matrix from the beginning
-#
-# Sampling / difficulty:
-# Your generator should ensure Q1/Q101/Q201/Q301 and Q901 sample early turns.
+# STEP 1: Basisfoki
+# - Early Game Varianten (Q1*, Q101*, Q201*)
+# - Invertiert für empty-intersections: Late Game Variante (Q304*)
 # ============================================================
 
 [questions.Q1]
@@ -72,7 +85,9 @@ Output constraint:
 Return a single integer (no extra text).
 """
 
-[questions.Q301]
+# Invertiertes Curriculum: In Stufe 1 bewusst die "leichtere" Late-Game-Variante
+# (weniger freie Schnittpunkte zu zählen als im Early Game).
+[questions.Q304]
 num_samples = 250
 text = """
 Task:
@@ -83,22 +98,4 @@ Count only intersections that contain no stone.
 
 Output constraint:
 Return a single integer (no extra text).
-"""
-
-# ============================================================
-# Q901–Q904: print_board_matrix
-# Answer: exactly 15 lines, each 15 integers separated by single spaces.
-# ============================================================
-
-[questions.Q901]
-num_samples = 250
-text = """
-Task:
-Output the full board as a 15×15 matrix of integers using:
-0 = empty, 1 = black (Player 1), 2 = white (Player 2).
-
-Answer format:
-- Exactly 15 lines.
-- Each line must contain exactly 15 integers separated by single spaces.
-- Do not output any extra text, symbols, commas, or brackets.
 """

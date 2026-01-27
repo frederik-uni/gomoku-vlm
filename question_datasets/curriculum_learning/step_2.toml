@@ -1,9 +1,15 @@
 [general]
 # ============================================================
-# Visual Curriculum Step 2 (Mid Game) — self-contained with SMALL rehearsal
+# Visual Curriculum Step 2 (Mid Game) + Rehearsal
 #
-# New (Step 2) variants: 250 samples each
-# Rehearsal (Step 1) variants: 25 samples each (minimal to reduce forgetting)
+# Neue Varianten (Stufe 2): 250 Samples je Question-ID
+# Rehearsal (aus Stufe 1): 25 Samples je bereits behandelter Question-ID
+#
+# Logik:
+# - Q2* entspricht t ∈ [31, 75] (Mid Game)
+# - print_board_matrix wird ab Stufe 2 eingeführt (Q902*)
+# - count_empty_intersections wird invers curriculisiert:
+#   Stufe 1: Q304* (Late) -> Stufe 2: Q303* (Mid/Late)
 #
 # Any question NOT listed here is excluded and will not be generated.
 # ============================================================
@@ -24,7 +30,13 @@ Important:
 """
 
 # ============================================================
-# REHEARSAL: Step 1 (Early Game variants) — VERY SMALL sampling
+# REHEARSAL: Stufe 1 — sehr klein (25 Samples je Question-ID)
+# Enthält nur das, was in Stufe 1 tatsächlich trainiert wurde:
+# Q1, Q101, Q201 und (invertiert) Q304.
+#
+# Wichtig:
+# - KEIN Q301 (war nicht Teil von Stufe 1 im paper-konformen Setup)
+# - KEIN Q901 (print_board_matrix startet erst ab Stufe 2)
 # ============================================================
 
 [questions.Q1]
@@ -66,7 +78,8 @@ Output constraint:
 Return a single integer (no extra text).
 """
 
-[questions.Q301]
+# Rehearsal für invertiertes Curriculum (Stufe 1 war Q304*)
+[questions.Q304]
 num_samples = 25
 text = """
 Task:
@@ -79,21 +92,13 @@ Output constraint:
 Return a single integer (no extra text).
 """
 
-[questions.Q901]
-num_samples = 25
-text = """
-Task:
-Output the full board as a 15×15 matrix of integers using:
-0 = empty, 1 = black (Player 1), 2 = white (Player 2).
-
-Answer format:
-- Exactly 15 lines.
-- Each line must contain exactly 15 integers separated by single spaces.
-- Do not output any extra text, symbols, commas, or brackets.
-"""
-
 # ============================================================
-# NEW: Step 2 (Mid Game variants) — full sampling
+# NEW: Stufe 2 (Mid Game; Q2*) — 250 Samples je Question-ID
+# - color_at_position: Q2
+# - count_black_stones: Q102
+# - count_white_stones: Q202
+# - count_empty_intersections (invertiert): Q303
+# - print_board_matrix ab hier: Q902
 # ============================================================
 
 [questions.Q2]
@@ -133,7 +138,8 @@ Output constraint:
 Return exactly one integer.
 """
 
-[questions.Q302]
+# Invertiertes Curriculum: Stufe 2 verwendet Q303* (t ∈ [76,150])
+[questions.Q303]
 num_samples = 250
 text = """
 Task:
@@ -144,8 +150,25 @@ Output constraint:
 Return exactly one integer.
 """
 
+# print_board_matrix startet erst ab Stufe 2 (Mid Game): 50% Q901* / 50% Q902*
+# ============================================================
+# NEW: Step 2 (Mid Game) — print_board_matrix aufgeteilt
+# ============================================================
+[questions.Q901]
+num_samples = 125
+text = """
+Task:
+Output the full board as a 15×15 matrix of integers using:
+0 = empty, 1 = black (Player 1), 2 = white (Player 2).
+
+Answer format:
+- Exactly 15 lines.
+- Each line must contain exactly 15 integers separated by single spaces.
+- Do not output any extra text, symbols, commas, or brackets.
+"""
+
 [questions.Q902]
-num_samples = 250
+num_samples = 125
 text = """
 Convert the board into a 15×15 integer matrix using:
 0 for empty, 1 for black stones, 2 for white stones.
