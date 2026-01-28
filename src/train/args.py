@@ -19,7 +19,9 @@ def parse_args():
     parser.add_argument(
         "--eval_path",
         type=str,
-        required=True,
+        required=False,
+        default=None,
+        help="Path to evaluation dataset file",
     )
 
     parser.add_argument(

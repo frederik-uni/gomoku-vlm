@@ -4,14 +4,29 @@ from datasets import Dataset, load_dataset
 from PIL import Image
 
 
-def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
-    ds = load_dataset(
-        "eganscha/gomoku_vlm_ds",
-        data_files={
-            "train": file_path,
-            "eval": eval_path,
-        },
-    )
+def load_our_dataset(file_path: str, eval_path: str | None) -> tuple[Dataset, Dataset]:
+    if eval_path is not None:
+        ds = load_dataset(
+            "eganscha/gomoku_vlm_ds",
+            data_files={
+                "train": file_path,
+                "eval": eval_path,
+            },
+        )
+        train_ds = ds["train"]
+        eval_ds = ds["eval"]
+    else:
+        ds = load_dataset(
+            "eganscha/gomoku_vlm_ds",
+            data_files={"train": file_path},
+        )
+
+        split = ds["train"].train_test_split(
+            test_size=0.1,
+            seed=42,
+        )
+        train_ds = split["train"]
+        eval_ds = split["test"]
     ds = ds.select_columns(["question", "img_bytes", "answer"])
 
     def preprocess_batch(batch):
@@ -78,29 +93,21 @@ def load_our_dataset(file_path: str, eval_path: str) -> tuple[Dataset, Dataset]:
 
         return {"messages": formatted_messages, "images": imgs}
 
-    dst = (
-        ds["train"]
-        .shuffle(seed=42)
-        .map(
-            preprocess_batch,
-            batched=True,
-            batch_size=8,
-            num_proc=4,
-            remove_columns=["question", "img_bytes", "answer"],
-            desc="Formatting dataset with messages",
-        )
+    dst = train_ds.shuffle(seed=42).map(
+        preprocess_batch,
+        batched=True,
+        batch_size=8,
+        num_proc=4,
+        remove_columns=["question", "img_bytes", "answer"],
+        desc="Formatting dataset with messages",
     )
-    dse = (
-        ds["eval"]
-        .shuffle(seed=42)
-        .map(
-            preprocess_batch,
-            batched=True,
-            batch_size=8,
-            num_proc=4,
-            remove_columns=["question", "img_bytes", "answer"],
-            desc="Formatting dataset with messages",
-        )
+    dse = eval_ds.shuffle(seed=42).map(
+        preprocess_batch,
+        batched=True,
+        batch_size=8,
+        num_proc=4,
+        remove_columns=["question", "img_bytes", "answer"],
+        desc="Formatting dataset with messages",
     )
 
     return (dst, dse)
