@@ -20,6 +20,10 @@ jeweils 25 pro Fragevariation.
 ) <fig1>
 
 #figure(
+  image("plots/delta_by_focus_visual_ft.png", width: 100%),
+) <fig2>
+
+#figure(
   image("plots/pretrain_vs_post_visual_heatmap.png", width: 100%),
 ) <fig1b>
 
@@ -117,6 +121,9 @@ verworfen.
   image("plots/summary_post_visual_vs_post_strategy.png", width: 100%),
 ) <fig2>
 
+#figure(
+  image("plots/delta_by_focus_strategy_ft.png", width: 100%),
+) <fig2>
 
 == Evaluation des Strategy Fine-Tunings
 
@@ -272,6 +279,7 @@ schrittweisen Progression untersuchen wir, ob sich die Modellperformance
   image("plots/curriculum_focus_trends.png", width: 100%),
 ) <fig4>
 
+#pagebreak()
 === Gesamtbild über die vier Stufen
 
 Die Ergebnisse des Curriculum-Learnings zeigen keinen monotonen
